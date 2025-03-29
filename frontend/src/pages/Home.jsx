@@ -49,6 +49,22 @@ const HomePage = () => {
   const [dropoffLocation, setDropoffLocation] = useState('');
   const [pickupDate, setPickupDate] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
+  
+  // Date min pour empêcher la sélection de dates passées
+  const getTodayFormatted = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    let month = today.getMonth() + 1;
+    let day = today.getDate();
+    
+    // Ajouter un zéro devant les mois/jours si nécessaire
+    month = month < 10 ? `0${month}` : month;
+    day = day < 10 ? `0${day}` : day;
+    
+    return `${year}-${month}-${day}`;
+  };
+  
+  const today = getTodayFormatted();
 
   // Get Data From Assets.js
   const featuredCars = resolveImagePaths(assets.data.featuredCars, 'image');
@@ -138,7 +154,7 @@ const HomePage = () => {
 
   // Generate Minimum Dropoff Date
   const getMinDropoffDate = () => {
-    return pickupDate ? pickupDate : '';
+    return pickupDate ? pickupDate : today;
   };
 
   return (
@@ -221,6 +237,7 @@ const HomePage = () => {
                   type="date"
                   value={pickupDate}
                   onChange={handlePickupDateChange}
+                  min={today}
                   className="w-full bg-black/80 border border-gray-700 rounded-md px-4 h-11 text-white 
                     focus:outline-none focus:ring-2 focus:ring-blue-500 
                     font-['Orbitron'] 

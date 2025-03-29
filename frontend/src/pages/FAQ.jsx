@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import '../styles/animations.css';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
+import FloatingParticles from '../components/Ui/FloatingParticles';
+import GlowingGrid from '../components/Ui/GlowingGrid';
 
 const FAQPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
+  const faqSectionRef = useRef(null);
+  const guidesRef = useRef(null);
   
   // State to track which FAQ items are expanded
   const [expandedItems, setExpandedItems] = useState({});
@@ -182,50 +186,76 @@ const FAQPage = () => {
       {/* Hero Section */}
       <div className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90" />
           <img 
             src={assets.faq?.heroImage || "/api/placeholder/1920/600"} 
             alt="Luxury car interior" 
             className="w-full h-full object-cover"
           />
+          
+          {/* Animated particles */}
+          <div className="absolute inset-0 pointer-events-none">
+            <FloatingParticles />
+          </div>
         </div>
         
         {/* Hero Content */}
         <div className="relative z-10 container mx-auto px-4 py-16 text-center">
-          <h1 className="text-2xl md:text-6xl font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 leading-[1.2]">
+          <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
+            <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('premiumCarRental')}</span>
+          </div>
+          <h1 className="text-2xl md:text-6xl font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative">
             {t('frequentlyAskedQuestions')}
+            <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
           </h1>
-          <p className="text-xl max-w-3xl mx-auto text-gray-200 mb-10">
+          <p className="text-xl max-w-3xl mx-auto text-gray-200 mb-10 relative">
             {t('everythingYouNeed')}
+            <div className="absolute -z-10 inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent blur-xl"></div>
           </p>
         </div>
       </div>
 
       {/* Animated Divider */}
       <div className="relative h-px w-full overflow-hidden">
-        <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-white via-cyan-400 to-white animate-pulse"></div>
+        <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
       </div>
       
       {/* Search Section */}
-      <div className="bg-black/60 backdrop-blur-sm py-10">
-        <div className="container mx-auto max-w-4xl px-4">
-          <div className="relative">
+      <div className="bg-gradient-to-b from-black/80 via-black/70 to-black/80 backdrop-blur-sm py-10 relative overflow-hidden">
+        {/* Background patterns */}
+        <div className="absolute inset-0 opacity-5 bg-[url('/patterns/grid-pattern.svg')] bg-center"></div>
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0 pointer-events-none">
+          <FloatingParticles count={10} />
+          <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-cyan-500/5 blur-[80px]"></div>
+          <div className="absolute bottom-10 left-10 w-32 h-32 rounded-full bg-blue-500/5 blur-[80px]"></div>
+        </div>
+        
+        <div className="container mx-auto max-w-4xl px-4 relative z-10">
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-lg blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            
             <input
               type="text"
               placeholder={t('searchForAnswers')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-5 py-4 pl-12 bg-gray-900/70 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white"
+              className="w-full px-5 py-4 pl-12 bg-gray-900/70 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-white transition-all duration-300 focus:border-cyan-400"
             />
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-              🔍
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-cyan-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
             </div>
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white cursor-pointer"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-cyan-400 cursor-pointer transition-colors duration-300"
               >
-                ✕
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
               </button>
             )}
           </div>
@@ -233,15 +263,51 @@ const FAQPage = () => {
       </div>
       
       {/* FAQ Content */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-4xl">
+      <section ref={faqSectionRef} className="py-16 px-4 relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <GlowingGrid containerRef={faqSectionRef} />
+          <div className="absolute top-1/4 right-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-36 h-36 rounded-full bg-blue-500/5 blur-3xl"></div>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/90 pointer-events-none"></div>
+        
+        <div className="container mx-auto max-w-4xl relative z-10">
           {filteredFAQs.length > 0 ? (
             filteredFAQs.map((category) => (
               <div key={category.id} className="mb-16">
                 <div className="flex items-center mb-8">
-                  <span className="text-3xl mr-4">{category.icon}</span>
-                  <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+                  <span className="text-3xl mr-4 text-cyan-400">
+                    {category.id === "booking" ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+                        <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0117.25 2.25c.41 0 .75.334.75.75V4.5h.75A2.25 2.25 0 0121 6.75v2.25h-2.25V6.75a.75.75 0 00-.75-.75H5.25a.75.75 0 00-.75.75v2.25H2.25V6.75A2.25 2.25 0 014.5 4.5h.75V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5zm-15-3.75V6.75a.75.75 0 01.75-.75h.75v3h-.75a.75.75 0 01-.75-.75zm14.25 0a.75.75 0 01-.75.75h-.75v-3h.75a.75.75 0 01.75.75v2.25z" clipRule="evenodd" />
+                      </svg>
+                    ) : category.id === "requirements" ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+                        <path fillRule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0118 9.375v9.375a3 3 0 003-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 00-.673-.05A3 3 0 0015 1.5h-1.5a3 3 0 00-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6zM13.5 3A1.5 1.5 0 0012 4.5h4.5A1.5 1.5 0 0015 3h-1.5z" clipRule="evenodd" />
+                        <path fillRule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 013 20.625V9.375zm9.586 4.594a.75.75 0 00-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 00-1.06 1.06l1.5 1.5a.75.75 0 001.116-.062l3-3.75z" clipRule="evenodd" />
+                      </svg>
+                    ) : category.id === "policies" ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+                        <path fillRule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" clipRule="evenodd" />
+                        <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
+                      </svg>
+                    ) : category.id === "vehicles" ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+                        <path d="M3.375 4.5C2.339 4.5 1.5 5.34 1.5 6.375V13.5h12V6.375c0-1.036-.84-1.875-1.875-1.875h-8.25zM13.5 15h-12v2.625c0 1.035.84 1.875 1.875 1.875h8.25c1.035 0 1.875-.84 1.875-1.875V15z" />
+                        <path d="M8.25 19.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0zM15.75 6.75a.75.75 0 00-.75.75v11.25c0 .087.015.17.042.248a3 3 0 015.958.464c.853-.175 1.522-.935 1.464-1.883a18.659 18.659 0 00-3.732-10.104 1.837 1.837 0 00-1.47-.725H15.75z" />
+                        <path d="M19.5 19.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z" />
+                      </svg>
+                    ) : category.id === "payment" ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+                        <path d="M4.5 3.75a3 3 0 00-3 3v.75h21v-.75a3 3 0 00-3-3h-15z" />
+                        <path fillRule="evenodd" d="M22.5 9.75h-21v7.5a3 3 0 003 3h15a3 3 0 003-3v-7.5zm-18 3.75a.75.75 0 01.75-.75h6a.75.75 0 010 1.5h-6a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" clipRule="evenodd" />
+                      </svg>
+                    ) : category.icon}
+                  </span>
+                  <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-cyan-400 relative">
                     {category.title}
+                    <div className="absolute -bottom-2 left-0 w-20 h-1 bg-gradient-to-r from-cyan-500 to-transparent"></div>
                   </h2>
                 </div>
                 
@@ -249,27 +315,36 @@ const FAQPage = () => {
                   {category.questions.map((item) => (
                     <div 
                       key={item.id} 
-                      className="bg-black/80 backdrop-blur-md border border-cyan-400 rounded-xl overflow-hidden relative group"
+                      className="bg-gradient-to-b from-gray-900/80 to-black/80 backdrop-blur-md border border-cyan-900/50 rounded-xl overflow-hidden relative group transition-all duration-300 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)]"
                     >
                       <button
                         onClick={() => toggleItem(item.id)}
                         className="w-full text-left p-6 flex justify-between items-center"
                       >
-                        <h3 className="text-xl font-medium pr-8">{item.question}</h3>
-                        <span className="text-xl transition-transform duration-300" style={{ transform: expandedItems[item.id] ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                          ⌄
+                        <h3 className="text-xl font-medium pr-8 group-hover:text-cyan-300 transition-colors duration-300">{item.question}</h3>
+                        <span className="text-cyan-400 transition-transform duration-500" style={{ transform: expandedItems[item.id] ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
                         </span>
                       </button>
                       
-                      {expandedItems[item.id] && (
-                        <div className="px-6 pb-6 text-gray-300 text-justify">
-                          <div className="h-px w-full bg-cyan-800 mb-4"></div>
-                          {item.answer}
-                        </div>
-                      )}
+                      <div 
+                        className={`px-6 pb-6 text-gray-300 text-justify overflow-hidden transition-all duration-500 ${
+                          expandedItems[item.id] ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+                        }`}
+                      >
+                        {expandedItems[item.id] && (
+                          <>
+                            <div className="h-px w-full bg-gradient-to-r from-cyan-800/50 via-cyan-600/50 to-cyan-800/50 mb-4"></div>
+                            {item.answer}
+                          </>
+                        )}
+                      </div>
                       
-                      {/* Animated border effect */}
-                      <div className="absolute -inset-[1px] rounded-xl bg-gradient-to-r from-white to-cyan-400 opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+                      {/* Border accents */}
+                      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent group-hover:via-cyan-400/60 transition-colors duration-500"></div>
+                      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent group-hover:via-cyan-400/60 transition-colors duration-500"></div>
                     </div>
                   ))}
                 </div>
@@ -277,14 +352,18 @@ const FAQPage = () => {
             ))
           ) : (
             <div className="text-center py-10">
-              <div className="text-5xl mb-6">🔍</div>
-              <h3 className="text-2xl mb-4">No results found</h3>
-              <p className="text-gray-400">
+              <div className="text-5xl mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16 mx-auto text-cyan-500 opacity-80">
+                  <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h3 className="text-2xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white">No results found</h3>
+              <p className="text-gray-400 max-w-lg mx-auto">
                 We couldn't find any FAQs matching your search. Try different keywords or browse our categories.
               </p>
               <button
                 onClick={() => setSearchQuery('')}
-                className="mt-6 px-6 py-2 bg-gradient-to-r font-medium from-white to-cyan-400 text-black rounded-md hover:bg-cyan-700 transition-colors cursor-pointer"
+                className="mt-6 px-6 py-2 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-medium rounded-md transition-all duration-300 transform hover:scale-105"
               >
                 Clear Search
               </button>
@@ -299,122 +378,182 @@ const FAQPage = () => {
       </div>
       
       {/* Still Have Questions Section */}
-      <section className="py-16 px-4 bg-black/60 backdrop-blur-md">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-4xl font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
-            {t('stillHaveQuestions')}
-          </h2>
-          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-            {t('supportTeamHelp')}
-          </p>
+      <section className="py-16 px-4 bg-gradient-to-b from-black/80 via-black/60 to-black/80 backdrop-blur-md relative overflow-hidden">
+        {/* Background patterns */}
+        <div className="absolute inset-0 bg-[url('/patterns/grid-pattern.svg')] bg-center opacity-30"></div>
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0 pointer-events-none">
+          <FloatingParticles count={10} />
+          <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-cyan-500/5 blur-[100px]"></div>
+          <div className="absolute bottom-20 left-20 w-64 h-64 rounded-full bg-blue-500/5 blur-[100px]"></div>
+        </div>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
+        
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
+          <div className="relative">
+            <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl"></div>
+            <h2 className="text-4xl font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+              {t('stillHaveQuestions')}
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto mb-4"></div>
+            <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+              {t('supportTeamHelp')}
+            </p>
+          </div>
           <div className="flex flex-col md:flex-row justify-center gap-6">
             <Link
               to="/contact"
-              className="px-8 py-3 bg-gradient-to-r from-white to-cyan-400 text-black font-medium rounded-md hover:shadow-lg transform transition-all duration-300 hover:scale-105"
+              className="px-8 py-3 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-medium rounded-md shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group"
             >
-              {t('contactUs')}
+              <span className="relative z-10">{t('contactUs')}</span>
+              <div className="absolute inset-0 w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-300 -z-5"></div>
             </Link>
             <a
               href="tel:+212 57 77 777"
-              className="px-8 py-3 border border-blue-500/50 text-blue-400 font-medium rounded-md hover:bg-blue-500/10 transition-all duration-300"
+              className="px-8 py-3 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-400 font-medium rounded-md hover:bg-cyan-500/10 transition-all duration-300 group"
             >
-              {t('callUs')}
+              <span className="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                </svg>
+                {t('callUs')}
+              </span>
             </a>
           </div>
         </div>
       </section>
       
-      {/* Bottom Border Glow */}
-      <div className="relative h-px w-full overflow-hidden">
-        <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-white via-cyan-400 to-white opacity-70"></div>
-      </div>
-      
       {/* Popular Guides */}
-      <section className="py-16 px-4 bg-black/60 backdrop-blur-md">
-        <div className="container mx-auto max-w-6xl">
+      <section ref={guidesRef} className="py-16 px-4 relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <GlowingGrid containerRef={guidesRef} />
+          <div className="absolute top-1/4 right-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-36 h-36 rounded-full bg-blue-500/5 blur-3xl"></div>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/90 pointer-events-none"></div>
+        
+        <div className="container mx-auto max-w-6xl relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-4">
-              {t('popularGuides')}
-          </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-white to-cyan-400 mx-auto mb-4"></div>
-            <p className="text-gray-300 max-w-2xl mx-auto">
-              {language === 'fr' 
-                ? "Des ressources utiles pour tirer le meilleur parti de votre expérience de location de luxe au Maroc" 
-                : "Helpful resources to get the most out of your luxury rental experience in Morocco"}
-            </p>
+            <div className="relative">
+              <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl"></div>
+              <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-4">
+                {t('popularGuides')}
+              </h2>
+              <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto mb-4"></div>
+              <p className="text-gray-300 max-w-2xl mx-auto">
+                {language === 'fr' 
+                  ? "Des ressources utiles pour tirer le meilleur parti de votre expérience de location de luxe au Maroc" 
+                  : "Helpful resources to get the most out of your luxury rental experience in Morocco"}
+              </p>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Guide 1 */}
-            <div className="bg-black/80 backdrop-blur-md rounded-xl border border-gray-800 overflow-hidden group relative">
+            <div className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm rounded-xl border border-cyan-900/30 overflow-hidden group relative transform transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(6,182,212,0.15)]">
               <div className="h-48 overflow-hidden">
                 <img 
                   src={ assets.faq?.keys || "/api/placeholder/600/400"} 
                   alt="First-time renter's guide" 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-3">{t('howToChooseRightCar')}</h3>
+              
+              {/* Corner accents */}
+              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
+              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
+              
+              <div className="p-6 relative">
+                <h3 className="text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('howToChooseRightCar')}</h3>
                 <p className="text-gray-400 text-sm mb-4">
                   {language === 'fr'
                     ? "Tout ce que vous devez savoir pour une expérience de location fluide avec Rent My Ride."
                     : "Everything you need to know for a smooth rental experience with Rent My Ride."}
                 </p>
-                <Link to="/guides/first-time" className="text-cyan-400 hover:text-cyan-300 text-sm">
-                  {language === 'fr' ? "Lire Plus →" : "Read More →"}
+                <Link to="/guides/first-time" className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center">
+                  {language === 'fr' ? "Lire Plus " : "Read More "}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </Link>
               </div>
-              {/* Animated border effect */}
-              <div className="absolute -inset-[1px] rounded-xl bg-gradient-to-r from-white to-cyan-400 opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+              
+              {/* Glow effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             </div>
             
             {/* Guide 2 */}
-            <div className="bg-black/80 backdrop-blur-md rounded-xl border border-gray-800 overflow-hidden group relative">
+            <div className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm rounded-xl border border-cyan-900/30 overflow-hidden group relative transform transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(6,182,212,0.15)]">
               <div className="h-48 overflow-hidden">
                 <img 
                   src={ assets.faq?.morocco || "/api/placeholder/600/400"} 
                   alt="Morocco driving guide" 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-3">{t('drivingInMorocco')}</h3>
+              
+              {/* Corner accents */}
+              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
+              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
+              
+              <div className="p-6 relative">
+                <h3 className="text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('drivingInMorocco')}</h3>
                 <p className="text-gray-400 text-sm mb-4">
                   {language === 'fr'
                     ? "Informations essentielles sur les lois locales de conduite, les coutumes et les itinéraires recommandés."
                     : "Essential information about local driving laws, customs, and recommended routes."}
                 </p>
-                <Link to="/guides/morocco-driving" className="text-cyan-400 hover:text-cyan-300 text-sm">
-                  {language === 'fr' ? "Lire Plus →" : "Read More →"}
+                <Link to="/guides/morocco-driving" className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center">
+                  {language === 'fr' ? "Lire Plus " : "Read More "}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </Link>
               </div>
-              {/* Animated border effect */}
-              <div className="absolute -inset-[1px] rounded-xl bg-gradient-to-r from-white to-cyan-400 opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+              
+              {/* Glow effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             </div>
             
             {/* Guide 3 */}
-            <div className="bg-black/80 backdrop-blur-md rounded-xl border border-gray-800 overflow-hidden group relative">
+            <div className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm rounded-xl border border-cyan-900/30 overflow-hidden group relative transform transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(6,182,212,0.15)]">
               <div className="h-48 overflow-hidden">
                 <img 
                   src={ assets.faq?.luxury || "/api/placeholder/600/400"} 
                   alt="Car selection guide" 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-3">{t('ultimateRoadTrip')}</h3>
+              
+              {/* Corner accents */}
+              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
+              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
+              
+              <div className="p-6 relative">
+                <h3 className="text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('ultimateRoadTrip')}</h3>
                 <p className="text-gray-400 text-sm mb-4">
                   {language === 'fr'
                     ? "Comment sélectionner le véhicule de luxe ou sportif idéal pour votre aventure marocaine."
                     : "How to select the ideal luxury or sports car for your Moroccan adventure."}
                 </p>
-                <Link to="/guides/vehicle-selection" className="text-cyan-400 hover:text-cyan-300 text-sm">
-                  {language === 'fr' ? "Lire Plus →" : "Read More →"}
+                <Link to="/guides/vehicle-selection" className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center">
+                  {language === 'fr' ? "Lire Plus " : "Read More "}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </Link>
               </div>
-              {/* Animated border effect */}
-              <div className="absolute -inset-[1px] rounded-xl bg-gradient-to-r from-white to-cyan-400 opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+              
+              {/* Glow effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             </div>
           </div>
         </div>
@@ -424,17 +563,23 @@ const FAQPage = () => {
       <section className="py-16 px-4 relative overflow-hidden">
         {/* Background with overlay */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90" />
           <img 
             src={assets.faq?.ctaBackground || "/api/placeholder/1920/600"} 
             alt="Luxury driving experience" 
             className="w-full h-full object-cover"
           />
+          
+          {/* Animated particles */}
+          <div className="absolute inset-0 pointer-events-none">
+            <FloatingParticles count={15} />
+          </div>
         </div>
         
         <div className="container mx-auto max-w-4xl relative z-10 text-center">
-          <h2 className="text-3xl mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-gray-500">
+          <h2 className="text-3xl mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative inline-block">
             {t('readyToExperienceLuxury')}
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
           </h2>
           <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
             {language === 'fr' 
@@ -443,9 +588,10 @@ const FAQPage = () => {
           </p>
           <Link
             to="/cars"
-            className="inline-block px-10 py-3 text-base font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-md transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            className="inline-block px-10 py-3 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-medium rounded-md shadow-lg hover:shadow-cyan-500/20 transform transition-all duration-300 hover:scale-105 relative overflow-hidden group"
           >
-            {t('browseOurFleet')}
+            <span className="relative z-10">{t('browseOurFleet')}</span>
+            <div className="absolute inset-0 w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-300 -z-5"></div>
           </Link>
         </div>
       </section>

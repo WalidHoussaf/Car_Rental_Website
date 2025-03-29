@@ -19,10 +19,10 @@ const CarsPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // État pour la recherche
+  // State for Search
   const [searchQuery, setSearchQuery] = useState(searchParam || '');
   
-  // Défilement vers le haut au chargement de la page
+  // Scroll to the of the Page
   useEffect(() => {
     if (!location.search) {
       window.scrollTo(0, 0);
@@ -48,14 +48,14 @@ const CarsPage = () => {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('recommended');
   
-  // Mise à jour de la recherche lorsque l'URL change
+  // Update search when the URL changes
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const search = queryParams.get('search');
     setSearchQuery(search || '');
   }, [location.search]);
   
-  // Fonction pour mettre à jour l'URL avec la recherche
+  // Function to update the URL with the search
   const handleSearchUpdate = useCallback((query) => {
     setSearchQuery(query);
     
@@ -66,11 +66,11 @@ const CarsPage = () => {
       newParams.delete('search');
     }
     
-    // Mise à jour de l'URL
+    // URL Update
     navigate(`/cars?${newParams.toString()}`, { replace: true });
   }, [location.search, navigate]);
   
-  // Écouteur d'événement pour la mise à jour de la recherche depuis la navbar
+  // Event listener for updating the search from the navbar
   useEffect(() => {
     const handleSearchEvent = (event) => {
       handleSearchUpdate(event.detail.query);
@@ -82,7 +82,7 @@ const CarsPage = () => {
     };
   }, [handleSearchUpdate]);
   
-  // Initialiser la recherche depuis l'URL lors du chargement
+  // Initialize the search from the URL on page load
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const search = queryParams.get('search');
@@ -113,7 +113,7 @@ const CarsPage = () => {
     navigate('/about');
   };
   
-  // Fonction pour naviguer vers une page avec défilement vers le haut
+  // Function to navigate to a page with scrolling to the top
   const navigateWithScroll = (path) => {
     window.scrollTo(0, 0);
     navigate(path);
@@ -196,7 +196,7 @@ const CarsPage = () => {
     if (searchQuery && searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase().trim();
       
-      // Liste des marques de voiture, y compris complètes et partielles
+      // List of car brands, including full and partial matches
       const carBrands = {
         simple: ["audi", "bmw", "mercedes", "tesla", "porsche", "bentley", "ferrari", 
                  "lamborghini", "maserati", "lexus", "cadillac", "mclaren"],
@@ -204,27 +204,27 @@ const CarsPage = () => {
         parts: ["range", "rover", "rolls", "royce", "aston", "martin"]
       };
 
-      // Cas 1: Recherche exacte de marque composée (ex: "range rover")
+      // Case 1: Exact search for a composite brand (e.g., 'range rover')
       if (carBrands.composed.includes(query)) {
         return car.name.toLowerCase().includes(query);
       }
-      // Cas 2: Recherche d'une partie d'une marque composée (ex: "range" ou "rover")
+      // Case 2: Search for a part of a composite brand (e.g., 'range' or 'rover')
       else if (carBrands.parts.includes(query)) {
-        // Vérifier si c'est un mot qui fait partie d'une marque composée
+        // Check if it's a word that is part of a composite brand
         const relatedBrands = carBrands.composed.filter(brand => brand.includes(query));
         if (relatedBrands.length > 0) {
-          // Vérifier si une des marques composées associées est dans le nom
+          // Check if any of the associated composite brands are in the name
           return relatedBrands.some(brand => car.name.toLowerCase().includes(brand));
         }
       }
-      // Cas 3: Recherche d'une marque simple (ex: "audi")
+      // Case 3: Search for a simple brand (e.g., 'audi')
       else if (carBrands.simple.includes(query)) {
-        // Vérifier si la marque exacte est dans le nom de la voiture
+        // Check if the exact brand is in the car's name
         const carNameWords = car.name.toLowerCase().split(/\s+/);
         return carNameWords.some(word => word === query);
       }
       
-      // Cas 4: Recherche standard pour tout autre terme
+      // Case 4: Standard search for any other term
       const nameMatch = car.name.toLowerCase().includes(query);
       const descriptionMatch = car.description ? car.description.toLowerCase().includes(query) : false;
       const featuresMatch = car.features.some(feature => 
@@ -262,24 +262,14 @@ const CarsPage = () => {
       
       {/* Main Content */}
       <section ref={carsSectionRef} id="cars-section" className="relative py-16 px-4 bg-gradient-to-b from-black via-black/95 to-black/90 overflow-hidden">
-        {/* Particules flottantes cyan */}
+        {/* Cyan floating particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-1/4 w-32 h-32 rounded-full bg-cyan-500/5 blur-3xl animate-float"></div>
-          <div className="absolute top-60 right-1/4 w-40 h-40 rounded-full bg-blue-500/5 blur-3xl animate-float-slow"></div>
-          <div className="absolute bottom-40 left-1/3 w-36 h-36 rounded-full bg-cyan-400/5 blur-3xl animate-float-slower"></div>
-          
-          
-          
-          {/* Points lumineux */}
+          {/* Light points */}
           <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.svg')] bg-repeat opacity-10"></div>
         </div>
         
-        {/* Cercle décoratif avec animation subtile */}
-        <div className="absolute -top-10 -right-10 w-40 h-40 border border-cyan-700/30 rounded-full opacity-20 animate-spin-slow"></div>
-        <div className="absolute bottom-20 -left-20 w-60 h-60 border border-cyan-700/20 rounded-full opacity-10 animate-spin-slower"></div>
-        
         <div className="max-w-7xl mx-auto relative z-10">
-          {/* Section Title avec un effet de lueur */}
+          {/* Section Title */}
           <div className="text-center mb-12 relative">
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl -z-10"></div>
             <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
@@ -297,7 +287,7 @@ const CarsPage = () => {
           </div>
           
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Filters Sidebar avec effet de verre */}
+            {/* Filters Sidebar */}
             <FiltersSidebar 
               filters={filters}
               handleFilterChange={handleFilterChange}
@@ -307,15 +297,9 @@ const CarsPage = () => {
             
             {/* Cars Grid */}
             <div className="flex-grow relative">
-              {/* Effet de lumière au-dessus des voitures */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-40 bg-black blur-3xl rounded-full -z-10"></div>
-              
               {/* Sort Controls */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 pb-4 border-b border-gray-800/50 bg-gradient-to-r from-transparent via-gray-800/10 to-transparent backdrop-blur-sm relative">
-                {/* Petit élément décoratif */}
-                <div className="absolute top-0 right-0 w-20 h-px bg-gradient-to-r from-transparent to-cyan-500/50"></div>
                 <div className="absolute bottom-0 left-0 w-20 h-px bg-gradient-to-r from-cyan-500/50 to-transparent"></div>
-                
                 <div className="mb-4 sm:mb-0">
                   <h2 className="text-xl font-semibold text-white font-['Orbitron'] flex items-center">
                     {loading ? (
@@ -381,7 +365,7 @@ const CarsPage = () => {
                 </div>
               </div>
               
-              {/* Loading State with improved visuals */}
+              {/* Loading State */}
               {loading && (
                 <div className="flex flex-col items-center justify-center py-20 relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent"></div>
@@ -398,18 +382,12 @@ const CarsPage = () => {
                 </div>
               )}
               
-              {/* Empty State with improved visuals */}
+              {/* Empty State */}
               {!loading && sortedCars.length === 0 && (
-                <div className="bg-gradient-to-b from-gray-900/50 to-black/60 backdrop-blur-sm border border-gray-800 rounded-lg p-8 text-center relative overflow-hidden">
-                  {/* Éléments décoratifs */}
-                  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
-                  <div className="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-800/30 to-transparent"></div>
-                  <div className="absolute right-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-800/30 to-transparent"></div>
-                  
+                <div className="bg-gradient-to-b from-gray-900/50 to-black/60 backdrop-blur-sm border border-gray-800 rounded-lg p-8 text-center relative overflow-hidden">  
                   <div className="relative">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 mx-auto text-gray-600 mb-4 opacity-80" viewBox="0 0 24 24" fill="none">
-                      {/* Car outline avec glow */}
+                      {/* Car outline */}
                       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                         <feGaussianBlur stdDeviation="1" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
@@ -437,21 +415,14 @@ const CarsPage = () => {
                 </div>
               )}
               
-              {/* Cars Grid avec effets améliorés */}
+              {/* Cars Grid */}
               {!loading && sortedCars.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 relative">
-                  {/* Effet de particules lumineux derrière la grille */}
-                  <div className="absolute -bottom-10 left-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl"></div>
-                  <div className="absolute top-1/2 right-1/3 w-40 h-40 rounded-full bg-blue-500/5 blur-3xl"></div>
-                  
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 relative">                  
                   {sortedCars.map((car) => (
                     <div
                       key={car.id}
-                      className="bg-gradient-to-b from-gray-900/40 to-black/20 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-blue-900/20 transition-all duration-300 group hover:border-blue-500/30 flex flex-col h-full relative"
-                    >
-                      {/* Effet de bordure animée au survol */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm -z-10 group-hover:bg-gradient-to-r group-hover:from-cyan-500/10 group-hover:via-cyan-500/5 group-hover:to-cyan-500/10"></div>
-                      
+                      className="bg-gradient-to-b from-gray-900/40 to-black/20 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 group hover:border-cyan-500/30 flex flex-col h-full relative"
+                    >                      
                       {/* Card Header */}
                       <div className="relative h-48 overflow-hidden">
                         <img
@@ -461,16 +432,16 @@ const CarsPage = () => {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
                         
-                        {/* Badge for Category with improved design */}
+                        {/* Badge for Category */}
                         <div className="absolute top-3 left-3">
-                          <div className="px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/80 to-blue-500/80 backdrop-blur-sm text-xs font-bold text-white font-['Orbitron'] uppercase tracking-wider shadow-lg shadow-cyan-900/20">
+                          <div className="px-3 py-1 rounded-full bg-gradient-to-r from-white to-cyan-500/80 backdrop-blur-sm text-xs font-bold text-black font-['Orbitron'] uppercase tracking-wider shadow-lg shadow-cyan-900/20">
                             {categoryTranslations[car.category] 
                               ? categoryTranslations[car.category][language] 
                               : car.category}
                           </div>
                         </div>
                         
-                        {/* Price Badge with improved design */}
+                        {/* Price Badge */}
                         <div className="absolute bottom-3 right-3">
                           <div className="px-3 py-1 rounded-md bg-black/80 backdrop-blur-sm text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] border border-cyan-500/20">
                             ${car.price}{t('day')}
@@ -480,9 +451,6 @@ const CarsPage = () => {
                       
                       {/* Card Content */}
                       <div className="p-5 flex flex-col flex-grow relative">
-                        {/* Décoration subtile */}
-                        <div className="absolute top-0 right-0 w-20 h-px bg-gradient-to-l from-cyan-500/30 to-transparent"></div>
-                        
                         <div>
                           <div className="flex justify-between items-start mb-2">
                             <h3 className="text-xl font-bold text-white font-['Orbitron'] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-cyan-400 transition-all duration-300">
@@ -492,11 +460,11 @@ const CarsPage = () => {
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                               </svg>
-                              <span className="text-white text-xl font-['Rationale']">{car.rating.toFixed(1)}</span>
+                              <span className="text-white text-2xs font-['Orbitron']">{car.rating.toFixed(1)}</span>
                             </div>
                           </div>
                           
-                          {/* Location avec style amélioré */}
+                          {/* Location */}
                           <div className="flex items-center mb-4 text-xl text-gray-400 font-['Rationale']">
                             <div className="flex items-center bg-gray-900/30 px-2 py-0.5 rounded-full">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -511,7 +479,7 @@ const CarsPage = () => {
                             </div>
                           </div>
                           
-                          {/* Features avec style amélioré */}
+                          {/* Features */}
                           <div className="flex flex-wrap gap-2 mb-5">
                             {car.features.slice(0, 3).map((feature, index) => (
                               <span
@@ -529,13 +497,13 @@ const CarsPage = () => {
                           </div>
                         </div>
                         
-                        {/* Action Buttons avec style amélioré */}
+                        {/* Action Buttons */}
                         <div className="flex space-x-2 mt-auto">
                           <button
                             onClick={() => {
                               navigateWithScroll(`/booking/${car.id}`);
                             }}
-                            className="flex-1 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white font-['Orbitron'] text-sm transition-all duration-500 rounded-md cursor-pointer shadow-lg shadow-cyan-800/10 hover:shadow-cyan-800/30"
+                            className="flex-1 px-4 py-2 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] text-sm transition-all duration-500 rounded-md cursor-pointer shadow-lg shadow-cyan-800/10 hover:shadow-cyan-800/30"
                           >
                             {t('bookNow')}
                           </button>
@@ -554,7 +522,7 @@ const CarsPage = () => {
                 </div>
               )}
               
-              {/* Load More Button with improved design */}
+              {/* Load More Button */}
               {!loading && sortedCars.length > 0 && (
                 <div className="mt-12 text-center relative">
                   <div className="absolute -z-10 inset-0 bg-gradient-to-b from-transparent to-cyan-900/5 blur-lg"></div>
@@ -571,13 +539,11 @@ const CarsPage = () => {
 
       {/* Call To Action with improved visuals */}
       <section className="relative overflow-hidden">
-        {/* Background décoratif */}
         <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/80 to-black">
-          {/* Particules flottantes */}
+         
           <div className="absolute top-10 left-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl animate-float-slow"></div>
           <div className="absolute bottom-20 right-1/4 w-60 h-60 rounded-full bg-blue-500/5 blur-3xl animate-float-slower"></div>
           
-          {/* Lignes décoratives */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
           <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
         </div>

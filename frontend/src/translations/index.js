@@ -232,6 +232,7 @@ export const translations = {
     discoverMore: "Discover More",
     
     // Stats section
+    ourAccomplishments: "Our Accomplishments",
     premiumVehicles: "Premium Vehicles",
     happyCustomers: "Happy Customers",
     yearsExperience: "Years Experience",
@@ -447,6 +448,7 @@ export const translations = {
     bookingConfirmed: "Booking Confirmed",
     thankYouForBooking: "Thank you for your booking!",
     bookingSuccessDescription: "Your booking has been successfully confirmed. Here are all the details of your reservation.",
+    bookingDetails: "Booking Details",
     carInfoCard: "Car Information",
     rentalPeriodTitle: "Rental Period",
     locationsTitle: "Locations",
@@ -462,6 +464,7 @@ export const translations = {
     receiptPreparation: "Preparing receipt...",
     receiptDownloaded: "Receipt downloaded successfully!",
     receiptError: "Error generating receipt. Please try again.",
+    clickToLearnMore: "Click to learn more",
   },
   
   fr: {
@@ -696,9 +699,9 @@ export const translations = {
     fleetReady: "Qu'il s'agisse d'une escapade de week-end ou d'une aventure à travers le pays, notre flotte est prête à rendre votre voyage inoubliable.",
     locations: "Emplacements",
     discoverMore: "Découvrir Plus",
-    premiumCarRental: "Location de Voitures Premium",
     
     // Stats section
+    ourAccomplishments: "Nos Accomplissements",
     premiumVehicles: "Véhicules Premium",
     happyCustomers: "Clients Satisfaits",
     yearsExperience: "Années d'Expérience",
@@ -729,7 +732,7 @@ export const translations = {
     
     // FAQ Resources
     helpfulResources: "Ressources Utiles",
-    readyToExperienceLuxury: "Prêt à Vivre le Luxe sur la Route ?",
+    readyToExperienceLuxury: "Prêt à Vivre le Luxe sur la Route?",
     browseOurFleet: "Parcourir Notre Flotte",
     popularGuides: "Guides Populaires",
     howToChooseRightCar: "Comment Choisir la Bonne Voiture pour Votre Voyage",
@@ -902,7 +905,7 @@ export const translations = {
     continueBooking: "Continuer la Réservation",
     paymentMethod: "MÉTHODE DE PAIEMENT",
     creditCard: "Carte de Crédit",
-    agreeToTerms_booking_fr: "J'accepte les",
+    agreeToTerms_booking: "J'accepte les",
     termsConditions: "Conditions d'Utilisation",
     andPrivacy: "et la",
     privacyPolicy: "Politique de Confidentialité",
@@ -914,6 +917,7 @@ export const translations = {
     bookingConfirmed: "Réservation Confirmée",
     thankYouForBooking: "Merci pour votre réservation !",
     bookingSuccessDescription: "Votre réservation a été confirmée avec succès. Voici tous les détails de votre réservation.",
+    bookingDetails: "Détails de la Réservation",
     carInfoCard: "Informations sur la Voiture",
     rentalPeriodTitle: "Période de Location",
     locationsTitle: "Emplacements",
@@ -929,6 +933,8 @@ export const translations = {
     receiptPreparation: "Préparation du reçu...",
     receiptDownloaded: "Reçu téléchargé avec succès !",
     receiptError: "Erreur lors de la génération du reçu. Veuillez réessayer.",
+    clickToLearnMore: "Cliquez pour en savoir plus",
+    confirmAndBook_now: "Confirmer et Réserver",
   }
 };
 

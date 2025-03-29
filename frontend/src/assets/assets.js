@@ -106,6 +106,7 @@ import mia from './about/team/mia.png'
 import ctaBackground from './about/ctaBackground.png'
 import heroImage1 from './contact/heroImage.png'
 import ctaBackground1 from './contact/ctaBackground1.png'
+import stayconnected from './contact/stayconnected.png'
 import keys from './faq/keys.png'
 import morocco from './faq/morocco.png'
 import luxury from './faq/luxury.png'
@@ -171,7 +172,8 @@ export const assets = {
     },
     contact: {
       heroImage1,
-      ctaBackground1
+      ctaBackground1,
+      stayconnected
     },
     faq: {
       keys,

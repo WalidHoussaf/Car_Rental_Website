@@ -30,8 +30,9 @@ const HeroSection = ({ onExploreClick, onLearnMoreClick }) => {
             <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('experienceTheFuture')}</span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white font-['Orbitron'] mb-6 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white font-['Orbitron'] mb-6 tracking-tight relative">
             {t('ourFleet')}
+            <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
           </h1>
           
           <p className="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl font-['Orbitron'] leading-relaxed mb-8">
