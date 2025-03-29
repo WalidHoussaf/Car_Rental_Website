@@ -81,7 +81,7 @@ const HeroSection = ({ car }) => {
                     ? categoryTranslations[car.category][language] 
                     : car.category}
                 </div>
-                <h1 className="text-4xl md:text-6xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-3 tracking-tight">
+                <h1 className="text-4xl md:text-6xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-3 tracking-tight leading-[1.2]">
                   {car.name}
                 </h1>
                 <div className="flex items-center text-2xl text-gray-300 font-['Rationale'] space-x-4">

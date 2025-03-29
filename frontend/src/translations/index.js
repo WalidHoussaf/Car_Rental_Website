@@ -12,6 +12,11 @@ export const translations = {
     logout: "Logout",
     myBookings: "My Bookings",
     premiumCarRental: "Premium Car Rental",
+    dashboard: "Dashboard",
+    profileSettings: "Profile Settings",
+    searchForCars: "Search for cars...",
+    clearSearch: "Clear search",
+    closeSearch: "Close search",
     
     // Home page
     exploreOurFleet: "Explore Our Fleet",
@@ -471,13 +476,19 @@ export const translations = {
     // Navigation
     home: "Accueil",
     cars: "Voitures",
-    about: "À Propos",
+    about: "À propos",
     contact: "Contact",
     faq: "FAQ",
     login: "Connexion",
-    register: "S'inscrire",
+    register: "Inscription",
     logout: "Déconnexion",
     myBookings: "Mes Réservations",
+    premiumCarRental: "Location de Voitures Premium",
+    dashboard: "Tableau de bord",
+    profileSettings: "Paramètres du profil",
+    searchForCars: "Rechercher des voitures...",
+    clearSearch: "Effacer la recherche",
+    closeSearch: "Fermer la recherche",
     
     // Home page
     exploreOurFleet: "Explorer Notre Flotte",
@@ -488,9 +499,6 @@ export const translations = {
     findYourPerfectRide: "Trouvez Votre Véhicule Parfait",
     from: "À partir de",
     day: "/jour",
-    
-    // About page
-    premiumCarRental: "Location de Voitures Premium",
     
     // Popular Destinations section
     popularDestinations: "Destinations Populaires",

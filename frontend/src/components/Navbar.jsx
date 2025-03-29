@@ -26,23 +26,16 @@ const Navbar = () => {
       const searchParam = queryParams.get('search');
       if (searchParam) {
         setSearchValue(searchParam);
+      } else {
+        setSearchValue('');
       }
     }
   }, [isOnCarsPage, location.search]);
 
-  // Check if the current route matches the nav item
-  const isActive = (path) => {
-    return location.pathname === path;
-  };
-
   // Change navbar style on scroll
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 10);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -77,21 +70,6 @@ const Navbar = () => {
     }
   };
 
-  // Fonction pour effacer la recherche
-  const clearSearch = () => {
-    setSearchValue('');
-    if (isOnCarsPage) {
-      window.dispatchEvent(new CustomEvent('update-search', { 
-        detail: { query: '' }
-      }));
-    }
-  };
-
-  // Close menu when clicking a link
-  const closeMenu = () => {
-    setIsSearchOpen(false);
-  };
-
   return (
     <nav className={`fixed top-0 left-0 w-full z-9999 transition-all duration-500 ${
       isScrolled ? 'bg-black/90 shadow-lg backdrop-blur-sm' : 'bg-black'
@@ -117,11 +95,11 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="block">
             <div className="ml-10 flex font-['Orbitron'] items-center space-x-8">
-              <NavLink to="/" label={t('home')} isActive={isActive('/')} onClick={closeMenu} />
-              <NavLink to="/cars" label={t('cars')} isActive={isActive('/cars')} onClick={closeMenu} />
-              <NavLink to="/about" label={t('about')} isActive={isActive('/about')} onClick={closeMenu} />
-              <NavLink to="/contact" label={t('contact')} isActive={isActive('/contact')} onClick={closeMenu} />
-              <NavLink to="/faq" label={t('faq')} isActive={isActive('/faq')} onClick={closeMenu} />
+              <NavLink to="/" label={t('home')} isActive={location.pathname === '/'} onClick={() => setIsSearchOpen(false)} />
+              <NavLink to="/cars" label={t('cars')} isActive={location.pathname === '/cars'} onClick={() => setIsSearchOpen(false)} />
+              <NavLink to="/about" label={t('about')} isActive={location.pathname === '/about'} onClick={() => setIsSearchOpen(false)} />
+              <NavLink to="/contact" label={t('contact')} isActive={location.pathname === '/contact'} onClick={() => setIsSearchOpen(false)} />
+              <NavLink to="/faq" label={t('faq')} isActive={location.pathname === '/faq'} onClick={() => setIsSearchOpen(false)} />
             </div>
           </div>
 
@@ -152,28 +130,28 @@ const Navbar = () => {
                   <Link
                     to="/dashboard"
                     className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
-                    onClick={closeMenu}
+                    onClick={() => setIsSearchOpen(false)}
                   >
-                    {language === 'en' ? 'Dashboard' : 'Tableau de bord'}
+                    {t('dashboard')}
                   </Link>
                   <Link
                     to="/my-bookings"
                     className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
-                    onClick={closeMenu}
+                    onClick={() => setIsSearchOpen(false)}
                   >
                     {t('myBookings')}
                   </Link>
                   <Link
                     to="/profile"
                     className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
-                    onClick={closeMenu}
+                    onClick={() => setIsSearchOpen(false)}
                   >
-                    {language === 'en' ? 'Profile Settings' : 'Paramètres du profil'}
+                    {t('profileSettings')}
                   </Link>
                   <button
                     onClick={() => {
                       logout();
-                      closeMenu();
+                      setIsSearchOpen(false);
                     }}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
                   >
@@ -186,14 +164,14 @@ const Navbar = () => {
                 <Link
                   to="/login"
                   className="px-4 py-2 text-sm font-medium font-['Orbitron'] text-white bg-gradient-to-r hover:from-cyan-400 hover:to-white bg-clip-text transition-all duration-300 border border-transparent hover:border-cyan-500 hover:border-opacity-50 rounded-md"
-                  onClick={closeMenu}
+                  onClick={() => setIsSearchOpen(false)}
                 >
                   {t('login')}
                 </Link>
                 <Link
                   to="/register"
                   className="px-6 py-2 text-sm font-medium font-['Orbitron'] text-black bg-gradient-to-r from-cyan-400 to-white hover:from-white hover:to-cyan-400 rounded-md transition-all duration-300 transform hover:scale-105"
-                  onClick={closeMenu}
+                  onClick={() => setIsSearchOpen(false)}
                 >
                   {t('register')}
                 </Link>
@@ -207,10 +185,8 @@ const Navbar = () => {
       </div>
 
       {/* Search Bar Overlay */}
-      {isOnCarsPage && (
-        <div className={`w-full bg-black/95 overflow-hidden transition-all duration-300 ${
-          isSearchOpen ? 'max-h-24 py-4 opacity-100 border-t border-gray-800' : 'max-h-0 py-0 opacity-0'
-        }`}>
+      {isOnCarsPage && isSearchOpen && (
+        <div className="w-full bg-black/95 overflow-hidden transition-all duration-300 max-h-24 py-4 opacity-100 border-t border-gray-800">
           <div className="max-w-3xl mx-auto px-4">
             <form onSubmit={handleSearch} className="relative">
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
@@ -233,17 +209,25 @@ const Navbar = () => {
                 type="text"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                placeholder={language === 'en' ? "Search for cars..." : "Rechercher des voitures..."}
+                placeholder={t('searchForCars')}
                 className="w-full bg-white/10 text-white border-0 rounded-md py-3 px-4 pl-10 font-['Orbitron'] focus:ring-2 focus:ring-blue-400 focus:bg-white/20 focus:outline-none transition-all duration-300"
               />
               <button
                 type="button"
-                onClick={searchValue ? clearSearch : toggleSearch}
+                onClick={() => {
+                  if (searchValue) {
+                    setSearchValue('');
+                    if (isOnCarsPage) {
+                      window.dispatchEvent(new CustomEvent('update-search', { 
+                        detail: { query: '' }
+                      }));
+                    }
+                  } else {
+                    toggleSearch();
+                  }
+                }}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                aria-label={searchValue 
-                  ? (language === 'en' ? "Clear search" : "Effacer la recherche")
-                  : (language === 'en' ? "Close search" : "Fermer la recherche")
-                }
+                aria-label={searchValue ? t('clearSearch') : t('closeSearch')}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

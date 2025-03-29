@@ -315,7 +315,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
         <div className="mt-8 flex justify-between">
           <button
             onClick={onPreviousStep}
-            className="px-6 py-3 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] rounded-md transition-all duration-300 flex items-center group"
+            className="px-6 py-3 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] rounded-md transition-all duration-300 flex items-center group cursor-pointer"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -325,7 +325,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
           
           <button
             onClick={handleContinue}
-            className="px-6 py-3 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] rounded-md flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-blue-500/20"
+            className="px-6 py-3 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] rounded-md flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-blue-500/20 cursor-pointer"
           >
             {t('continueToSummary')}
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

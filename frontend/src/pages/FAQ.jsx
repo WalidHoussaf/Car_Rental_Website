@@ -4,7 +4,6 @@ import { assets } from '../assets/assets';
 import '../styles/animations.css';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
-import FloatingParticles from '../components/Ui/FloatingParticles';
 import GlowingGrid from '../components/Ui/GlowingGrid';
 
 const FAQPage = () => {
@@ -188,15 +187,10 @@ const FAQPage = () => {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90" />
           <img 
-            src={assets.faq?.heroImage || "/api/placeholder/1920/600"} 
+            src={assets.faq?.heroImage2 || "/api/placeholder/1920/600"} 
             alt="Luxury car interior" 
             className="w-full h-full object-cover"
           />
-          
-          {/* Animated particles */}
-          <div className="absolute inset-0 pointer-events-none">
-            <FloatingParticles />
-          </div>
         </div>
         
         {/* Hero Content */}
@@ -222,16 +216,6 @@ const FAQPage = () => {
       
       {/* Search Section */}
       <div className="bg-gradient-to-b from-black/80 via-black/70 to-black/80 backdrop-blur-sm py-10 relative overflow-hidden">
-        {/* Background patterns */}
-        <div className="absolute inset-0 opacity-5 bg-[url('/patterns/grid-pattern.svg')] bg-center"></div>
-        
-        {/* Floating particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          <FloatingParticles count={10} />
-          <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-cyan-500/5 blur-[80px]"></div>
-          <div className="absolute bottom-10 left-10 w-32 h-32 rounded-full bg-blue-500/5 blur-[80px]"></div>
-        </div>
-        
         <div className="container mx-auto max-w-4xl px-4 relative z-10">
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-lg blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
@@ -264,12 +248,6 @@ const FAQPage = () => {
       
       {/* FAQ Content */}
       <section ref={faqSectionRef} className="py-16 px-4 relative overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <GlowingGrid containerRef={faqSectionRef} />
-          <div className="absolute top-1/4 right-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl"></div>
-          <div className="absolute bottom-1/3 left-1/3 w-36 h-36 rounded-full bg-blue-500/5 blur-3xl"></div>
-        </div>
         <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/90 pointer-events-none"></div>
         
         <div className="container mx-auto max-w-4xl relative z-10">
@@ -384,7 +362,6 @@ const FAQPage = () => {
         
         {/* Floating particles */}
         <div className="absolute inset-0 pointer-events-none">
-          <FloatingParticles count={10} />
           <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-cyan-500/5 blur-[100px]"></div>
           <div className="absolute bottom-20 left-20 w-64 h-64 rounded-full bg-blue-500/5 blur-[100px]"></div>
         </div>
@@ -396,7 +373,7 @@ const FAQPage = () => {
         <div className="container mx-auto max-w-4xl text-center relative z-10">
           <div className="relative">
             <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl"></div>
-            <h2 className="text-4xl font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+            <h2 className="text-4xl font-semibold uppercase mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
               {t('stillHaveQuestions')}
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto mb-4"></div>
@@ -441,7 +418,7 @@ const FAQPage = () => {
           <div className="text-center mb-12">
             <div className="relative">
               <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl"></div>
-              <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-4">
+              <h2 className="text-4xl font-semibold uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-4">
                 {t('popularGuides')}
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto mb-4"></div>
@@ -464,10 +441,6 @@ const FAQPage = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
               </div>
-              
-              {/* Corner accents */}
-              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
-              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
               
               <div className="p-6 relative">
                 <h3 className="text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('howToChooseRightCar')}</h3>
@@ -499,10 +472,6 @@ const FAQPage = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
               </div>
               
-              {/* Corner accents */}
-              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
-              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
-              
               <div className="p-6 relative">
                 <h3 className="text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('drivingInMorocco')}</h3>
                 <p className="text-gray-400 text-sm mb-4">
@@ -533,10 +502,6 @@ const FAQPage = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
               </div>
               
-              {/* Corner accents */}
-              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
-              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
-              
               <div className="p-6 relative">
                 <h3 className="text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('ultimateRoadTrip')}</h3>
                 <p className="text-gray-400 text-sm mb-4">
@@ -565,15 +530,10 @@ const FAQPage = () => {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90" />
           <img 
-            src={assets.faq?.ctaBackground || "/api/placeholder/1920/600"} 
+            src={assets.faq?.ctaBackground2 || "/api/placeholder/1920/600"} 
             alt="Luxury driving experience" 
             className="w-full h-full object-cover"
           />
-          
-          {/* Animated particles */}
-          <div className="absolute inset-0 pointer-events-none">
-            <FloatingParticles count={15} />
-          </div>
         </div>
         
         <div className="container mx-auto max-w-4xl relative z-10 text-center">

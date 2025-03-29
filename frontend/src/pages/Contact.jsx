@@ -170,11 +170,6 @@ const ContactPage = () => {
             alt="Luxury cars" 
             className="w-full h-full object-cover"
           />
-          
-          {/* Animated particles */}
-          <div className="absolute inset-0 pointer-events-none">
-            <FloatingParticles />
-          </div>
         </div>
         
         {/* Hero Content */}
@@ -182,7 +177,7 @@ const ContactPage = () => {
           <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
             <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('premiumCarRental')}</span>
           </div>
-          <h1 className="text-3xl md:text-6xl font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative">
+          <h1 className="text-3xl md:text-6xl uppercase font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative">
             {t('contact')}
             <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
           </h1>
@@ -197,7 +192,7 @@ const ContactPage = () => {
       <div className="relative h-px w-full overflow-hidden">
         <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
       </div>
-      
+            
       {/* Contact Information */}
       <section ref={contactFormRef} className="py-16 px-4 relative overflow-hidden">
         {/* Background effects */}
@@ -313,9 +308,9 @@ const ContactPage = () => {
                     `}
                   disabled={submitStatus === 'loading'}
                 >
-                    <span className="relative z-10">
+                    <span className="relative z-10 cursor-pointer">
                       {submitStatus === 'loading' 
-                        ? <span className="flex items-center justify-center">
+                        ? <span className="flex items-center justify-center ">
                             <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -325,7 +320,7 @@ const ContactPage = () => {
                         : t('sendMessage')
                       }
                     </span>
-                    <div className="absolute inset-0 w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-300 -z-5"></div>
+                    <div className="absolute inset-0 w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-300 -z-5 cursor-pointer"></div>
                 </button>
                 </div>
                 
@@ -440,13 +435,6 @@ const ContactPage = () => {
         {/* Background patterns */}
         <div className="absolute inset-0 bg-[url('/patterns/grid-pattern.svg')] bg-center opacity-30"></div>
         
-        {/* Floating particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          <FloatingParticles containerRef={mapSectionRef} />
-          <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-cyan-500/5 blur-[100px]"></div>
-          <div className="absolute bottom-20 left-20 w-64 h-64 rounded-full bg-blue-500/5 blur-[100px]"></div>
-        </div>
-        
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
@@ -454,7 +442,7 @@ const ContactPage = () => {
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="text-center mb-12 relative">
             <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl"></div>
-            <h2 className="text-3xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+            <h2 className="text-4xl font-semibold uppercase mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
               {language === 'fr' ? 'Trouvez-Nous' : 'Find Us'}
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto"></div>
@@ -489,7 +477,7 @@ const ContactPage = () => {
       </div>
       
       {/* Newsletter Signup Section */}
-      <section className="py-16 px-4 bg-gradient-to-b from-black/80 via-black/70 to-black/80 backdrop-blur-lg relative overflow-hidden">
+      <section className="mt-24 py-16 px-4 bg-gradient-to-b from-black/80 via-black/70 to-black/80 backdrop-blur-lg relative overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0 opacity-20 z-0">
           <img 
@@ -536,7 +524,7 @@ const ContactPage = () => {
               type="submit"
               className="px-6 py-3 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] rounded-r-md shadow-lg hover:shadow-blue-500/20 transition-all duration-300 relative overflow-hidden group flex items-center justify-center"
             >
-              <span className="relative z-10">{t('subscribe')}</span>
+              <span className="relative z-10 cursor-pointer">{t('subscribe')}</span>
               <div className="absolute inset-0 w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-300 -z-5"></div>
             </button>
           </form>

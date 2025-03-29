@@ -55,7 +55,7 @@ const FeaturesFilter = ({ filters, toggleFeature }) => {
         {featureOptions.length > defaultVisibleCount && (
           <button
             onClick={() => setShowAllFeatures(!showAllFeatures)}
-            className="mt-2 w-full text-center text-xs text-cyan-400 hover:text-cyan-300 font-['Orbitron'] transition-colors duration-300"
+            className="mt-2 w-full text-center text-xs text-cyan-400 hover:text-cyan-300 font-['Orbitron'] transition-colors duration-300 cursor-pointer"
           >
             {showAllFeatures ? 'Show Less' : `Show ${featureOptions.length - defaultVisibleCount} More`}
           </button>

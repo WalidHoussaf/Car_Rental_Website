@@ -110,6 +110,8 @@ import stayconnected from './contact/stayconnected.png'
 import keys from './faq/keys.png'
 import morocco from './faq/morocco.png'
 import luxury from './faq/luxury.png'
+import heroImage2 from './faq/ctaBackground.png'
+import ctaBackground2 from './faq/ctaBackground2.png'
 
 export const assets = {
     logo,
@@ -178,7 +180,9 @@ export const assets = {
     faq: {
       keys,
       morocco,
-      luxury
+      luxury,
+      heroImage2,
+      ctaBackground2
     },
     about: {
         heroImage,

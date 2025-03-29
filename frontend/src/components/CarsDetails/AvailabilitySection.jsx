@@ -129,7 +129,7 @@ const AvailabilitySection = ({ carId }) => {
         <button
           key={i}
           onClick={() => handleDateChange(dateString)}
-          className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500/50 rounded-md p-2 text-center transition-colors duration-300"
+          className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500/50 rounded-md p-2 text-center transition-colors duration-300 cursor-pointer"
         >
           <div className="text-xs text-gray-400 font-['Orbitron']">
             {date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'short' })}
@@ -161,7 +161,7 @@ const AvailabilitySection = ({ carId }) => {
             className="w-full bg-gray-900 border border-cyan-500/30 rounded-md px-4 py-3 text-white cursor-pointer flex items-center justify-between hover:border-cyan-400/50 hover:bg-gray-800 transition-all duration-300"
           >
             <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center mr-3">
+              <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center mr-3 ">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -184,7 +184,7 @@ const AvailabilitySection = ({ carId }) => {
                 <span className="font-['Orbitron'] text-cyan-400 text-sm">{t('selectDate')}</span>
                 <button 
                   onClick={() => setIsCalendarOpen(false)}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

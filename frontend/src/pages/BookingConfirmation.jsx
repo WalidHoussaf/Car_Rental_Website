@@ -4,7 +4,6 @@ import { useBooking } from '../context/BookingContext';
 import { assets } from '../assets/assets';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
-import FloatingParticles from '../components/Ui/FloatingParticles';
 import GlowingGrid from '../components/Ui/GlowingGrid';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -581,8 +580,8 @@ const BookingConfirmation = () => {
         <div className="absolute inset-0 opacity-10 z-0 bg-[url('/patterns/grid-pattern.svg')] bg-center"></div>
         
         {/* Particules flottantes et effets lumineux */}
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <FloatingParticles count={15} />
+        <div className="absolute inset-0 pointer-events-none z-100">
+          <FloatingParticles />
           <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-[100px]"></div>
           <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px]"></div>
         </div>
@@ -593,13 +592,12 @@ const BookingConfirmation = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <SuccessIcon />
             </div>
-            <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
-              <span className="text-sm text-cyan-400 tracking-widest">Confirmation #{bookingId || 'en cours...'}</span>
-            </div>
-            <h1 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white mb-4 relative">
+
+            <h1 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white mb-4 relative leading-[1.2]">
               {t('bookingConfirmed')}
               <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
             </h1>
+            <br></br>
             <p className="text-cyan-300 text-lg mb-2 relative">
               {t('thankYouForBooking')}
               <div className="absolute -z-10 inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent blur-xl"></div>
@@ -612,7 +610,7 @@ const BookingConfirmation = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
                 onClick={handleDownloadReceipt}
-                className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-cyan-500/20 transform hover:scale-105 relative overflow-hidden group"
+                className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-cyan-500/20 transform hover:scale-105 relative overflow-hidden group cursor-pointer"
               >
                 <span className="relative z-10 flex items-center">
                   <DownloadIcon />
@@ -623,7 +621,7 @@ const BookingConfirmation = () => {
               
               <button 
                 onClick={handleExploreMore}
-                className="px-6 py-3 bg-transparent border border-cyan-500/30 text-cyan-400 rounded-lg flex items-center justify-center hover:bg-cyan-900/10 hover:border-cyan-400 transition-all duration-300 transform hover:scale-105"
+                className="px-6 py-3 bg-transparent border border-cyan-500/30 text-cyan-400 rounded-lg flex items-center justify-center hover:bg-cyan-900/10 hover:border-cyan-400 transition-all duration-300 transform hover:scale-105 cursor-pointer"
               >
                 {t('exploreMoreVehicles')}
               </button>
@@ -652,7 +650,7 @@ const BookingConfirmation = () => {
           <div className="text-center mb-12">
             <div className="relative">
               <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl"></div>
-              <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-4">
+              <h2 className="text-4xl font-semibold text-transparent uppercase bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-4">
                 {t('bookingDetails')}
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto mb-4"></div>
@@ -837,7 +835,7 @@ const BookingConfirmation = () => {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90" />
           <img 
-            src={assets.faq?.ctaBackground || "/api/placeholder/1920/600"} 
+            src={assets.faq?.ctaBackground2 || "/api/placeholder/1920/600"} 
             alt="Luxury driving experience" 
             className="w-full h-full object-cover"
           />

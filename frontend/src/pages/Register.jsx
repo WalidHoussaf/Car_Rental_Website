@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import '../styles/animations.css';
@@ -8,21 +8,6 @@ import { useTranslations } from '../translations';
 const RegisterPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
-  
-  // État pour les éléments visuels interactifs
-  const [circlePositions, setCirclePositions] = useState([]);
-  
-  // Générer les positions des cercles
-  useEffect(() => {
-    const positions = Array.from({ length: 10 }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 60 + 40,
-      opacity: Math.random() * 0.08 + 0.02,
-      animationDuration: Math.random() * 40 + 30,
-    }));
-    setCirclePositions(positions);
-  }, []);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -161,54 +146,14 @@ const RegisterPage = () => {
           <source src={assets.hero.loginbg} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        
-        {/* Éléments décoratifs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Cercles flottants */}
-          {circlePositions.map((circle, index) => (
-            <div 
-              key={index}
-              className="absolute rounded-full bg-cyan-500"
-              style={{
-                left: `${circle.x}%`,
-                top: `${circle.y}%`,
-                width: `${circle.size}px`,
-                height: `${circle.size}px`,
-                opacity: circle.opacity,
-                animation: `float ${circle.animationDuration}s infinite ease-in-out alternate`
-              }}
-            />
-          ))}
-          
-          {/* Lignes de grille */}
-          <div className="absolute inset-0 bg-[url('/patterns/grid.svg')] bg-repeat opacity-5"></div>
-        </div>
-        
-        {/* Rayons lumineux */}
-        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent"></div>
-        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent"></div>
-        
-        {/* Lignes horizontales */}
-        <div className="absolute top-1/4 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent"></div>
-        <div className="absolute bottom-1/4 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent"></div>
       </div>
 
       {/* Contenu principal */}
       <div className="relative z-20 min-h-screen flex flex-col items-center justify-center px-4 py-10">
-        {/* Logo ou symbole décoratif */}
-        <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-20 h-20">
-          <div className="relative w-full h-full">
-            <div className="absolute inset-6 rounded-full bg-cyan-500/10 animate-pulse"></div>
-            <div className="absolute inset-0 border-2 border-cyan-500/30 rounded-full animate-spin-slow"></div>
-            <div className="absolute inset-3 border border-cyan-400/20 rounded-full animate-spin-slower"></div>
-          </div>
-        </div>
+
         
         {/* Formulaire d'inscription */}
         <div className="w-full max-w-xl bg-gradient-to-b from-black/90 via-black/80 to-black/90 backdrop-blur-xl rounded-xl p-8 shadow-2xl border border-cyan-900/20 relative z-10 animate-fade-in-up overflow-hidden">
-          {/* Effet de halo dans le coin */}
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-32 -left-20 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
           
           {/* Bordures lumineuses */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
@@ -249,7 +194,6 @@ const RegisterPage = () => {
                     className={inputClassName('firstName')}
                     autoComplete="off"
                   />
-                  <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
                 </div>
                 {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
               </div>
@@ -266,7 +210,6 @@ const RegisterPage = () => {
                     className={inputClassName('lastName')}
                     autoComplete="off"
                   />
-                  <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
                 </div>
                 {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
               </div>
@@ -284,7 +227,6 @@ const RegisterPage = () => {
                   className={inputClassName('email')}
                   autoComplete="off"
                 />
-                <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
               </div>
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
@@ -302,7 +244,6 @@ const RegisterPage = () => {
                     className={inputClassName('password')}
                     autoComplete="off"
                   />
-                  <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
                 </div>
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
@@ -319,7 +260,6 @@ const RegisterPage = () => {
                     className={inputClassName('confirmPassword')}
                     autoComplete="off"
                   />
-                  <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
                 </div>
                 {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
               </div>
@@ -337,7 +277,6 @@ const RegisterPage = () => {
                   className={inputClassName('phoneNumber')}
                   autoComplete="off"
                 />
-                <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
               </div>
               {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>}
             </div>
@@ -351,7 +290,7 @@ const RegisterPage = () => {
                     type="checkbox"
                     checked={formData.agreeTerms}
                     onChange={handleChange}
-                    className="w-4 h-4 bg-transparent border-cyan-800 rounded focus:ring-cyan-500 text-cyan-500"
+                    className="w-4 h-4 bg-transparent border-cyan-800 rounded focus:ring-cyan-500 text-cyan-500 cursor-pointer"
                   />
                 </div>
                 <div className="ml-3 text-sm">

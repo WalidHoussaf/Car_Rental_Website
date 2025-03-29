@@ -210,13 +210,13 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
           <div>
             <h3 className="text-white font-['Orbitron'] font-medium">{car.name}</h3>
             <div className="flex items-center text-sm">
-              <span className="text-gray-400 font-['Orbitron']">{car.category}</span>
+              <span className="text-gray-400 uppercase font-['Orbitron']">{car.category}</span>
               <span className="mx-2 text-gray-600">•</span>
               <div className="flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                <span className="text-white">{car.rating}</span>
+                <span className="text-white font-['Orbitron']">{car.rating}</span>
               </div>
             </div>
           </div>
@@ -322,22 +322,6 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
               <div className="px-6 py-3 bg-gradient-to-r from-black/60 to-blue-900/30 backdrop-blur-sm rounded-lg border border-cyan-400/30 text-cyan-400 text-sm font-['Orbitron'] shadow-lg shadow-cyan-500/10">
                 {t('completeStepsToBook')}
               </div>
-              
-              {/* Ajout des boutons d'action */}
-              <div className="mt-4 flex flex-col space-y-3 mb-8">
-                <button
-                  type="button"
-                  onClick={() => window.scrollTo(0, 0)}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500/80 to-blue-500/80 text-white font-semibold font-['Orbitron'] 
-                    rounded-md transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-blue-500/20
-                    flex items-center justify-center hover:from-cyan-400 hover:to-blue-400"
-                >
-                  {t('continueBooking')}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -410,7 +394,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
                     id="terms"
                     checked={termsAccepted}
                     onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="w-4 h-4 appearance-none bg-black border border-gray-700 rounded checked:bg-cyan-400 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300"
+                    className="w-4 h-4 appearance-none bg-black border border-gray-700 rounded checked:bg-cyan-400 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 cursor-pointer"
                   />
                   <div className={`absolute inset-0 pointer-events-none flex items-center justify-center transition-opacity duration-300 ${termsAccepted ? 'opacity-100' : 'opacity-0'}`}>
                     <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -432,7 +416,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
                     w-full px-6 py-3 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] 
                     rounded-md transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-blue-500/20
                     flex items-center justify-center
-                    ${!termsAccepted ? 'opacity-50 cursor-not-allowed' : 'hover:from-cyan-400 hover:to-white'}
+                    ${!termsAccepted ? 'opacity-50 cursor-not-allowed' : 'hover:from-cyan-400 hover:to-white cursor-pointer'}
                     ${isSubmitting ? 'animate-pulse' : ''}
                   `}
                 >
@@ -458,7 +442,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
                   type="button"
                   onClick={onPreviousStep}
                   disabled={isSubmitting}
-                  className="w-full px-6 py-3 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] rounded-md transition-all duration-300 flex items-center justify-center group"
+                  className="w-full px-6 py-3 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] rounded-md transition-all duration-300 flex items-center justify-center group cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />

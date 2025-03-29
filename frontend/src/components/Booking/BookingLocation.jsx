@@ -24,7 +24,7 @@ const DestinationPin = () => (
 const LOCATIONS_COORDINATES = {
   'casablanca': { lat: 33.5731, lng: -7.5898 },
   'marrakech': { lat: 31.6295, lng: -7.9811 },
-  'marrakesh': { lat: 31.6295, lng: -7.9811 }, // Alias pour marrakech
+  'marrakesh': { lat: 31.6295, lng: -7.9811 }, 
   'rabat': { lat: 34.0209, lng: -6.8416 },
   'fes': { lat: 34.0181, lng: -5.0078 },
   'tangier': { lat: 35.7595, lng: -5.8340 },
@@ -347,7 +347,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                     id="same-location"
                     checked={sameLocation}
                     onChange={(e) => setSameLocation(e.target.checked)}
-                    className="w-4 h-4 appearance-none bg-black border border-gray-700 rounded checked:bg-cyan-400 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300"
+                    className="w-4 h-4 appearance-none bg-black border border-gray-700 rounded checked:bg-cyan-400 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 cursor-pointer"
                   />
                   <div className={`absolute inset-0 pointer-events-none flex items-center justify-center transition-opacity duration-300 ${sameLocation ? 'opacity-100' : 'opacity-0'}`}>
                     <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -441,7 +441,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
         <div className="mt-8 flex justify-between">
           <button
             onClick={onPreviousStep}
-            className="px-6 py-3 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] rounded-md transition-all duration-300 flex items-center group"
+            className="px-6 py-3 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] rounded-md transition-all duration-300 flex items-center group cursor-pointer"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -451,7 +451,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
           
           <button
             onClick={handleContinue}
-            className="px-6 py-3 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] rounded-md flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-blue-500/20"
+            className="px-6 py-3 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] rounded-md flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-blue-500/20 cursor-pointer"
           >
             {t('continueToOptions')}
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
