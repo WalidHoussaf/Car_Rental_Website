@@ -1,21 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
+import { useTranslations } from '../translations';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { language } = useLanguage();
+  const t = useTranslations(language);
   
   const footerLinks = [
     {
-      title: 'Company',
+      title: t('companySection'),
       links: [
-        { name: 'Our Fleet', url: '/cars' },
-        { name: 'About Us', url: '/about' },
+        { name: t('cars'), url: '/cars' },
+        { name: t('about'), url: '/about' },
         { name: 'Careers', url: '/careers' },
-        { name: 'Contact', url: '/contact' }
+        { name: t('contact'), url: '/contact' }
       ]
     },
     {
-      title: 'Services',
+      title: t('servicesSection'),
       links: [
         { name: 'Vehicle Rental', url: '/rentals' },
         { name: 'Luxury Experience', url: '/luxury' },
@@ -24,12 +28,12 @@ const Footer = () => {
       ]
     },
     {
-      title: 'Support',
+      title: t('supportSection'),
       links: [
-        { name: 'FAQs', url: '/faq' },
+        { name: t('faq'), url: '/faq' },
         { name: 'Help Center', url: '/help' },
-        { name: 'Terms of Service', url: '/terms' },
-        { name: 'Privacy Policy', url: '/privacy' }
+        { name: t('terms'), url: '/terms' },
+        { name: t('privacy'), url: '/privacy' }
       ]
     }
   ];
@@ -91,7 +95,7 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-gray-400 mb-6 font-['Orbitron'] text-sm">
-              Experience the future of transportation today. Our cutting-edge fleet offers unparalleled comfort and style for your journey through the cityscape.
+              {t('experienceFuture')}
             </p>
             
             {/* Social Links */}
@@ -140,12 +144,12 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row justify-between items-center text-gray-400 text-xs font-['Orbitron']">
           <div className="mb-4 md:mb-0">
-            &copy; {currentYear} RENT MY RIDE. All rights reserved. WH.
+            &copy; {currentYear} RENT MY RIDE. {t('allRightsReserved')}
           </div>
           <div className="flex space-x-6">
-            <Link to="/terms" className="hover:text-cyan-400 transition-colors duration-300">Terms</Link>
-            <Link to="/privacy" className="hover:text-cyan-400 transition-colors duration-300">Privacy</Link>
-            <Link to="/cookies" className="hover:text-cyan-400 transition-colors duration-300">Cookies</Link>
+            <Link to="/terms" className="hover:text-cyan-400 transition-colors duration-300">{t('terms')}</Link>
+            <Link to="/privacy" className="hover:text-cyan-400 transition-colors duration-300">{t('privacy')}</Link>
+            <Link to="/cookies" className="hover:text-cyan-400 transition-colors duration-300">{t('cookies')}</Link>
           </div>
         </div>
       </div>

@@ -8,13 +8,17 @@ import PopularDestinations from '../components/Home/PopularDestinations';
 import Testimonials from '../components/Home/Testimonials';
 import NewsletterSection from '../components/Home/NewsletterSection';
 import '../styles/animations.css'; 
+import { useLanguage } from '../context/LanguageContext';
+import { useTranslations } from '../translations';
 
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { language } = useLanguage();
+  const t = useTranslations(language);
   
   // Location Options 
   const locationOptions = [
-    { value: "", label: "Select location", disabled: true },
+    { value: "", label: t('selectLocation'), disabled: true },
     { value: "mohammedia", label: "Mohammedia" },
     { value: "casablanca", label: "Casablanca" },
     { value: "marrakesh", label: "Marrakesh" },
@@ -27,16 +31,16 @@ const HomePage = () => {
   // Hero Slides Captions 
   const heroMessages = [
     {
-      title: "Luxury Cars, Affordable Prices",
-      subtitle: "Enjoy Luxury Rides at an Unbeatable Price"
+      title: language === 'en' ? "Luxury Cars, Affordable Prices" : "Voitures de Luxe, Prix Abordables",
+      subtitle: language === 'en' ? "Enjoy Luxury Rides at an Unbeatable Price" : "Profitez de Voyages de Luxe à un Prix Imbattable"
     },
     {
-      title: "Discover New Horizons",
-      subtitle: "The perfect vehicle for every adventure"
+      title: language === 'en' ? "Discover New Horizons" : "Découvrez de Nouveaux Horizons",
+      subtitle: language === 'en' ? "The perfect vehicle for every adventure" : "Le véhicule parfait pour chaque aventure"
     },
     {
-      title: "Quick & Easy Booking",
-      subtitle: "Your journey begins with just a few clicks"
+      title: language === 'en' ? "Quick & Easy Booking" : "Réservation Rapide & Facile",
+      subtitle: language === 'en' ? "Your journey begins with just a few clicks" : "Votre voyage commence en quelques clics"
     }
   ];
   
@@ -172,11 +176,11 @@ const HomePage = () => {
 
           {/* Booking Form Card */}
           <div className="w-full max-w-5xl bg-black/80 backdrop-blur-md rounded-xl p-6 shadow-2xl border border-gray-800 relative">
-            <h2 className="text-2xl font-semibold mb-6 text-center font-['Orbitron']">Find Your Perfect Car</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-center font-['Orbitron']">{t('findYourPerfectRide')}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Pickup Location</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">{t('pickupLocation')}</label>
                 <Select
                   options={selectLocationOptions}
                   value={selectLocationOptions.find(option => option.value === pickupLocation)}
@@ -194,7 +198,7 @@ const HomePage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Dropoff Location</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">{t('returnLocation')}</label>
                 <Select
                   options={selectLocationOptions}
                   value={selectLocationOptions.find(option => option.value === dropoffLocation)}
@@ -212,7 +216,7 @@ const HomePage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Pickup Date</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">{t('selectDates')}</label>
                 <input
                   type="date"
                   value={pickupDate}
@@ -231,7 +235,7 @@ const HomePage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Dropoff Date</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">{language === 'en' ? 'Return Date' : 'Date de retour'}</label>
                 <input
                   type="date"
                   value={dropoffDate}
@@ -252,12 +256,12 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="mt-6 text-center">
+            <div className="mt-6 flex justify-center">
               <Link
                 to="/cars"
-                className="inline-block px-10 py-3 text-base font-medium text-black bg-gradient-to-r from-cyan-400 to-white rounded-md transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                className="bg-gradient-to-r from-white to-cyan-500 hover:from-cyan-500 hover:to-white text-black font-bold py-3 px-10 rounded-md transition-all duration-300 font-['Orbitron'] transform hover:scale-105 shadow-lg shadow-cyan-500/5"
               >
-                Search Cars
+                {t('exploreOurFleet')}
               </Link>
             </div>
           </div>

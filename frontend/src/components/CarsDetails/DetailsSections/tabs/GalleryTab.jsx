@@ -1,7 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, X, Maximize, ZoomIn, ZoomOut, Download, Heart, Share2 } from 'lucide-react';
+import { useLanguage } from '../../../../context/LanguageContext';
+import { useTranslations } from '../../../../translations';
 
 const GalleryTab = ({ car }) => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
   // State to track the currently displayed main image
   const [selectedImage, setSelectedImage] = useState(0);
   // State to track if the full-size image modal is open
@@ -19,9 +24,11 @@ const GalleryTab = ({ car }) => {
   const hasGallery = car && car.gallery && Array.isArray(car.gallery) && car.gallery.length > 0;
   
   // Create a combined array of images starting with the main car image
-  const allImages = hasGallery 
-    ? [{ path: car.image, alt: `${car.name} main view` }, ...car.gallery]
-    : car?.image ? [{ path: car.image, alt: `${car.name} main view` }] : [];
+  const allImages = useMemo(() => {
+    return hasGallery 
+      ? [{ path: car.image, alt: `${car.name} main view` }, ...car.gallery]
+      : car?.image ? [{ path: car.image, alt: `${car.name} main view` }] : [];
+  }, [hasGallery, car?.image, car?.gallery, car?.name]);
 
   // Load favorites from localStorage on component mount
   useEffect(() => {
@@ -246,11 +253,11 @@ const GalleryTab = ({ car }) => {
           <div>
             <h2 className="text-3xl font-bold text-white font-['Orbitron'] mb-2">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
-            MEDIA GALLERY
+            {t('mediaGallery')}
               </span>
             </h2>
             <p className="text-2xs text-blue-200 font-['Orbitron']">
-              Explore every detail of this extraordinary vehicle through our comprehensive gallery.
+              {t('exploreDetails')}
             </p>
           </div>
           
@@ -265,7 +272,7 @@ const GalleryTab = ({ car }) => {
               }`}
               type="button"
             >
-              {isAutoplayOn ? 'Autoplay On' : 'Autoplay Off'}
+              {isAutoplayOn ? t('autoplayOn') : t('autoplayOff')}
             </button>
           </div>
         </div>
@@ -303,7 +310,7 @@ const GalleryTab = ({ car }) => {
                   onClick={handleFeatureClick}
                   type="button"
                 >
-                  <span className="text-xs font-['Orbitron'] px-2 text-center">Show more</span>
+                  <span className="text-xs font-['Orbitron'] px-2 text-center">{t('showMore')}</span>
                 </button>
                 
                 {/* Favorite Button */}

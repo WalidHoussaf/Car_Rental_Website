@@ -1,7 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTranslations } from '../../translations';
 
 const Testimonials = ({ testimonials }) => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+
   return (
     <section className="relative py-24 px-4 bg-black overflow-hidden">
       {/* Background Effects */}
@@ -17,7 +22,7 @@ const Testimonials = ({ testimonials }) => {
       
       <div className="max-w-7xl mx-auto relative z-10">
         <h2 className="text-2xl md:text-5xl font-semibold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
-          What Our Customers Say
+          {t('customerTestimonials')}
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -45,13 +50,17 @@ const Testimonials = ({ testimonials }) => {
                     />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg text-white group-hover:text-blue-500 transition-colors duration-300 font-['Orbitron']">{testimonial.name}</h3>
-                    <p className="text-xs text-gray-400 font-['Orbitron']">{testimonial.title}</p>
+                    <h3 className="font-semibold text-lg text-white group-hover:text-blue-500 transition-colors duration-300 font-['Orbitron']">
+                      {t(`testimonial_${testimonial.name.toLowerCase().replace(/\s+/g, '_')}_name`) || testimonial.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 font-['Orbitron']">
+                      {t(`testimonial_${testimonial.name.toLowerCase().replace(/\s+/g, '_')}_title`) || testimonial.title}
+                    </p>
                   </div>
                 </div>
                 
                 <p className="text-gray-300 mb-6 font-['Orbitron'] text-2xs leading-relaxed text-justify">
-                  "{testimonial.quote}"
+                  "{t(`testimonial_${testimonial.name.toLowerCase().replace(/\s+/g, '_')}_quote`) || testimonial.quote}"
                 </p>
                 
                 {/* Star Rating Design */}
@@ -87,7 +96,7 @@ const Testimonials = ({ testimonials }) => {
             <div className="absolute inset-0 w-3 bg-gradient-to-r from-blue-500/20 to-blue-400/20 transition-all duration-500 group-hover:w-full"></div>
             
             <span className="relative z-10 text-white group-hover:text-blue-300 transition-colors duration-300 font-['Orbitron']">
-              Read More Reviews
+              {t('readMoreReviews')}
             </span>
             <svg xmlns="http://www.w3.org/2000/svg" className="relative z-10 h-5 w-5 ml-2 text-white group-hover:text-blue-300 transition-colors duration-300 transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />

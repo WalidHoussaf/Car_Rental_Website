@@ -1,18 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { sampleCars, resolveImagePaths } from '../assets/assets'; 
+import { sampleCars, resolveImagePaths, categoryTranslations } from '../assets/assets'; 
 import Select from 'react-select';
 import HeroSection from '../components/Cars/HeroSection';
 import StatsSection from '../components/Cars/StatsSection';
 import CallToAction from '../components/Cars/CallToAction';
 import FiltersSidebar from '../components/Cars/Filters/FiltersSidebar';
 import { selectStyles } from '../styles/selectStyles';
+import { useLanguage } from '../context/LanguageContext';
+import { useTranslations } from '../translations';
 
 const CarsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const locationParam = queryParams.get('location');
+  const searchParam = queryParams.get('search');
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
+  // État pour la recherche
+  const [searchQuery, setSearchQuery] = useState(searchParam || '');
+  
+  // Défilement vers le haut au chargement de la page
+  useEffect(() => {
+    if (!location.search) {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.search]);
   
   // Reference to store current scroll position
   const scrollPositionRef = useRef(0);
@@ -33,6 +48,49 @@ const CarsPage = () => {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('recommended');
   
+  // Mise à jour de la recherche lorsque l'URL change
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const search = queryParams.get('search');
+    setSearchQuery(search || '');
+  }, [location.search]);
+  
+  // Fonction pour mettre à jour l'URL avec la recherche
+  const handleSearchUpdate = useCallback((query) => {
+    setSearchQuery(query);
+    
+    const newParams = new URLSearchParams(location.search);
+    if (query) {
+      newParams.set('search', query);
+    } else {
+      newParams.delete('search');
+    }
+    
+    // Mise à jour de l'URL
+    navigate(`/cars?${newParams.toString()}`, { replace: true });
+  }, [location.search, navigate]);
+  
+  // Écouteur d'événement pour la mise à jour de la recherche depuis la navbar
+  useEffect(() => {
+    const handleSearchEvent = (event) => {
+      handleSearchUpdate(event.detail.query);
+    };
+    
+    window.addEventListener('update-search', handleSearchEvent);
+    return () => {
+      window.removeEventListener('update-search', handleSearchEvent);
+    };
+  }, [handleSearchUpdate]);
+  
+  // Initialiser la recherche depuis l'URL lors du chargement
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const search = queryParams.get('search');
+    if (search) {
+      setSearchQuery(search);
+    }
+  }, []);
+  
   // Initialize cars data
   useEffect(() => {
     setLoading(true);
@@ -42,16 +100,6 @@ const CarsPage = () => {
       setLoading(false);
     }, 800);
   }, []);
-  
-  // Effect to handle scroll restoration
-  useEffect(() => {
-    // Restore scroll position after URL change/navigation
-    const timeoutId = setTimeout(() => {
-      window.scrollTo(0, scrollPositionRef.current);
-    }, 0);
-    
-    return () => clearTimeout(timeoutId);
-  }, [location.search]);
   
   // Handle scroll to cars section
   const scrollToCarsSection = () => {
@@ -63,6 +111,12 @@ const CarsPage = () => {
   // Handle navigation to About Us page
   const navigateToAboutUs = () => {
     navigate('/about');
+  };
+  
+  // Fonction pour naviguer vers une page avec défilement vers le haut
+  const navigateWithScroll = (path) => {
+    window.scrollTo(0, 0);
+    navigate(path);
   };
   
   // Handle filter changes
@@ -132,8 +186,53 @@ const CarsPage = () => {
     }
     
     // Filter by features
-    if (filters.features.length > 0 && !filters.features.every(feature => car.features.includes(feature))) {
+    if (filters.features.length > 0 && !filters.features.some(feature => 
+      car.features.some(carFeature => carFeature.toLowerCase().includes(feature.toLowerCase()))
+    )) {
       return false;
+    }
+    
+    // Filter by search query
+    if (searchQuery && searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase().trim();
+      
+      // Liste des marques de voiture, y compris complètes et partielles
+      const carBrands = {
+        simple: ["audi", "bmw", "mercedes", "tesla", "porsche", "bentley", "ferrari", 
+                 "lamborghini", "maserati", "lexus", "cadillac", "mclaren"],
+        composed: ["rolls royce", "rolls-royce", "range rover", "aston martin"],
+        parts: ["range", "rover", "rolls", "royce", "aston", "martin"]
+      };
+
+      // Cas 1: Recherche exacte de marque composée (ex: "range rover")
+      if (carBrands.composed.includes(query)) {
+        return car.name.toLowerCase().includes(query);
+      }
+      // Cas 2: Recherche d'une partie d'une marque composée (ex: "range" ou "rover")
+      else if (carBrands.parts.includes(query)) {
+        // Vérifier si c'est un mot qui fait partie d'une marque composée
+        const relatedBrands = carBrands.composed.filter(brand => brand.includes(query));
+        if (relatedBrands.length > 0) {
+          // Vérifier si une des marques composées associées est dans le nom
+          return relatedBrands.some(brand => car.name.toLowerCase().includes(brand));
+        }
+      }
+      // Cas 3: Recherche d'une marque simple (ex: "audi")
+      else if (carBrands.simple.includes(query)) {
+        // Vérifier si la marque exacte est dans le nom de la voiture
+        const carNameWords = car.name.toLowerCase().split(/\s+/);
+        return carNameWords.some(word => word === query);
+      }
+      
+      // Cas 4: Recherche standard pour tout autre terme
+      const nameMatch = car.name.toLowerCase().includes(query);
+      const descriptionMatch = car.description ? car.description.toLowerCase().includes(query) : false;
+      const featuresMatch = car.features.some(feature => 
+        feature.toLowerCase().includes(query)
+      );
+      const categoryMatch = car.category.toLowerCase().includes(query);
+      
+      return (nameMatch || descriptionMatch || featuresMatch || categoryMatch);
     }
     
     return true;
@@ -162,26 +261,43 @@ const CarsPage = () => {
       <StatsSection />
       
       {/* Main Content */}
-      <section ref={carsSectionRef} id="cars-section" className="relative py-16 px-4 bg-black">
-        <div className="max-w-7xl mx-auto">
-          {/* Section Title */}
-          <div className="text-center mb-12">
-            <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20">
-              <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">CUSTOMIZE YOUR SEARCH</span>
+      <section ref={carsSectionRef} id="cars-section" className="relative py-16 px-4 bg-gradient-to-b from-black via-black/95 to-black/90 overflow-hidden">
+        {/* Particules flottantes cyan */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-1/4 w-32 h-32 rounded-full bg-cyan-500/5 blur-3xl animate-float"></div>
+          <div className="absolute top-60 right-1/4 w-40 h-40 rounded-full bg-blue-500/5 blur-3xl animate-float-slow"></div>
+          <div className="absolute bottom-40 left-1/3 w-36 h-36 rounded-full bg-cyan-400/5 blur-3xl animate-float-slower"></div>
+          
+          
+          
+          {/* Points lumineux */}
+          <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.svg')] bg-repeat opacity-10"></div>
+        </div>
+        
+        {/* Cercle décoratif avec animation subtile */}
+        <div className="absolute -top-10 -right-10 w-40 h-40 border border-cyan-700/30 rounded-full opacity-20 animate-spin-slow"></div>
+        <div className="absolute bottom-20 -left-20 w-60 h-60 border border-cyan-700/20 rounded-full opacity-10 animate-spin-slower"></div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Section Title avec un effet de lueur */}
+          <div className="text-center mb-12 relative">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl -z-10"></div>
+            <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
+              <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('customizeYourSearch')}</span>
             </div>
             <br />
             <br />
             <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-4">
-              FIND YOUR PERFECT RIDE
+              {t('findYourPerfectRide')}
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-white to-cyan-400 mx-auto mb-4"></div>
             <p className="text-gray-400 max-w-2xl mx-auto text-sm font-['Orbitron']">
-              Use the filters to narrow down your options and find the ideal vehicle for your needs.
+              {t('useFiltersDescription')}
             </p>
           </div>
           
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Filters Sidebar */}
+            {/* Filters Sidebar avec effet de verre */}
             <FiltersSidebar 
               filters={filters}
               handleFilterChange={handleFilterChange}
@@ -190,15 +306,22 @@ const CarsPage = () => {
             />
             
             {/* Cars Grid */}
-            <div className="flex-grow">
+            <div className="flex-grow relative">
+              {/* Effet de lumière au-dessus des voitures */}
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-40 bg-black blur-3xl rounded-full -z-10"></div>
+              
               {/* Sort Controls */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 pb-4 border-b border-gray-800/50 bg-gradient-to-r from-transparent via-gray-800/10 to-transparent">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 pb-4 border-b border-gray-800/50 bg-gradient-to-r from-transparent via-gray-800/10 to-transparent backdrop-blur-sm relative">
+                {/* Petit élément décoratif */}
+                <div className="absolute top-0 right-0 w-20 h-px bg-gradient-to-r from-transparent to-cyan-500/50"></div>
+                <div className="absolute bottom-0 left-0 w-20 h-px bg-gradient-to-r from-cyan-500/50 to-transparent"></div>
+                
                 <div className="mb-4 sm:mb-0">
                   <h2 className="text-xl font-semibold text-white font-['Orbitron'] flex items-center">
                     {loading ? (
                       <span className="flex items-center">
                         <div className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mr-2"></div>
-                        Loading vehicles...
+                        {t('loadingVehicles')}
                       </span>
                     ) : (
                       <>
@@ -207,28 +330,28 @@ const CarsPage = () => {
                           <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1v-1h3a1 1 0 00.8-.4l3-4a1 1 0 00.2-.6V5a1 1 0 00-1-1H3zM14 7h2.7l-1.5 2H14V7z" />
                         </svg>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{sortedCars.length}</span>
-                        <span className="ml-1">vehicles available</span>
+                        <span className="ml-1">{t('vehiclesAvailable')}</span>
                       </>
                     )}
                   </h2>
                 </div>
                 <div className="flex items-center">
-                  <label className="mr-2 text-sm text-gray-300 font-['Orbitron']">Sort by:</label>
+                  <label className="mr-2 text-sm text-gray-300 font-['Orbitron']">{t('sortBy')}:</label>
                   <div className="w-48">
                     <Select
                       options={[
-                        { value: 'recommended', label: 'Recommended' },
-                        { value: 'price-low', label: 'Price: Low to High' },
-                        { value: 'price-high', label: 'Price: High to Low' },
-                        { value: 'rating', label: 'Rating' }
+                        { value: 'recommended', label: t('recommended') },
+                        { value: 'price-low', label: t('priceLowToHigh') },
+                        { value: 'price-high', label: t('priceHighToLow') },
+                        { value: 'rating', label: t('rating') }
                       ]}
                       value={{ 
                         value: sortBy, 
                         label: {
-                          'recommended': 'Recommended',
-                          'price-low': 'Price: Low to High',
-                          'price-high': 'Price: High to Low',
-                          'rating': 'Rating'
+                          'recommended': t('recommended'),
+                          'price-low': t('priceLowToHigh'),
+                          'price-high': t('priceHighToLow'),
+                          'rating': t('rating')
                         }[sortBy] 
                       }}
                       onChange={(selectedOption) => {
@@ -236,6 +359,7 @@ const CarsPage = () => {
                         setSortBy(selectedOption.value);
                       }}
                       isSearchable={false}
+                      menuPortalTarget={document.body}
                       styles={{
                         ...selectStyles,
                         control: (provided, state) => ({
@@ -257,46 +381,77 @@ const CarsPage = () => {
                 </div>
               </div>
               
-              {/* Loading State */}
+              {/* Loading State with improved visuals */}
               {loading && (
-                <div className="flex flex-col items-center justify-center py-20">
-                  <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-400 font-['Orbitron']">Loading vehicles...</p>
+                <div className="flex flex-col items-center justify-center py-20 relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent"></div>
+                  <div className="w-20 h-20 relative">
+                    <div className="w-full h-full border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 border-4 border-transparent border-l-cyan-400/50 rounded-full animate-spin-slow"></div>
+                  </div>
+                  <div className="mt-6 px-4 py-2 bg-black/50 backdrop-blur-sm rounded-full">
+                    <p className="text-cyan-300 font-['Orbitron'] relative">
+                      <span className="animate-pulse">{t('loadingVehicles')}</span>
+                      <span className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></span>
+                    </p>
+                  </div>
                 </div>
               )}
               
-              {/* Empty State */}
+              {/* Empty State with improved visuals */}
               {!loading && sortedCars.length === 0 && (
-                <div className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-lg p-8 text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-600 mb-4" viewBox="0 0 24 24" fill="none">
-                    {/* Car outline */}
-                    <path d="M3 14L4 8C4.4 6.5 5.2 6 7 6H17C18.8 6 19.6 6.5 20 8L21 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <path d="M4 17H2C1.5 17 1 16.5 1 16V14C1 13.5 1.5 13 2 13H22C22.5 13 23 13.5 23 14V16C23 16.5 22.5 17 22 17H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <circle cx="6" cy="16.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
-                    <circle cx="18" cy="16.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M4 11H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                  <h3 className="text-xl font-bold font-['Orbitron'] text-white mb-2">No vehicles found</h3>
-                  <p className="text-gray-400 mb-6 max-w-md mx-auto font-['Orbitron']">
-                    We couldn't find any vehicles matching your current filters. Try adjusting your search criteria.
-                  </p>
-                  <button
-                    onClick={resetFilters}
-                    className="px-6 py-3 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 rounded-md cursor-pointer"
-                  >
-                    Reset Filters
-                  </button>
+                <div className="bg-gradient-to-b from-gray-900/50 to-black/60 backdrop-blur-sm border border-gray-800 rounded-lg p-8 text-center relative overflow-hidden">
+                  {/* Éléments décoratifs */}
+                  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
+                  <div className="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-800/30 to-transparent"></div>
+                  <div className="absolute right-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-800/30 to-transparent"></div>
+                  
+                  <div className="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 mx-auto text-gray-600 mb-4 opacity-80" viewBox="0 0 24 24" fill="none">
+                      {/* Car outline avec glow */}
+                      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="1" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                      </filter>
+                      <g filter="url(#glow)">
+                        <path d="M3 14L4 8C4.4 6.5 5.2 6 7 6H17C18.8 6 19.6 6.5 20 8L21 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M4 17H2C1.5 17 1 16.5 1 16V14C1 13.5 1.5 13 2 13H22C22.5 13 23 13.5 23 14V16C23 16.5 22.5 17 22 17H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <circle cx="6" cy="16.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+                        <circle cx="18" cy="16.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+                        <path d="M4 11H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </g>
+                    </svg>
+                    <h3 className="text-xl font-bold font-['Orbitron'] text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-2">{t('noVehiclesFound')}</h3>
+                    <p className="text-gray-400 mb-6 max-w-md mx-auto font-['Orbitron']">
+                      {t('noVehiclesDescription')}
+                    </p>
+                    <button
+                      onClick={resetFilters}
+                      className="relative px-8 py-3 bg-gradient-to-r from-cyan-800/40 to-blue-800/40 text-white font-['Orbitron'] transition-all duration-300 shadow-lg hover:shadow-cyan-700/20 rounded-md cursor-pointer overflow-hidden group"
+                    >
+                      <span className="relative z-10">{t('resetFilters')}</span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    </button>
+                  </div>
                 </div>
               )}
               
-              {/* Cars Grid */}
+              {/* Cars Grid avec effets améliorés */}
               {!loading && sortedCars.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 relative">
+                  {/* Effet de particules lumineux derrière la grille */}
+                  <div className="absolute -bottom-10 left-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl"></div>
+                  <div className="absolute top-1/2 right-1/3 w-40 h-40 rounded-full bg-blue-500/5 blur-3xl"></div>
+                  
                   {sortedCars.map((car) => (
                     <div
                       key={car.id}
-                      className="bg-gradient-to-b from-gray-900/40 to-black/20 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-blue-900/20 transition-all duration-300 group hover:border-blue-500/30 flex flex-col h-full"
+                      className="bg-gradient-to-b from-gray-900/40 to-black/20 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-blue-900/20 transition-all duration-300 group hover:border-blue-500/30 flex flex-col h-full relative"
                     >
+                      {/* Effet de bordure animée au survol */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm -z-10 group-hover:bg-gradient-to-r group-hover:from-cyan-500/10 group-hover:via-cyan-500/5 group-hover:to-cyan-500/10"></div>
+                      
                       {/* Card Header */}
                       <div className="relative h-48 overflow-hidden">
                         <img
@@ -306,23 +461,28 @@ const CarsPage = () => {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
                         
-                        {/* Badge for Category */}
+                        {/* Badge for Category with improved design */}
                         <div className="absolute top-3 left-3">
-                          <div className="px-3 py-1 rounded-full bg-cyan-500/90 backdrop-blur-sm text-xs font-bold text-white font-['Orbitron'] uppercase tracking-wider">
-                            {car.category}
+                          <div className="px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/80 to-blue-500/80 backdrop-blur-sm text-xs font-bold text-white font-['Orbitron'] uppercase tracking-wider shadow-lg shadow-cyan-900/20">
+                            {categoryTranslations[car.category] 
+                              ? categoryTranslations[car.category][language] 
+                              : car.category}
                           </div>
                         </div>
                         
-                        {/* Price Badge */}
+                        {/* Price Badge with improved design */}
                         <div className="absolute bottom-3 right-3">
-                          <div className="px-3 py-1 rounded-md bg-black/80 backdrop-blur-sm text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
-                            ${car.price}/day
+                          <div className="px-3 py-1 rounded-md bg-black/80 backdrop-blur-sm text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] border border-cyan-500/20">
+                            ${car.price}{t('day')}
                           </div>
                         </div>
                       </div>
                       
                       {/* Card Content */}
-                      <div className="p-5 flex flex-col flex-grow">
+                      <div className="p-5 flex flex-col flex-grow relative">
+                        {/* Décoration subtile */}
+                        <div className="absolute top-0 right-0 w-20 h-px bg-gradient-to-l from-cyan-500/30 to-transparent"></div>
+                        
                         <div>
                           <div className="flex justify-between items-start mb-2">
                             <h3 className="text-xl font-bold text-white font-['Orbitron'] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-cyan-400 transition-all duration-300">
@@ -336,54 +496,56 @@ const CarsPage = () => {
                             </div>
                           </div>
                           
-                          {/* Location */}
+                          {/* Location avec style amélioré */}
                           <div className="flex items-center mb-4 text-xl text-gray-400 font-['Rationale']">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span>
-                              {Array.isArray(car.location) 
-                                ? car.location.join(', ').charAt(0).toUpperCase() + car.location.join(', ').slice(1).toLowerCase()
-                                : car.location.charAt(0).toUpperCase() + car.location.slice(1).toLowerCase()}
-                            </span>
+                            <div className="flex items-center bg-gray-900/30 px-2 py-0.5 rounded-full">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              <span>
+                                {Array.isArray(car.location) 
+                                  ? car.location.join(', ').charAt(0).toUpperCase() + car.location.join(', ').slice(1).toLowerCase()
+                                  : car.location.charAt(0).toUpperCase() + car.location.slice(1).toLowerCase()}
+                              </span>
+                            </div>
                           </div>
                           
-                          {/* Features */}
+                          {/* Features avec style amélioré */}
                           <div className="flex flex-wrap gap-2 mb-5">
                             {car.features.slice(0, 3).map((feature, index) => (
                               <span
                                 key={index}
-                                className="px-2 py-1 bg-gray-800/50 rounded text-xs text-gray-300 font-['Orbitron']"
+                                className="px-2 py-1 bg-gray-800/50 border border-gray-700/30 rounded text-xs text-gray-300 font-['Orbitron'] transition-colors duration-300 hover:text-cyan-300 hover:border-cyan-700/30"
                               >
-                                {feature}
+                                {language === 'fr' ? t(feature) : feature}
                               </span>
                             ))}
                             {car.features.length > 3 && (
-                              <span className="px-2 py-1 bg-gray-800/50 rounded text-xs text-gray-300 font-['Orbitron']">
-                                +{car.features.length - 3} more
+                              <span className="px-2 py-1 bg-cyan-900/20 border border-cyan-900/30 rounded text-xs text-cyan-300 font-['Orbitron']">
+                                +{car.features.length - 3} {t('moreFeatures')}
                               </span>
                             )}
                           </div>
                         </div>
                         
-                        {/* Action Buttons */}
+                        {/* Action Buttons avec style amélioré */}
                         <div className="flex space-x-2 mt-auto">
                           <button
                             onClick={() => {
-                              scrollPositionRef.current = window.pageYOffset;
-                              navigate(`/booking/${car.id}`);
+                              navigateWithScroll(`/booking/${car.id}`);
                             }}
-                            className="flex-1 px-4 py-2 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] text-sm transition-all duration-300 rounded-md cursor-pointer">
-                            Book Now
+                            className="flex-1 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-blue-500 hover:to-cyan-500 text-white font-['Orbitron'] text-sm transition-all duration-500 rounded-md cursor-pointer shadow-lg shadow-cyan-800/10 hover:shadow-cyan-800/30"
+                          >
+                            {t('bookNow')}
                           </button>
                           <button 
                             onClick={() => {
-                              scrollPositionRef.current = window.pageYOffset;
-                              navigate(`/cars/${car.id}`);
+                              navigateWithScroll(`/cars/${car.id}`);
                             }}
-                            className="px-4 py-2 bg-transparent border border-gray-700 hover:border-cyan-500 text-cyan-300 hover:text-cyan-400 font-['Orbitron'] text-sm transition-all duration-300 rounded-md cursor-pointer">
-                            Details
+                            className="px-4 py-2 bg-transparent border border-gray-700 hover:border-cyan-500 text-cyan-300 hover:text-cyan-400 font-['Orbitron'] text-sm transition-all duration-300 rounded-md cursor-pointer"
+                          >
+                            {t('details')}
                           </button>
                         </div>
                       </div>
@@ -392,11 +554,13 @@ const CarsPage = () => {
                 </div>
               )}
               
-              {/* Load More Button */}
+              {/* Load More Button with improved design */}
               {!loading && sortedCars.length > 0 && (
-                <div className="mt-12 text-center">
-                  <button className="px-8 py-3 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 hover:from-blue-600/30 hover:to-cyan-600/30 text-white font-['Orbitron'] transition-all duration-300 border border-cyan-500/30 hover:border-cyan-500/50 rounded-md shadow-lg shadow-blue-900/5 hover:shadow-blue-900/10 cursor-pointer">
-                    Load More Vehicles
+                <div className="mt-12 text-center relative">
+                  <div className="absolute -z-10 inset-0 bg-gradient-to-b from-transparent to-cyan-900/5 blur-lg"></div>
+                  <button className="relative px-10 py-4 bg-gradient-to-r from-gray-900/70 to-gray-800/70 text-white font-['Orbitron'] transition-all duration-300 border border-cyan-500/30 hover:border-cyan-400/60 rounded-md shadow-lg shadow-cyan-900/10 hover:shadow-cyan-800/30 cursor-pointer overflow-hidden group">
+                    <span className="relative z-10">{t('loadMore')}</span>
+                    <span className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></span>
                   </button>
                 </div>
               )}
@@ -405,7 +569,21 @@ const CarsPage = () => {
         </div>
       </section>
 
-      <CallToAction />
+      {/* Call To Action with improved visuals */}
+      <section className="relative overflow-hidden">
+        {/* Background décoratif */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/80 to-black">
+          {/* Particules flottantes */}
+          <div className="absolute top-10 left-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl animate-float-slow"></div>
+          <div className="absolute bottom-20 right-1/4 w-60 h-60 rounded-full bg-blue-500/5 blur-3xl animate-float-slower"></div>
+          
+          {/* Lignes décoratives */}
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
+        </div>
+        
+        <CallToAction />
+      </section>
     </div>
   );
 };

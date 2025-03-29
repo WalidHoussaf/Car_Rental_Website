@@ -1,11 +1,16 @@
 import React from 'react';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useTranslations } from '../../../translations';
 
 const TabNavigation = ({ activeTab, setActiveTab }) => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
   const tabs = [
-    { id: 'overview', label: 'OVERVIEW' },
-    { id: 'gallery', label: 'GALLERY' },
-    { id: 'specifications', label: 'SPECIFICATIONS' },
-    { id: 'features', label: 'FEATURES' },
+    { id: 'overview', label: t('overview') },
+    { id: 'gallery', label: t('gallery') },
+    { id: 'specifications', label: t('specifications') },
+    { id: 'features', label: t('features') },
   ];
   
   return (

@@ -1,8 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import CarHighlights from '../CarHighlights';
+import { useLanguage } from '../../../../context/LanguageContext';
+import { useTranslations } from '../../../../translations';
 
 const OverviewTab = ({ car }) => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+
   return (
     <div className="relative overflow-hidden rounded-lg p-8">
       {/* Background Elements */}
@@ -28,13 +33,16 @@ const OverviewTab = ({ car }) => {
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div>
           <h2 className="text-3xl font-bold text-white font-['Orbitron'] mb-6">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r uppercase from-white to-cyan-400">EXPERIENCE THE {car.name}</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r uppercase from-white to-cyan-400">{t('experienceThe')} {car.name}</span>
           </h2>
           <div className="space-y-6 text-gray-300 text-justify font-['Orbitron'] text-sm backdrop-blur-sm bg-black/30 p-6 rounded-lg border border-blue-900/50 shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
-            <p>{car.description}</p>
+            <p>{t('luxuryExperience', { carName: car.name })}</p>
             
             <p>
-              Powered by a {car.specifications.engine} producing an impressive {car.specifications.horsepower || car.specifications.power}, the {car.name} delivers exhilarating acceleration, reaching 60 mph in just {car.specifications.acceleration?.split(' ')[0] || 'record'} seconds. The advanced {car.specifications.transmission} transmission and {car.specifications.driveType || car.specifications.torque} system ensure that power is delivered smoothly and efficiently in all driving conditions.
+              {t('poweredBy')} {car.specifications.engine} {t('producing')} {car.specifications.horsepower || car.specifications.power}, {t('the')} {car.name} {t('deliversAcceleration')} {car.specifications.acceleration?.split(' ')[0] || 'record'} {t('seconds')}. {t('advancedTransmission', {
+                transmission: car.specifications.transmission, 
+                driveType: car.specifications.driveType || car.specifications.torque
+              })}
             </p>
           </div>
           
@@ -43,7 +51,7 @@ const OverviewTab = ({ car }) => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
-              Contact Us About This Vehicle
+              {t('contactAboutVehicle')}
             </Link>
           </div>
         </div>

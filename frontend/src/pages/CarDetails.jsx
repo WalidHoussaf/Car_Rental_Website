@@ -1,14 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { sampleCars, resolveImagePaths, resolveGalleryPaths } from '../assets/assets';
+import { sampleCars, resolveImagePaths, resolveGalleryPaths, categoryTranslations } from '../assets/assets';
 import HeroSection from '../components/CarsDetails/HeroSection';
 import PerformanceStats from '../components/CarsDetails/PerformanceStats';
 import AvailabilitySection from '../components/CarsDetails/AvailabilitySection';
 import DetailsTabSection from '../components/CarsDetails/DetailsTabSection';
+import { useLanguage } from '../context/LanguageContext';
+import { useTranslations } from '../translations';
 
 const CarDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
+  // Scroll to top on component mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+  
+  // Fonction pour naviguer avec défilement vers le haut
+  const navigateWithScroll = (path) => {
+    window.scrollTo(0, 0);
+    navigate(path);
+  };
   
   // Find the car by ID
   const car = sampleCars.find(car => car.id === parseInt(id));
@@ -25,13 +40,13 @@ const CarDetailPage = () => {
             <circle cx="18" cy="16.5" r="1.5" stroke="currentColor" strokeWidth="1.5" />
             <path d="M4 11H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          <h2 className="text-2xl font-bold mb-4 font-['Orbitron']">Vehicle Not Found</h2>
-          <p className="text-gray-400 mb-8">The vehicle you're looking for doesn't exist or has been removed.</p>
+          <h2 className="text-2xl font-bold mb-4 font-['Orbitron']">{t('vehicleNotFound')}</h2>
+          <p className="text-gray-400 mb-8">{t('vehicleNotFoundDesc')}</p>
           <button 
             className="px-6 py-3 bg-gradient-to-r from-cyan-400 to-white hover:from-white hover:to-cyan-400 text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 rounded-md"
-            onClick={() => navigate('/cars')}
+            onClick={() => navigateWithScroll('/cars')}
           >
-            Back to Vehicles
+            {t('backToVehicles')}
           </button>
         </div>
       </div>
@@ -101,11 +116,11 @@ const CarDetailPage = () => {
         <div className="max-w-7xl mx-auto relative z-20">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-4">
-              SIMILAR VEHICLES
+              {t('similarVehicles')}
             </h2> 
             <div className="w-24 h-1 bg-gradient-to-r from-white to-cyan-400 mx-auto mb-4"></div>
             <p className="text-gray-300 max-w-2xl mx-auto text-2xs font-['Orbitron']">
-              Explore other vehicles that might interest you based on your preferences.
+              {t('exploreVehicles')}
             </p>
           </div>
           
@@ -138,14 +153,16 @@ const CarDetailPage = () => {
                     {/* Badge for category */}
                     <div className="absolute top-3 left-3">
                     <div className="px-3 py-1 rounded-full bg-blue-500/80 backdrop-blur-sm text-xs text-black font-bold bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] uppercase tracking-wider">
-                      {processedRelatedCar.category}
+                      {categoryTranslations[processedRelatedCar.category] 
+                        ? categoryTranslations[processedRelatedCar.category][language] 
+                        : processedRelatedCar.category}
                     </div>
                     </div>
                     
                     {/* Price Badge */}
                     <div className="absolute bottom-3 right-3">
                     <div className="px-3 py-1 rounded-md bg-black/80 backdrop-blur-sm text-2xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
-                      ${processedRelatedCar.price}/day
+                      ${processedRelatedCar.price}{t('day')}
                     </div>
                     </div>
                   </div>
@@ -166,14 +183,16 @@ const CarDetailPage = () => {
                     
                     {/* Button */}
                     <button
-                    onClick={() => navigate(`/cars/${processedRelatedCar.id}`)}
+                    onClick={() => {
+                      navigateWithScroll(`/cars/${processedRelatedCar.id}`);
+                    }}
                     className="w-full px-4 py-2 bg-black text-white border border-cyan-400 font-['Orbitron'] text-sm transition-all duration-300 rounded-sm mt-2 
                       hover:bg-gradient-to-r hover:from-white hover:to-cyan-500/50 
                       group relative overflow-hidden cursor-pointer"
                     >
                     <span className="relative z-10 transition-colors duration-100  text-white
                       group-hover:text-black">
-                      View Details
+                      {t('viewDetails')}
                     </span>
                     <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-white 
                       transition-all duration-500 

@@ -21,6 +21,11 @@ export const selectStyles = {
       fontFamily: 'Orbitron, sans-serif',
       maxHeight: '240px',
       overflowY: 'hidden',
+      zIndex: 9999,
+    }),
+    menuPortal: (provided) => ({
+      ...provided,
+      zIndex: 9999,
     }),
     menulist: (provided) => ({
       ...provided,

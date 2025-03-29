@@ -1,7 +1,12 @@
 import React from 'react';
 import SpecsSection from '../SpecsSection';
+import { useLanguage } from '../../../../context/LanguageContext';
+import { useTranslations } from '../../../../translations';
 
 const SpecificationsTab = ({ car }) => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
   // Group specs by category
   const performanceSpecs = ['engine', 'horsepower', 'torque', 'acceleration', 'topSpeed', 'transmission'];
   const dimensionSpecs = ['weight', 'length', 'width', 'height', 'wheelbase', 'driveType'];
@@ -27,16 +32,16 @@ const SpecificationsTab = ({ car }) => {
       <div className="relative z-10">
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-white font-['Orbitron'] mb-6">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">TECHNICAL SPECIFICATIONS</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('technicalSpecifications')}</span>
           </h2>
           <p className="text-gray-300 text-2xs font-['Orbitron']">
-            Explore the engineering excellence that powers the {car.name}.
+            {t('exploreEngineering', { carName: car && car.name ? car.name : '' })}
           </p>
         </div>
        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <SpecsSection
-            title="Performance"
+            title="performance"
             icon={
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-cyan-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
@@ -48,7 +53,7 @@ const SpecificationsTab = ({ car }) => {
           />
          
           <SpecsSection
-            title="Dimensions & Weight"
+            title="dimensions_weight"
             icon={
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-cyan-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" clipRule="evenodd" />

@@ -1,9 +1,13 @@
 import React, { useState, useRef } from 'react';
 import FloatingParticles from '../Ui/FloatingParticles';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTranslations } from '../../translations';
 
 const HowItWorks = () => {
   const [activeStep, setActiveStep] = useState(null);
   const howItWorksRef = useRef(null);
+  const { language } = useLanguage();
+  const t = useTranslations(language);
 
   return (
     <section ref={howItWorksRef} className="relative py-20 px-4 bg-black overflow-hidden">
@@ -14,8 +18,8 @@ const HowItWorks = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-blue-900/5 to-purple-900/10 pointer-events-none"></div>
       
       <div className="max-w-7xl mx-auto relative z-100">
-        <h2 className="text-2xl md:text-5xl font-semibold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
-          How It Works
+        <h2 className="text-2xl md:text-5xl font-semibold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
+          {t('howItWorks')}
         </h2>
 
         <div className="relative">
@@ -39,8 +43,8 @@ const HowItWorks = () => {
 
               {/* Content Card */}
               <div className="p-6 rounded-lg bg-black/80 border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-blue-500/50 w-full h-full flex flex-col items-center group-hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                <h3 className="text-2xl font-semibold mb-4 font-['Orbitron'] text-cyan-400 group-hover:text-cyan-400 transition-colors duration-300">Search</h3>
-                <p className="text-gray-300 font-['Orbitron'] text-4xs">Browse our extensive fleet of premium vehicles and find the perfect match for your journey.</p>
+                <h3 className="text-2xl font-semibold mb-4 font-['Orbitron'] text-cyan-400 group-hover:text-cyan-400 transition-colors duration-300">{t('search')}</h3>
+                <p className="text-gray-300 font-['Orbitron'] text-4xs">{t('searchDescription')}</p>
 
                 <div className="mt-6 w-14 h-14 rounded-full bg-black/60 flex items-center justify-center border border-gray-700 group-hover:border-cyan-400 transition-all duration-300 overflow-hidden">
                   {/* Animated Search Icon */}
@@ -53,10 +57,10 @@ const HowItWorks = () => {
                 <div className="mt-auto pt-4 w-full">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs text-cyan-400 font-['Orbitron']">
-                      Step 1/3
+                      {t('step')} 1/3
                     </span>
                     <span className="text-xs text-cyan-400 font-['Orbitron']">
-                      Search
+                      {t('search')}
                     </span>
                   </div>
                   <div className="w-full h-1 bg-gray-800 rounded-full overflow-hidden">
@@ -82,8 +86,8 @@ const HowItWorks = () => {
 
               {/* Content Card */}
               <div className="p-6 rounded-lg bg-black/80 border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-blue-500/50 w-full h-full flex flex-col items-center group-hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                <h3 className="text-2xl font-semibold mb-4 font-['Orbitron'] text-cyan-400 group-hover:text-cyan-400 transition-colors duration-300">Book</h3>
-                <p className="text-gray-300 font-['Orbitron'] text-4xs">Secure your reservation in minutes with our simple, intuitive booking process.</p>
+                <h3 className="text-2xl font-semibold mb-4 font-['Orbitron'] text-cyan-400 group-hover:text-cyan-400 transition-colors duration-300">{t('book')}</h3>
+                <p className="text-gray-300 font-['Orbitron'] text-4xs">{t('bookDescription')}</p>
 
                 <div className="mt-6 w-14 h-14 rounded-full bg-black/60 flex items-center justify-center border border-gray-700 group-hover:border-cyan-400 transition-all duration-300 overflow-hidden">
                   {/* Calendar Icon */}
@@ -105,10 +109,10 @@ const HowItWorks = () => {
                 <div className="mt-auto pt-4 w-full">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs text-cyan-400 font-['Orbitron']">
-                      Step 2/3
+                      {t('step')} 2/3
                     </span>
                     <span className="text-xs text-cyan-400 font-['Orbitron']">
-                      Book
+                      {t('book')}
                     </span>
                   </div>
                   <div className="w-full h-1 bg-gray-800 rounded-full overflow-hidden">
@@ -134,8 +138,8 @@ const HowItWorks = () => {
 
               {/* Content Card */}
               <div className="p-6 rounded-lg bg-black/80 border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-blue-500/50 w-full h-full flex flex-col items-center group-hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                <h3 className="text-2xl font-semibold mb-4 font-['Orbitron'] text-cyan-400 group-hover:text-cyan-400 transition-colors duration-300">Enjoy</h3>
-                <p className="text-gray-300 font-['Orbitron'] text-4xs">Pick up your car and hit the road with confidence. The adventure awaits! Drive Safely!</p>
+                <h3 className="text-2xl font-semibold mb-4 font-['Orbitron'] text-cyan-400 group-hover:text-cyan-400 transition-colors duration-300">{t('enjoy')}</h3>
+                <p className="text-gray-300 font-['Orbitron'] text-4xs">{t('enjoyDescription')}</p>
 
                 <div className="mt-6 w-14 h-14 rounded-full bg-black/60 flex items-center justify-center border border-gray-700 group-hover:border-cyan-500 transition-all duration-300 overflow-hidden">
                   {/* Animated Smiley Face */}
@@ -156,10 +160,10 @@ const HowItWorks = () => {
                 <div className="mt-auto pt-4 w-full">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs text-cyan-400 font-['Orbitron']">
-                      Step 3/3
+                      {t('step')} 3/3
                     </span>
                     <span className="text-xs text-cyan-400 font-['Orbitron']">
-                      Enjoy
+                      {t('enjoy')}
                     </span>
                   </div>
                   <div className="w-full h-1 bg-gray-800 rounded-full overflow-hidden">

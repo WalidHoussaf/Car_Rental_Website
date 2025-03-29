@@ -1,8 +1,30 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { assets, categoryTranslations } from '../../assets/assets';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTranslations } from '../../translations';
+
+// Fonction pour résoudre les chemins d'image
+const resolvePath = (path) => {
+  if (!path || typeof path !== 'string') return null;
+  
+  // Si c'est une référence aux assets (format: "cars.tesla")
+  if (path.includes('cars.')) {
+    const parts = path.split('.');
+    if (parts.length === 2 && parts[0] === 'cars') {
+      const carKey = parts[1];
+      return assets.cars[carKey];
+    }
+  }
+  
+  // Si c'est déjà un chemin complet
+  return path;
+};
 
 const HeroSection = ({ car }) => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = useTranslations(language);
   
   // Handle booking
   const handleBookNow = () => {
@@ -19,11 +41,27 @@ const HeroSection = ({ car }) => {
       {/* Main Image with parallax effect */}
       <div className="h-[60vh] overflow-hidden relative">
         <div className="absolute inset-0 transform scale-105 transition-transform duration-15000 hover:scale-100">
-          <img 
-            src={car.image || "/api/placeholder/1200/800"} 
-            alt={car.name} 
-            className="w-full h-full object-cover"
-          />
+          {car.image && car.image.includes('cars.') ? (
+            <img 
+              src={resolvePath(car.image)} 
+              alt={car.name} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://via.placeholder.com/1200/800/0f172a/22d3ee?text=${encodeURIComponent(car.name)}`;
+              }}
+            />
+          ) : (
+            <img 
+              src={car.image || "/api/placeholder/1200/800"} 
+              alt={car.name} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://via.placeholder.com/1200/800/0f172a/22d3ee?text=${encodeURIComponent(car.name)}`;
+              }}
+            />
+          )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40"></div>
         
@@ -39,7 +77,9 @@ const HeroSection = ({ car }) => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
               <div className="animate-fade-in-up">
                 <div className="px-4 py-1.5 rounded-full bg-cyan-600/80 backdrop-blur-md text-xs font-bold text-white font-['Orbitron'] uppercase tracking-widest inline-block mb-4 shadow-lg shadow-cyan-500/20">
-                  {car.category}
+                  {categoryTranslations[car.category] 
+                    ? categoryTranslations[car.category][language] 
+                    : car.category}
                 </div>
                 <h1 className="text-4xl md:text-6xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-3 tracking-tight">
                   {car.name}
@@ -78,16 +118,16 @@ const HeroSection = ({ car }) => {
                 <div className="px-6 py-4 rounded-lg bg-black/70 backdrop-blur-lg border border-gray-800/50 shadow-xl hover:shadow-blue-900/20 transition-all duration-300 transform hover:scale-105">
                   <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] text-center">
                     ${car.price}
-                    <span className="text-gray-400 text-sm font-normal ml-1">/day</span>
+                    <span className="text-gray-400 text-sm font-normal ml-1">{t('day')}</span>
                   </div>
-                  <div className="mt-1 text-xs text-gray-400 text-center font-['Orbitron']">Premium Experience</div>
+                  <div className="mt-1 text-xs text-gray-400 text-center font-['Orbitron']">{t('premiumExperience')}</div>
                   
                   {/* Book Now button */}
                   <button 
                     onClick={handleBookNow}
                     className="w-full mt-3 px-6 py-2.5 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] text-sm transition-all duration-300 rounded-lg shadow-lg hover:shadow-cyan-500/30 transform hover:-translate-y-0.5 cursor-pointer"
                   >
-                    Book Now
+                    {t('bookNow')}
                   </button>
                   
                   {/* Back to Vehicles Button */}
@@ -98,7 +138,7 @@ const HeroSection = ({ car }) => {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
                     </svg>
-                    <span className="font-['Orbitron'] tracking-wider">Back to Vehicles</span>
+                    <span className="font-['Orbitron'] tracking-wider">{t('backToVehicles')}</span>
                   </button>
                 </div>
               </div>

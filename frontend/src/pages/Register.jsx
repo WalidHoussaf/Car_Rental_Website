@@ -1,9 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import '../styles/animations.css';
+import { useLanguage } from '../context/LanguageContext';
+import { useTranslations } from '../translations';
 
 const RegisterPage = () => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
+  // État pour les éléments visuels interactifs
+  const [circlePositions, setCirclePositions] = useState([]);
+  
+  // Générer les positions des cercles
+  useEffect(() => {
+    const positions = Array.from({ length: 10 }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 60 + 40,
+      opacity: Math.random() * 0.08 + 0.02,
+      animationDuration: Math.random() * 40 + 30,
+    }));
+    setCirclePositions(positions);
+  }, []);
+  
   // Form state
   const [formData, setFormData] = useState({
     firstName: '',
@@ -38,42 +58,42 @@ const RegisterPage = () => {
     }
   };
 
-  // Validate form
+  // Validate form with translated error messages
   const validateForm = () => {
     const newErrors = {};
     
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
+      newErrors.firstName = language === 'fr' ? 'Le prénom est requis' : 'First name is required';
     }
     
     if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
+      newErrors.lastName = language === 'fr' ? 'Le nom est requis' : 'Last name is required';
     }
     
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = language === 'fr' ? 'L\'email est requis' : 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email address is invalid';
+      newErrors.email = language === 'fr' ? 'L\'adresse email est invalide' : 'Email address is invalid';
     }
     
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = language === 'fr' ? 'Le mot de passe est requis' : 'Password is required';
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+      newErrors.password = language === 'fr' ? 'Le mot de passe doit contenir au moins 8 caractères' : 'Password must be at least 8 characters';
     }
     
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = language === 'fr' ? 'Les mots de passe ne correspondent pas' : 'Passwords do not match';
     }
     
     if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
+      newErrors.phoneNumber = language === 'fr' ? 'Le numéro de téléphone est requis' : 'Phone number is required';
     } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ''))) {
-      newErrors.phoneNumber = 'Phone number must be 10 digits';
+      newErrors.phoneNumber = language === 'fr' ? 'Le numéro de téléphone doit comporter 10 chiffres' : 'Phone number must be 10 digits';
     }
     
     if (!formData.agreeTerms) {
-      newErrors.agreeTerms = 'You must agree to the terms and conditions';
+      newErrors.agreeTerms = language === 'fr' ? 'Vous devez accepter les conditions d\'utilisation' : 'You must agree to the terms and conditions';
     }
     
     return newErrors;
@@ -111,195 +131,270 @@ const RegisterPage = () => {
   };
 
   // Common input styling
-  const inputClassName = (name) => `w-full bg-black/80 border ${
-    errors[name] ? 'border-red-500' : 'border-gray-800/50'
-  } rounded-md px-4 h-11 text-white 
-    focus:outline-none focus:ring-2 focus:ring-blue-500 
+  const inputClassName = (name) => `w-full bg-black/40 border ${
+    errors[name] ? 'border-red-500' : 'border-cyan-900/40'
+  } rounded-md px-4 h-12 text-white 
+    focus:outline-none focus:ring-2 focus:ring-cyan-500/50
     font-['Orbitron'] 
     text-sm
     transition-all duration-300
-    hover:border-blue-400
-    hover:bg-black/90
-    transform hover:scale-102`;
+    group-hover:border-cyan-400/30
+    group-hover:bg-black/60
+    placeholder-gray-500
+    shadow-inner shadow-cyan-900/5`;
 
   return (
-    <div className="bg-black text-white min-h-screen font-['Orbitron'] relative">
-      {/* Background with Overlay */}
+    <div className="bg-black text-white min-h-screen font-['Orbitron'] relative overflow-hidden">
+      {/* Arrière-plan amélioré */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
+        {/* Overlay de dégradé */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-black/80 to-black" />
+        
+        {/* Vidéo d'arrière-plan */}
         <video
           autoPlay
           muted
           loop
           playsInline
-          className="w-full h-full object-cover opacity-40"
+          className="w-full h-full object-cover opacity-20"
         >
           <source src={assets.hero.loginbg} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         
-        {/* Animated light beams - matching HeroSection */}
-        <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-1 h-full bg-blue-400 blur-xl transform -skew-x-12 animate-pulse"></div>
-          <div className="absolute top-0 right-1/3 w-1 h-full bg-purple-400 blur-xl transform skew-x-12 animate-pulse delay-1000"></div>
+        {/* Éléments décoratifs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Cercles flottants */}
+          {circlePositions.map((circle, index) => (
+            <div 
+              key={index}
+              className="absolute rounded-full bg-cyan-500"
+              style={{
+                left: `${circle.x}%`,
+                top: `${circle.y}%`,
+                width: `${circle.size}px`,
+                height: `${circle.size}px`,
+                opacity: circle.opacity,
+                animation: `float ${circle.animationDuration}s infinite ease-in-out alternate`
+              }}
+            />
+          ))}
+          
+          {/* Lignes de grille */}
+          <div className="absolute inset-0 bg-[url('/patterns/grid.svg')] bg-repeat opacity-5"></div>
         </div>
+        
+        {/* Rayons lumineux */}
+        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent"></div>
+        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent"></div>
+        
+        {/* Lignes horizontales */}
+        <div className="absolute top-1/4 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent"></div>
+        <div className="absolute bottom-1/4 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent"></div>
       </div>
 
-      {/* Content */}
-      <div className="relative z-20 min-h-screen flex flex-col items-center justify-center px-4 py-12">
-        {/* Registration Form Card */}
-        <div className="w-full max-w-xl bg-black/70 backdrop-blur-lg rounded-xl p-8 shadow-2xl border border-gray-800/50 relative transform transition-all duration-500 hover:shadow-blue-900/20 animate-fade-in-up">
-          {/* Form Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-regular mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-gray-400">
-              Create Your Account
+      {/* Contenu principal */}
+      <div className="relative z-20 min-h-screen flex flex-col items-center justify-center px-4 py-10">
+        {/* Logo ou symbole décoratif */}
+        <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-20 h-20">
+          <div className="relative w-full h-full">
+            <div className="absolute inset-6 rounded-full bg-cyan-500/10 animate-pulse"></div>
+            <div className="absolute inset-0 border-2 border-cyan-500/30 rounded-full animate-spin-slow"></div>
+            <div className="absolute inset-3 border border-cyan-400/20 rounded-full animate-spin-slower"></div>
+          </div>
+        </div>
+        
+        {/* Formulaire d'inscription */}
+        <div className="w-full max-w-xl bg-gradient-to-b from-black/90 via-black/80 to-black/90 backdrop-blur-xl rounded-xl p-8 shadow-2xl border border-cyan-900/20 relative z-10 animate-fade-in-up overflow-hidden">
+          {/* Effet de halo dans le coin */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-32 -left-20 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
+          
+          {/* Bordures lumineuses */}
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent"></div>
+          <div className="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent"></div>
+          <div className="absolute right-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent"></div>
+          
+          {/* En-tête du formulaire */}
+          <div className="text-center mb-8 relative">
+            <h1 className="text-3xl md:text-4xl font-regular mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+              {t('createYourAccount')}
             </h1>
             <p className="text-sm md:text-base text-gray-300 font-['Orbitron']">
-              Join our premium car rental service today
+              {t('joinPremiumService')}
             </p>
+            <div className="w-32 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto mt-4"></div>
           </div>
 
-          {/* Success Message */}
+          {/* Message de succès */}
           {isSuccess && (
-            <div className="mb-6 p-4 bg-green-500/20 border border-green-500 rounded-md text-center animate-fade-in">
-              <p className="text-green-400">Registration successful! Welcome aboard.</p>
+            <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/10 to-green-500/10 border border-cyan-500/30 rounded-md text-center animate-fade-in">
+              <p className="text-cyan-300">{t('registrationSuccessful')}</p>
             </div>
           )}
 
-          {/* Registration Form */}
-          <form onSubmit={handleSubmit} className="animate-fade-in">
+          {/* Formulaire d'inscription */}
+          <form onSubmit={handleSubmit} className="animate-fade-in relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
-              <div className="mb-4 group">
-                <label className="block text-sm font-medium text-gray-400 mb-1 group-hover:text-blue-400 transition-colors">First Name</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="Enter your first name"
-                  className={inputClassName('firstName')}
-                  autoComplete="off"
-                />
+              <div className="mb-5 group">
+                <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">{t('firstName')}</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    placeholder={t('enterFirstName')}
+                    className={inputClassName('firstName')}
+                    autoComplete="off"
+                  />
+                  <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
+                </div>
                 {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
               </div>
 
-              <div className="mb-4 group">
-                <label className="block text-sm font-medium text-gray-400 mb-1 group-hover:text-blue-400 transition-colors">Last Name</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Enter your last name"
-                  className={inputClassName('lastName')}
-                  autoComplete="off"
-                />
+              <div className="mb-5 group">
+                <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">{t('lastName')}</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    placeholder={t('enterLastName')}
+                    className={inputClassName('lastName')}
+                    autoComplete="off"
+                  />
+                  <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
+                </div>
                 {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
               </div>
             </div>
 
-            <div className="mb-4 group">
-              <label className="block text-sm font-medium text-gray-400 mb-1 group-hover:text-blue-400 transition-colors">Email Address</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email address"
-                className={inputClassName('email')}
-                autoComplete="off"
-              />
+            <div className="mb-5 group">
+              <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">{t('emailAddress')}</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder={t('enterEmail')}
+                  className={inputClassName('email')}
+                  autoComplete="off"
+                />
+                <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
+              </div>
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
-              <div className="mb-4 group">
-                <label className="block text-sm font-medium text-gray-400 mb-1 group-hover:text-blue-400 transition-colors">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Enter your password"
-                  className={inputClassName('password')}
-                  autoComplete="off"
-                />
+              <div className="mb-5 group">
+                <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">{t('password')}</label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder={t('enterPassword')}
+                    className={inputClassName('password')}
+                    autoComplete="off"
+                  />
+                  <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
+                </div>
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
 
-              <div className="mb-4 group">
-                <label className="block text-sm font-medium text-gray-400 mb-1 group-hover:text-blue-400 transition-colors">Confirm Password</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm your password"
-                  className={inputClassName('confirmPassword')}
-                  autoComplete="off"
-                />
+              <div className="mb-5 group">
+                <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">{t('confirmPassword')}</label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder={t('confirmYourPassword')}
+                    className={inputClassName('confirmPassword')}
+                    autoComplete="off"
+                  />
+                  <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
+                </div>
                 {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
               </div>
             </div>
 
             <div className="mb-6 group">
-              <label className="block text-sm font-medium text-gray-400 mb-1 group-hover:text-blue-400 transition-colors">Phone Number</label>
-              <input
-                type="tel"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                placeholder="Enter your phone number"
-                className={inputClassName('phoneNumber')}
-                autoComplete="off"
-              />
+              <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">{t('phoneNumber')}</label>
+              <div className="relative">
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  placeholder={t('enterPhoneNumber')}
+                  className={inputClassName('phoneNumber')}
+                  autoComplete="off"
+                />
+                <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-500"></div>
+              </div>
               {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>}
             </div>
-
-            <div className="mb-6">
+            
+            <div className="mb-8">
               <div className="flex items-start">
                 <div className="flex items-center h-5">
                   <input
-                    id="terms"
+                    id="agreeTerms"
                     name="agreeTerms"
                     type="checkbox"
                     checked={formData.agreeTerms}
                     onChange={handleChange}
-                    className="w-4 h-4 bg-black border-gray-600 rounded focus:ring-blue-500 hover:border-blue-400 transition-colors"
+                    className="w-4 h-4 bg-transparent border-cyan-800 rounded focus:ring-cyan-500 text-cyan-500"
                   />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor="terms" className="text-gray-300 hover:text-blue-400 transition-colors">
-                    I agree to the <a href="#" className="text-blue-400 hover:text-blue-300 hover:underline transition-colors">Terms of Service</a> and <a href="#" className="text-blue-400 hover:text-blue-300 hover:underline transition-colors">Privacy Policy</a>
+                  <label htmlFor="agreeTerms" className="text-gray-300 hover:text-cyan-300 transition-colors duration-300">
+                    {t('agreeToTerms')}
                   </label>
-                  {errors.agreeTerms && <p className="text-red-500 text-xs mt-1">{errors.agreeTerms}</p>}
                 </div>
               </div>
+              {errors.agreeTerms && <p className="text-red-500 text-xs mt-1">{errors.agreeTerms}</p>}
             </div>
 
             <button
               type="submit"
-              className="w-full px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-blue-600 to-gray-800 hover:from-blue-500 hover:to-gray-500 rounded-lg transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 cursor-pointer"
+              className="w-full px-6 py-3.5 text-base font-medium text-black bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white rounded-md transform transition-all duration-500 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/30 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none cursor-pointer relative overflow-hidden group"
             >
-              Create Account
+              {/* Effet de lueur au survol */}
+              <span className="absolute inset-0 bg-white/30 opacity-0 group-hover:opacity-10 transition-opacity"></span>
+              {/* Effet subtil de ligne en bas */}
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/10"></span>
+              
+              {t('signUp')}
             </button>
-          </form>
 
-          {/* Login Link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm font-['Orbitron']">
-              Already have an account?{' '}
-              <Link to="/login" className="text-blue-400 hover:text-blue-300 hover:underline transition-colors">
-                Log in
-              </Link>
-            </p>
-          </div>
+            {/* Lien vers la connexion */}
+            <div className="text-center mt-8 relative">
+              <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent -z-10"></div>
+              <span className="px-4 bg-black/60 backdrop-blur-sm relative inline-block">
+                <p className="text-sm text-gray-400">
+                  {t('alreadyHaveAccount')} 
+                  <Link to="/login" className="ml-2 text-cyan-400 hover:text-white transition-colors duration-300 relative group">
+                    {t('signIn')}
+                    <span className="absolute left-0 bottom-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
+                  </Link>
+                </p>
+              </span>
+            </div>
+          </form>
         </div>
       </div>
-
-      {/* Animated Divider */}
+      
+      {/* Séparateur animé */}
       <div className="relative h-px w-full overflow-hidden">
-        <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-blue-500 via-purple-600 to-blue-500 animate-pulse"></div>
+        <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse"></div>
       </div>
     </div>
   );

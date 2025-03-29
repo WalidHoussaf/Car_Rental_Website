@@ -1,4 +1,6 @@
 import logo from './logo.png'
+import frenchFlag from './france.png'
+import ukFlag from './united-kingdom.png'
 import bmw from './cars/bmw.png'
 import mercedes from './cars/mercedes.png'
 import tesla from './cars/tesla.png'
@@ -110,6 +112,8 @@ import luxury from './faq/luxury.png'
 
 export const assets = {
     logo,
+    frenchFlag,
+    ukFlag,
     cars: {
         tesla,
         bmw,
@@ -828,33 +832,50 @@ export const sampleCars = [
 
 // Categories for filter
 export const categories = [
-  { value: 'all', label: 'All Categories' },
-  { value: 'luxury', label: 'Luxury' },
-  { value: 'sport', label: 'Sport' },
-  { value: 'suv', label: 'SUV' }
+  { value: 'all', label: { en: 'All Categories', fr: 'Toutes les Catégories' } },
+  { value: 'luxury', label: { en: 'Luxury', fr: 'Luxe' } },
+  { value: 'sport', label: { en: 'Sport', fr: 'Sport' } },
+  { value: 'suv', label: { en: 'SUV', fr: 'SUV' } }
 ];
+
+// Object pour les traductions des catégories
+export const categoryTranslations = {
+  luxury: { en: 'Luxury', fr: 'Luxe' },
+  sport: { en: 'Sport', fr: 'Sport' },
+  suv: { en: 'SUV', fr: 'SUV' },
+  all: { en: 'All Categories', fr: 'Toutes Catégories' },
+  'luxury suv': { en: 'Luxury SUV', fr: 'SUV de Luxe' },
+  'hybrid sport': { en: 'Hybrid Sport', fr: 'Sport Hybride' },
+  electric: { en: 'Electric', fr: 'Électrique' }
+};
 
 // Locations for filter
 export const locations = [
-  { value: 'all', label: 'All Locations' },
-  { value: 'casablanca', label: 'Casablanca' },
-  { value: 'rabat', label: 'Rabat' },
-  { value: 'marrakesh', label: 'Marrakesh' },
-  { value: 'mohammedia', label: 'Mohammedia' },
-  { value: 'kenitra', label: 'Kenitra' },
-  { value: 'agadir', label: 'Agadir' },
-  { value: 'tangier', label: 'Tangier' },
-  
-
+  { value: 'all', label: { en: 'All Locations', fr: 'Tous les Emplacements' } },
+  { value: 'casablanca', label: { en: 'Casablanca', fr: 'Casablanca' } },
+  { value: 'rabat', label: { en: 'Rabat', fr: 'Rabat' } },
+  { value: 'marrakesh', label: { en: 'Marrakesh', fr: 'Marrakech' } },
+  { value: 'mohammedia', label: { en: 'Mohammedia', fr: 'Mohammedia' } },
+  { value: 'kenitra', label: { en: 'Kenitra', fr: 'Kénitra' } },
+  { value: 'agadir', label: { en: 'Agadir', fr: 'Agadir' } },
+  { value: 'tangier', label: { en: 'Tangier', fr: 'Tanger' } }
 ];
 
 // Features for filter
 export const featureOptions = [
-  { value: 'leather seats', label: 'Leather Seats' },
-  { value: 'panoramic roof', label: 'Panoramic Roof' },
-  { value: 'driver assistance', label: 'Driver Assistance' },
-  { value: 'air suspension', label: 'Air Suspension' },
-  { value: 'heated seats', label: 'Heated Seats' },
-  { value: 'premium sound system', label: 'Premium Sound System' },
-  { value: 'adaptive suspension', label: 'Adaptive Suspension' }
+  { value: 'leather seats', label: { en: 'Leather Seats', fr: 'Sièges en Cuir' } },
+  { value: 'panoramic roof', label: { en: 'Panoramic Roof', fr: 'Toit Panoramique' } },
+  { value: 'driver assistance', label: { en: 'Driver Assistance', fr: 'Assistance à la Conduite' } },
+  { value: 'air suspension', label: { en: 'Air Suspension', fr: 'Suspension Pneumatique' } },
+  { value: 'heated seats', label: { en: 'Heated Seats', fr: 'Sièges Chauffants' } },
+  { value: 'premium sound system', label: { en: 'Premium Sound System', fr: 'Système Audio Premium' } },
+  { value: 'adaptive suspension', label: { en: 'Adaptive Suspension', fr: 'Suspension Adaptative' } },
+  { value: 'autopilot', label: { en: 'Autopilot', fr: 'Pilote Automatique' } },
+  { value: 'all-wheel drive', label: { en: 'All-Wheel Drive', fr: 'Transmission Intégrale' } },
+  { value: 'massage seats', label: { en: 'Massage Seats', fr: 'Sièges Massants' } },
+  { value: 'carbon fiber', label: { en: 'Carbon Fiber Components', fr: 'Composants en Fibre de Carbone' } },
+  { value: 'turbo', label: { en: 'Turbo Engine', fr: 'Moteur Turbo' } },
+  { value: 'v8', label: { en: 'V8 Engine', fr: 'Moteur V8' } },
+  { value: 'ventilated seats', label: { en: 'Ventilated Seats', fr: 'Sièges Ventilés' } },
+  { value: 'head-up display', label: { en: 'Head-Up Display', fr: 'Affichage Tête Haute' } }
 ];

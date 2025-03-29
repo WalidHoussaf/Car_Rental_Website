@@ -1,7 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTranslations } from '../../translations';
 
 const PopularDestinations = ({ destinations }) => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+
+  // Fonction pour obtenir le nom traduit d'une destination
+  const getTranslatedName = (destination) => {
+    const key = `destination_${destination.name.toLowerCase().replace(/\s+/g, '_')}`;
+    return t(key) || destination.name;
+  };
+
+  // Fonction pour obtenir la description traduite d'une destination
+  const getTranslatedDescription = (destination) => {
+    const key = `destination_${destination.name.toLowerCase().replace(/\s+/g, '_')}_desc`;
+    return t(key) || destination.description || t('exploreDestination');
+  };
+
   return (
     <section className="relative py-24 px-4 bg-black overflow-hidden">
       {/* Background Effects */}
@@ -17,7 +34,7 @@ const PopularDestinations = ({ destinations }) => {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <h2 className="text-2xl md:text-5xl font-semibold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
-          Popular Destinations
+          {t('popularDestinations')}
         </h2>
     
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -54,7 +71,7 @@ const PopularDestinations = ({ destinations }) => {
               </div>
               <img
                 src={destination.image}
-                alt={destination.name}
+                alt={getTranslatedName(destination)}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               
@@ -68,10 +85,12 @@ const PopularDestinations = ({ destinations }) => {
               
               {/* Content */}
               <div className="absolute bottom-0 left-0 right-0 p-6 z-30 transform transition-transform duration-500 translate-y-2 group-hover:translate-y-0">
-                <h3 className="text-2xl font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300 font-['Orbitron'] mb-3">{destination.name}</h3>
+                <h3 className="text-2xl font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300 font-['Orbitron'] mb-3">
+                  {getTranslatedName(destination)}
+                </h3>
                 
                 <p className="text-xs text-gray-300 mb-4 opacity-0 group-hover:opacity-100 transform transition-all duration-500 translate-y-4 group-hover:translate-y-0 font-['Orbitron']">
-                  {destination.description || "Explore the futuristic cityscape and iconic landmarks."}
+                  {getTranslatedDescription(destination)}
                 </p>
                 
                 <Link
@@ -80,7 +99,7 @@ const PopularDestinations = ({ destinations }) => {
                 >
                   {/* Animated background glow */}
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
-                  <span className="relative z-10 font-['Orbitron']">Discover Rides</span>
+                  <span className="relative z-10 font-['Orbitron']">{t('discoverRides')}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 relative z-10 transform transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>

@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTranslations } from '../../translations';
 
 const AvailabilitySection = ({ carId }) => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = useTranslations(language);
   const [isAvailable, setIsAvailable] = useState(null);
   const [nextAvailableDate, setNextAvailableDate] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -37,7 +41,7 @@ const AvailabilitySection = ({ carId }) => {
     // Validate date is not in the past
     if (!isValidDate(date)) {
       setIsAvailable(false);
-      setDateError("Cannot select a date in the past");
+      setDateError(t('cannotSelectPastDate'));
       setLoading(false);
       return;
     }
@@ -72,7 +76,7 @@ const AvailabilitySection = ({ carId }) => {
     setSelectedDate(newDate);
     
     if (!isValidDate(newDate)) {
-      setDateError("Cannot select a date in the past");
+      setDateError(t('cannotSelectPastDate'));
       setIsAvailable(false);
     } else {
       setDateError(null);
@@ -91,12 +95,14 @@ const AvailabilitySection = ({ carId }) => {
   // Format date for display
   const formatDateForDisplay = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
+    const options = { 
       weekday: 'short', 
       month: 'short', 
       day: 'numeric', 
       year: 'numeric' 
-    });
+    };
+    
+    return date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', options);
   };
 
   // Check availability when component mounts or date changes
@@ -104,7 +110,7 @@ const AvailabilitySection = ({ carId }) => {
     if (isValidDate(selectedDate)) {
       checkAvailability(selectedDate);
     } else {
-      setDateError("Cannot select a date in the past");
+      setDateError(t('cannotSelectPastDate'));
       setIsAvailable(false);
     }
   }, [carId]);
@@ -126,7 +132,7 @@ const AvailabilitySection = ({ carId }) => {
           className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500/50 rounded-md p-2 text-center transition-colors duration-300"
         >
           <div className="text-xs text-gray-400 font-['Orbitron']">
-            {date.toLocaleDateString('en-US', { weekday: 'short' })}
+            {date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'short' })}
           </div>
           <div className="text-lg text-white font-['Rationale']">
             {date.getDate()}
@@ -141,13 +147,13 @@ const AvailabilitySection = ({ carId }) => {
   return (
     <div className="bg-gradient-to-b from-gray-900/40 to-black/20 backdrop-blur-sm border border-gray-800 rounded-lg p-6 mb-8">
       <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-6">
-        Availability
+        {t('availability')}
       </h2>
       
       {/* Custom Date Selector */}
       <div className="mb-6">
         <label className="block text-gray-400 text-sm font-['Orbitron'] mb-2">
-          Check availability for:
+          {t('checkAvailabilityFor')}
         </label>
         <div className="relative">
           <div 
@@ -175,7 +181,7 @@ const AvailabilitySection = ({ carId }) => {
           {isCalendarOpen && (
             <div className="absolute z-10 mt-2 w-full bg-gray-900 border border-cyan-500/30 rounded-lg shadow-lg shadow-cyan-500/10 overflow-hidden">
               <div className="p-3 border-b border-gray-800 flex justify-between items-center">
-                <span className="font-['Orbitron'] text-cyan-400 text-sm">SELECT DATE</span>
+                <span className="font-['Orbitron'] text-cyan-400 text-sm">{t('selectDate')}</span>
                 <button 
                   onClick={() => setIsCalendarOpen(false)}
                   className="text-gray-400 hover:text-white"
@@ -206,11 +212,11 @@ const AvailabilitySection = ({ carId }) => {
       {loading ? (
         <div className="flex items-center space-x-3 py-4">
           <div className="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-gray-300 font-['Orbitron']">Checking availability...</span>
+          <span className="text-gray-300 font-['Orbitron']">{t('checkingAvailability')}</span>
         </div>
       ) : isAvailable === null ? (
         <div className="py-4">
-          <span className="text-gray-400 font-['Orbitron']">Select a date to check availability</span>
+          <span className="text-gray-400 font-['Orbitron']">{t('selectDateToCheck')}</span>
         </div>
       ) : dateError ? (
         <div className="bg-gradient-to-r from-red-900/30 to-red-800/20 border border-red-800/30 rounded-lg p-4 flex items-center">
@@ -220,10 +226,10 @@ const AvailabilitySection = ({ carId }) => {
             </svg>
           </div>
           <div>
-            <p className="text-red-400 font-['Orbitron'] font-bold">Invalid Date</p>
+            <p className="text-red-400 font-['Orbitron'] font-bold">{t('invalidDate')}</p>
             <p className="text-gray-300 text-sm font-['Rationale']">{dateError}</p>
             <p className="text-cyan-400 text-sm font-['Rationale'] mt-1">
-              Please select a date starting from today
+              {t('pleaseSelectFromToday')}
             </p>
           </div>
         </div>
@@ -235,8 +241,8 @@ const AvailabilitySection = ({ carId }) => {
             </svg>
           </div>
           <div>
-            <p className="text-green-400 font-['Orbitron'] font-bold">Available!</p>
-            <p className="text-gray-300 text-2xs font-['Rationale']">This vehicle is available on {formatDateForDisplay(selectedDate)}</p>
+            <p className="text-green-400 font-['Orbitron'] font-bold">{t('availableExclamation')}</p>
+            <p className="text-gray-300 text-2xs font-['Rationale']">{t('vehicleAvailableOn')} {formatDateForDisplay(selectedDate)}</p>
           </div>
         </div>
       ) : (
@@ -247,11 +253,11 @@ const AvailabilitySection = ({ carId }) => {
             </svg>
           </div>
           <div>
-            <p className="text-red-400 font-['Orbitron'] font-bold">Not Available</p>
-            <p className="text-gray-300 text-2xs font-['Rationale']">This vehicle is not available on the selected date.</p>
+            <p className="text-red-400 font-['Orbitron'] font-bold">{t('notAvailable')}</p>
+            <p className="text-gray-300 text-2xs font-['Rationale']">{t('vehicleNotAvailable')}</p>
             {nextAvailableDate && (
               <p className="text-cyan-400 text-2xs font-['Rationale'] mt-1">
-                Next available on {formatDateForDisplay(nextAvailableDate)}
+                {t('nextAvailableOn')} {formatDateForDisplay(nextAvailableDate)}
               </p>
             )}
           </div>
@@ -269,13 +275,13 @@ const AvailabilitySection = ({ carId }) => {
           disabled={!isAvailable || loading || dateError}
           onClick={handleReserveNow}
         >
-          Reserve Now
+          {t('reserveNow')}
         </button>
         <button 
           className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white font-['Orbitron'] text-sm rounded-md flex-1 transition-colors duration-300 cursor-pointer"
           onClick={() => checkAvailability(selectedDate)}
         >
-          Check Again
+          {t('checkAgain')}
         </button>
       </div>
     </div>

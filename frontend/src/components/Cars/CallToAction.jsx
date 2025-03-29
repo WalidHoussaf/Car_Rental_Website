@@ -1,6 +1,11 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTranslations } from '../../translations';
 
 const CallToAction = () => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
   return (
     <section className="relative py-16 overflow-hidden">
       {/* Background Elements */}
@@ -24,13 +29,13 @@ const CallToAction = () => {
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="max-w-2xl">
               <div className="inline-block mb-3 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20">
-                <span className="text-xs text-cyan-400 font-['Orbitron'] tracking-widest">PREMIUM EXPERIENCE</span>
+                <span className="text-xs text-cyan-400 font-['Orbitron'] tracking-widest">{t('premiumExperience')}</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-white font-['Orbitron'] mb-4 leading-tight">
-                Ready to Experience the <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">Future of Transportation?</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('futureTransportation')}</span>
               </h2>
               <p className="text-gray-300 text-lg mb-8 max-w-xl font-['Orbitron'] text-justify">
-                Join thousands of satisfied customers who have chosen our fleet for their transportation needs. Book your ride today and experience luxury like never before.
+                {t('joinCustomers')}
               </p>
             </div>
             
@@ -39,13 +44,13 @@ const CallToAction = () => {
                 onClick={() => window.location.href = '/faq'} 
                 className="px-8 py-4 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 rounded-md cursor-pointer"
               >
-                NEED HELP ?
+                {t('needHelp')}
               </button>
               <button 
                 onClick={() => window.location.href = '/contact'} 
                 className="px-8 py-4 bg-transparent border border-cyan-500/50 hover:border-cyan-400 text-cyan-400 hover:text-cyan-300 font-['Orbitron'] transition-all duration-300 rounded-md cursor-pointer"
               >
-                CONTACT US
+                {t('contactUs')}
               </button>
             </div>
           </div>

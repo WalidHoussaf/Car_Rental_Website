@@ -7,6 +7,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CarProvider } from './context/CarContext';
 import { BookingProvider } from './context/BookingContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <CarProvider>
         <BookingProvider>
           <NotificationProvider>
+            <LanguageProvider>
               <App />
+            </LanguageProvider>
           </NotificationProvider>
         </BookingProvider>
       </CarProvider>

@@ -1,7 +1,12 @@
 import React from 'react';
 import { assets } from '../../assets/assets';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTranslations } from '../../translations';
 
 const HeroSection = ({ onExploreClick, onLearnMoreClick }) => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
   return (
     <section className="relative h-screen max-h-[600px] bg-black overflow-hidden">
       {/* Video Background */}
@@ -22,27 +27,27 @@ const HeroSection = ({ onExploreClick, onLearnMoreClick }) => {
       <div className="relative z-10 h-full flex flex-col items-center justify-center">
         <div className="text-center px-4 max-w-4xl mx-auto">
           <div className="inline-block mb-6 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20">
-            <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">EXPERIENCE THE FUTURE</span>
+            <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('experienceTheFuture')}</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white font-['Orbitron'] mb-6 tracking-tight">
-            OUR FLEET
+            {t('ourFleet')}
           </h1>
           
           <p className="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl font-['Orbitron'] leading-relaxed mb-8">
-            Discover the most advanced vehicles in our collection. From luxury cruisers to high-performance speedsters, find your perfect ride.
+            {t('discoverFleetDescription')}
           </p>
           
           <div className="flex flex-wrap gap-4 justify-center">
             <button 
             onClick={onExploreClick}
             className="px-6 py-3 rounded-md bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-cyan-600/20 hover:shadow-cyan-500/30 cursor-pointer">
-              EXPLORE CARS
+              {t('exploreCars')}
             </button>
             <button 
             onClick={onLearnMoreClick}
             className="px-6 py-3 rounded-md bg-transparent border border-cyan-500/50 hover:border-cyan-400 text-cyan-400 hover:text-cyan-300 font-['Orbitron'] transition-all duration-300 cursor-pointer">
-              LEARN MORE
+              {t('learnMore')}
             </button>
           </div>
         </div>

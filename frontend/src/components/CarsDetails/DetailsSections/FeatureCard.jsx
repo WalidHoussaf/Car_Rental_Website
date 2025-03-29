@@ -1,7 +1,19 @@
 import React from 'react';
-import { RocketIcon } from 'lucide-react';
+import { featureIcons } from './featureIcons.jsx';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useTranslations } from '../../../translations';
 
-const FeatureCard = ({ feature, icon = <RocketIcon />, description = "Experience the finest in automotive technology and comfort with this premium feature." }) => {
+const FeatureCard = ({ feature, iconType, icon, description = "" }) => {
+  // Utiliser les hooks pour la traduction
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
+  // Déterminer l'icône à afficher en fonction de iconType ou utiliser l'icône personnalisée fournie
+  const displayIcon = iconType ? featureIcons[iconType] || featureIcons.default : icon;
+  
+  // Utiliser la description fournie ou une description par défaut traduite
+  const featureDescription = description || t('defaultFeatureDescription');
+  
   return (
     <div className="group relative bg-gradient-to-br from-gray-900/70 to-black/80 border border-gray-800 rounded-xl p-6 hover:border-blue-500 transition-all duration-300 overflow-hidden shadow-lg">
       {/* Glow effect */}
@@ -13,7 +25,7 @@ const FeatureCard = ({ feature, icon = <RocketIcon />, description = "Experience
       <div className="flex items-start gap-4">
         {/* Icon Container */}
         <div className="bg-blue-500/20 p-2 rounded-lg text-cyan-400 group-hover:text-blue-300 group-hover:bg-blue-500/30 transition-all duration-300">
-          {icon}
+          {displayIcon}
         </div>
 
         <div className="flex-1">
@@ -22,7 +34,7 @@ const FeatureCard = ({ feature, icon = <RocketIcon />, description = "Experience
           
           {/* Description */}
           <p className="text-gray-400 text-sm font-['Orbitron'] text-justify group-hover:text-gray-300 transition-colors duration-300">
-            {description}
+            {featureDescription}
           </p>
         </div>
       </div>
