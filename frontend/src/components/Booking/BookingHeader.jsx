@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
 
-// Composant icône futuriste pour le calendrier (Dates)
+// Futuristic calendar icon component (Dates)
 const CalendarIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
     <path className="stroke-current stroke-1" strokeLinecap="round" d="M6 2v4M18 2v4" />
@@ -17,7 +17,7 @@ const CalendarIcon = () => (
   </svg>
 );
 
-// Composant icône futuriste pour la localisation (Location)
+// Futuristic location icon component (Location)
 const LocationIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
@@ -27,27 +27,27 @@ const LocationIcon = () => (
   </svg>
 );
 
-// Composant icône futuriste pour les options
+// Futuristic options icon component
 const OptionsIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-    {/* Cercle extérieur */}
+    {/* Outer circle */}
     <circle cx="12" cy="12" r="10" className="fill-transparent stroke-current stroke-1" />
     
-    {/* Engrenage principal */}
+    {/* Main gear */}
     <path d="M12 6.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" className="fill-transparent stroke-current stroke-1" />
     
-    {/* Dents d'engrenage */}
+    {/* Gear teeth */}
     <path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8M19.1 19.1l-1.8-1.8M6.7 6.7l-1.8-1.8" strokeLinecap="round" className="stroke-current stroke-1" />
     
-    {/* Point central */}
+    {/* Center point */}
     <circle cx="12" cy="12" r="1.8" className="fill-current" />
     
-    {/* Effet lumineux */}
+    {/* Light effect */}
     <circle cx="12" cy="12" r="3" className="fill-transparent stroke-current stroke-1" strokeDasharray="0.5 1" />
   </svg>
 );
 
-// Composant icône futuriste pour le résumé
+// Futuristic summary icon component
 const SummaryIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
     <rect x="3" y="3" width="18" height="18" rx="2" className="fill-transparent stroke-current stroke-1" />
@@ -61,7 +61,7 @@ const BookingHeader = ({ car, bookingStep }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Étapes pour le processus de réservation avec icônes SVG
+  // Booking process steps with SVG icons
   const steps = [
     { id: 1, name: t('dates'), icon: <CalendarIcon />, description: t('selectRentalPeriod') },
     { id: 2, name: t('location'), icon: <LocationIcon />, description: t('choosePickupReturn') },
@@ -71,7 +71,7 @@ const BookingHeader = ({ car, bookingStep }) => {
 
   return (
     <div className="relative py-16 overflow-hidden">
-      {/* Éléments d'arrière-plan */}
+      {/* Background elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-900/5 to-cyan-900/5 pointer-events-none"></div>
       <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none">
         <div className="h-full w-full" style={{

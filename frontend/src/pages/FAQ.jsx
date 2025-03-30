@@ -12,10 +12,10 @@ const FAQPage = () => {
   const faqSectionRef = useRef(null);
   const guidesRef = useRef(null);
   
-  // State to track which FAQ items are expanded
+  // State to Track which FAQ Items are Expanded
   const [expandedItems, setExpandedItems] = useState({});
   
-  // Toggle FAQ item expansion
+  // Toggle FAQ Item Expansion
   const toggleItem = (id) => {
     setExpandedItems(prev => ({
       ...prev,
@@ -23,7 +23,7 @@ const FAQPage = () => {
     }));
   };
   
-  // FAQ categories and questions
+  // FAQ Categories and Questions
   const faqCategories = [
     {
       id: "booking",
@@ -162,10 +162,10 @@ const FAQPage = () => {
     }
   ];
   
-  // Search functionality
+  // Search Functionality
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Filter questions based on search query
+  // Filter Questions Based on Search Query
   const getFilteredFAQs = () => {
     if (!searchQuery.trim()) return faqCategories;
     
@@ -320,7 +320,7 @@ const FAQPage = () => {
                         )}
                       </div>
                       
-                      {/* Border accents */}
+                      {/* Border Accents */}
                       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent group-hover:via-cyan-400/60 transition-colors duration-500"></div>
                       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent group-hover:via-cyan-400/60 transition-colors duration-500"></div>
                     </div>
@@ -366,7 +366,7 @@ const FAQPage = () => {
           <div className="absolute bottom-20 left-20 w-64 h-64 rounded-full bg-blue-500/5 blur-[100px]"></div>
         </div>
         
-        {/* Decorative elements */}
+        {/* Decorative Elements */}
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
         
@@ -406,7 +406,7 @@ const FAQPage = () => {
       
       {/* Popular Guides */}
       <section ref={guidesRef} className="py-16 px-4 relative overflow-hidden">
-        {/* Background effects */}
+        {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <GlowingGrid containerRef={guidesRef} />
           <div className="absolute top-1/4 right-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -444,7 +444,7 @@ const FAQPage = () => {
               
               <div className="p-6 relative">
                 <h3 className="text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('howToChooseRightCar')}</h3>
-                <p className="text-gray-400 text-sm mb-4">
+                <p className="text-gray-400 text-sm mb-4 text-justify">
                   {language === 'fr'
                     ? "Tout ce que vous devez savoir pour une expérience de location fluide avec Rent My Ride."
                     : "Everything you need to know for a smooth rental experience with Rent My Ride."}
@@ -457,7 +457,7 @@ const FAQPage = () => {
                 </Link>
               </div>
               
-              {/* Glow effect */}
+              {/* Glow Effect */}
               <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             </div>
             
@@ -474,7 +474,7 @@ const FAQPage = () => {
               
               <div className="p-6 relative">
                 <h3 className="text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('drivingInMorocco')}</h3>
-                <p className="text-gray-400 text-sm mb-4">
+                <p className="text-gray-400 text-sm mb-4 text-justify">
                   {language === 'fr'
                     ? "Informations essentielles sur les lois locales de conduite, les coutumes et les itinéraires recommandés."
                     : "Essential information about local driving laws, customs, and recommended routes."}
@@ -487,7 +487,7 @@ const FAQPage = () => {
                 </Link>
               </div>
               
-              {/* Glow effect */}
+              {/* Glow Effect */}
               <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             </div>
             
@@ -504,7 +504,7 @@ const FAQPage = () => {
               
               <div className="p-6 relative">
                 <h3 className="text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('ultimateRoadTrip')}</h3>
-                <p className="text-gray-400 text-sm mb-4">
+                <p className="text-gray-400 text-sm mb-4 text-justify">
                   {language === 'fr'
                     ? "Comment sélectionner le véhicule de luxe ou sportif idéal pour votre aventure marocaine."
                     : "How to select the ideal luxury or sports car for your Moroccan adventure."}
@@ -517,7 +517,7 @@ const FAQPage = () => {
                 </Link>
               </div>
               
-              {/* Glow effect */}
+              {/* Glow Effect */}
               <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             </div>
           </div>
@@ -526,7 +526,7 @@ const FAQPage = () => {
       
       {/* CTA Section */}
       <section className="py-16 px-4 relative overflow-hidden">
-        {/* Background with overlay */}
+        {/* Background with Overlay */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90" />
           <img 

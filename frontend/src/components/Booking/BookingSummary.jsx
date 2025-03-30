@@ -3,7 +3,7 @@ import { assets } from '../../assets/assets';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
 
-// Icônes SVG
+// SVG Icons
 const LocationPinIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
@@ -46,13 +46,13 @@ const PayPalIcon = () => (
   </svg>
 );
 
-// Fonction pour résoudre les chemins d'image
+// Function to resolve image paths
 const resolvePath = (path) => {
   if (!path || typeof path !== 'string') return null;
   
   console.log('Resolving path:', path);
   
-  // Si c'est une référence aux assets (format: "cars.tesla")
+  // If it's a reference to assets (format: "cars.tesla")
   if (path.includes('.')) {
     const parts = path.split('.');
     if (parts.length === 2) {
@@ -77,7 +77,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [carImage, setCarImage] = useState(null);
   
-  // Résoudre l'image de la voiture au chargement et quand car change
+  // Resolve car image on load and when car changes
   useEffect(() => {
     if (!car) return;
     
@@ -85,19 +85,19 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
     
     let image = null;
     
-    // Tentative 1: Utiliser car.image si c'est une référence d'asset
+    // Attempt 1: Use car.image if it's an asset reference
     if (car.image && typeof car.image === 'string' && car.image.includes('.')) {
       console.log('Trying to resolve from car.image:', car.image);
       image = resolvePath(car.image);
     }
     
-    // Tentative 2: Chercher par ID (car1, car2, etc.)
+    // Attempt 2: Look up by ID (car1, car2, etc.)
     if (!image && car.id && assets.cars[`car${car.id}`]) {
       console.log('Resolving from car ID:', car.id);
       image = assets.cars[`car${car.id}`];
     }
     
-    // Tentative 3: Chercher par nom de marque
+    // Attempt 3: Look up by brand name
     if (!image && car.name) {
       const carBrand = car.name.toLowerCase().split(' ')[0];
       console.log('Trying to resolve by car brand:', carBrand);
@@ -302,6 +302,21 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
             ) : (
               <div className="text-gray-500 text-sm font-['Orbitron']">{t('notSelectedYet')}</div>
             )}
+          </div>
+          
+          {/* Map Preview */}
+          <div className="backdrop-blur-sm bg-black/50 p-6 rounded-lg border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group">
+            {/* Luminous glow effect on hover */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 pointer-events-none"></div>
+            
+            <div className="relative">
+              <h3 className="text-lg text-cyan-400 font-['Orbitron'] mb-4 flex items-center">
+                <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-2"></span>
+                {t('rentalSummary')}
+              </h3>
+              
+              {/* ... existing code ... */}
+            </div>
           </div>
         </div>
         

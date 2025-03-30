@@ -50,14 +50,14 @@ const HomePage = () => {
   const [pickupDate, setPickupDate] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
   
-  // Date min pour empêcher la sélection de dates passées
+  // Min Date to Prevent Past Date Selection
   const getTodayFormatted = () => {
     const today = new Date();
     const year = today.getFullYear();
     let month = today.getMonth() + 1;
     let day = today.getDate();
     
-    // Ajouter un zéro devant les mois/jours si nécessaire
+    // Add a Zero in Front of Months/Days if Necessary
     month = month < 10 ? `0${month}` : month;
     day = day < 10 ? `0${day}` : day;
     

@@ -8,7 +8,7 @@ import GlowingGrid from '../components/Ui/GlowingGrid';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-// Icônes SVG
+// SVG Icons
 const SuccessIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -66,11 +66,11 @@ const BookingConfirmation = () => {
   const detailsSectionRef = useRef(null);
   const paymentSectionRef = useRef(null);
 
-  // Récupération des données de réservation depuis l'état de location
+  // Get Booking Data from Location State
   const bookingData = location.state || {};
   const { bookingDetails, carDetails } = bookingData;
 
-  // Fonction d'aide pour formater la date
+  // Format date helper
   const formatDate = (date) => {
     if (!date) return '';
     return new Date(date).toLocaleDateString('fr-FR', { 
@@ -81,7 +81,7 @@ const BookingConfirmation = () => {
     });
   };
 
-  // Liste des options disponibles avec tarification (identique à BookingOption.jsx)
+  // Available options with pricing
   const availableOptions = [
     { id: 'insurance', name: 'Assurance Premium', price: 45 },
     { id: 'driver', name: 'Chauffeur Professionnel', price: 120 },
@@ -91,13 +91,13 @@ const BookingConfirmation = () => {
     { id: 'additional_driver', name: 'Conducteur Supplémentaire', price: 30 }
   ];
 
-  // Résoudre l'image de la voiture
+  // Resolve car image
   useEffect(() => {
     if (!carDetails) return;
     
     let image = null;
     
-    // Tentative 1: Utiliser car.image si c'est une référence d'actif
+    // Try using car.image as asset reference
     if (carDetails.image && typeof carDetails.image === 'string' && carDetails.image.includes('.')) {
       const parts = carDetails.image.split('.');
       if (parts.length === 2) {
@@ -107,12 +107,12 @@ const BookingConfirmation = () => {
       }
     }
     
-    // Tentative 2: Rechercher par ID (car1, car2, etc.)
+    // Try using car ID
     if (!image && carDetails.id && assets.cars[`car${carDetails.id}`]) {
       image = assets.cars[`car${carDetails.id}`];
     }
     
-    // Tentative 3: Rechercher par nom de marque
+    // Try using car brand
     if (!image && carDetails.name) {
       const carBrand = carDetails.name.toLowerCase().split(' ')[0];
       
@@ -128,7 +128,7 @@ const BookingConfirmation = () => {
     setCarImage(image);
   }, [carDetails]);
 
-  // Créer la réservation au montage
+  // Create booking on component mount
   useEffect(() => {
     const createNewBooking = async () => {
       if (!bookingDetails || !carDetails) {
@@ -137,7 +137,6 @@ const BookingConfirmation = () => {
       }
       
       try {
-        // Créer la réservation dans le contexte
         const result = await createBooking({
           car: carDetails,
           ...bookingDetails,
@@ -148,21 +147,18 @@ const BookingConfirmation = () => {
           setBookingId(result.booking.id);
         }
       } catch (error) {
-        console.error('Erreur lors de la création de la réservation:', error);
-      } finally {
-        // Animation de chargement supprimée
+        console.error('Error creating booking:', error);
       }
     };
     
     createNewBooking();
   }, [bookingDetails, carDetails, createBooking, navigate]);
 
-  // Gérer le téléchargement du reçu
+  // Handle receipt download
   const handleDownloadReceipt = () => {
-    // Utiliser cette variable pour éviter les re-renders
     const pdfBookingId = bookingId || 'TEMP-' + Math.floor(Math.random() * 10000);
     
-    // Afficher un message de chargement avec style amélioré
+    // Display loading notification
     const loadingNotification = document.createElement('div');
     loadingNotification.style.position = 'fixed';
     loadingNotification.style.bottom = '20px';
@@ -179,11 +175,11 @@ const BookingConfirmation = () => {
     document.body.appendChild(loadingNotification);
     
     try {
-      // Créer un élément div pour le contenu du PDF avec un style plus élaboré
+      // Create a div element for PDF content with a more elaborate style
       const receiptContent = document.createElement('div');
       receiptContent.id = 'pdf-content';
-      receiptContent.style.width = '210mm'; // Format A4
-      receiptContent.style.padding = '0'; // Supprimer le padding complètement
+      receiptContent.style.width = '210mm'; 
+      receiptContent.style.padding = '0'; 
       receiptContent.style.backgroundColor = 'black';
       receiptContent.style.color = 'white';
       receiptContent.style.fontFamily = '"Orbitron", sans-serif';
@@ -191,11 +187,11 @@ const BookingConfirmation = () => {
       receiptContent.style.top = '0';
       receiptContent.style.left = '0';
       receiptContent.style.zIndex = '-9999';
-      receiptContent.style.margin = '0'; // Supprimer les marges
+      receiptContent.style.margin = '0';
       receiptContent.style.boxSizing = 'border-box';
       receiptContent.style.overflow = 'hidden';
       
-      // Stocker des copies locales pour éviter les problèmes de référence
+      // Store local copies to avoid reference issues
       const carName = carDetails?.name || 'Véhicule';
       const carCategory = carDetails?.category || 'Premium';
       const carPrice = carDetails?.price || 0;
@@ -208,25 +204,25 @@ const BookingConfirmation = () => {
       const hasOptions = bookingDetails?.options && bookingDetails.options.length > 0;
       const optionsPrice = hasOptions ? totalPrice - (carPrice * totalDays) : 0;
       
-      // Déterminer quelles options ont été sélectionnées
+      // Determine which options have been selected
       const selectedOptions = bookingDetails?.options?.map(optionId => {
         return availableOptions.find(opt => opt.id === optionId);
       }).filter(Boolean) || [];
       
-      // Créer le contenu du reçu avec un design adapté au thème noir/cyan et optimisé pour A4
+      // Create the receipt content 
       receiptContent.innerHTML = `
         <div style="border: 1px solid #0e7490; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(8, 145, 178, 0.2); max-width: 100%; margin: 0 auto; background-color: #0f172a;">
-          <!-- Entête -->
+          <!-- Header -->
           <div style="background: linear-gradient(to right, #0e7490, #1e40af); color: white; padding: 15px; position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center;">
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgzMCkiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg=='); opacity: 0.2;"></div>
             
-            <!-- Logo et info à gauche -->
+            <!-- Logo and info to the left -->
             <div style="position: relative; z-index: 1;">
               <h1 style="font-size: 24px; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: white; text-shadow: 0 0 5px rgba(34, 211, 238, 0.7);">RENT MY RIDE</h1>
               <p style="margin: 2px 0 0; font-size: 14px; opacity: 0.9;">${language === 'fr' ? 'Location de Voitures Premium' : 'Premium Car Rental'}</p>
             </div>
             
-            <!-- Informations de contact à droite -->
+            <!-- Contact info to the right -->
             <div style="text-align: right; font-size: 12px; position: relative; z-index: 1;">
               <p style="margin: 0; opacity: 0.8;">www.rentmyride-morocco.ma</p>
               <p style="margin: 0; opacity: 0.8;">info@rentmyride-morocco.ma</p>
@@ -234,12 +230,12 @@ const BookingConfirmation = () => {
             </div>
           </div>
           
-          <!-- Titre du reçu -->
+          <!-- Receipt title -->
           <div style="background-color: #1e293b; padding: 10px; border-bottom: 1px solid #334155; text-align: center;">
             <h2 style="margin: 0; font-size: 16px; font-weight: 600; color: #22d3ee; text-shadow: 0 0 8px rgba(34, 211, 238, 0.5);">${language === 'fr' ? 'CONFIRMATION DE RÉSERVATION' : 'BOOKING CONFIRMATION'}</h2>
           </div>
           
-          <!-- Information de réservation -->
+          <!-- Reservation information -->
           <div style="padding: 15px; background: #0f172a;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
               <div>
@@ -256,7 +252,7 @@ const BookingConfirmation = () => {
               </div>
             </div>
             
-            <!-- Détails du véhicule -->
+            <!-- Vehicle details -->
             <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #334155;">
               <h3 style="margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: #22d3ee;">${language === 'fr' ? 'Détails du Véhicule' : 'Vehicle Details'}</h3>
               <div style="background-color: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; display: flex; align-items: center;">
@@ -279,7 +275,7 @@ const BookingConfirmation = () => {
               </div>
             </div>
             
-            <!-- Détails de la réservation -->
+            <!-- Rental details -->
             <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #334155;">
               <h3 style="margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: #22d3ee;">${language === 'fr' ? 'Détails de la Location' : 'Rental Details'}</h3>
               
@@ -310,7 +306,7 @@ const BookingConfirmation = () => {
               </div>
             </div>
             
-            <!-- Options sélectionnées -->
+            <!-- Selected options -->
             <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #334155;">
               <h3 style="margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: #22d3ee;">${language === 'fr' ? 'Options Sélectionnées' : 'Selected Options'}</h3>
               
@@ -337,7 +333,7 @@ const BookingConfirmation = () => {
               }
             </div>
             
-            <!-- Résumé du paiement -->
+            <!-- Payment summary -->
             <div>
               <h3 style="margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: #22d3ee;">${language === 'fr' ? 'Résumé du Paiement' : 'Payment Summary'}</h3>
               
@@ -377,7 +373,7 @@ const BookingConfirmation = () => {
         </div>
       `;
       
-      // Ajouter des styles pour garantir que tout le PDF a un fond noir
+      // Add styles to ensure that all PDF has a black background
       const style = document.createElement('style');
       style.textContent = `
         @page {
@@ -404,16 +400,15 @@ const BookingConfirmation = () => {
       `;
       document.head.appendChild(style);
 
-      // Ajouter au document
+      // Add to document
       document.body.appendChild(receiptContent);
       
-      // Ajouter temporairement la police Orbitron si elle n'est pas déjà chargée
       const orbitronFont = document.createElement('link');
       orbitronFont.rel = 'stylesheet';
       orbitronFont.href = 'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap';
       document.head.appendChild(orbitronFont);
       
-      // Délai pour laisser le contenu se rendre correctement
+      // Delay for letting content render correctly
       setTimeout(() => {
         const containerBackground = document.createElement('div');
         containerBackground.style.position = 'fixed';
@@ -426,11 +421,11 @@ const BookingConfirmation = () => {
         document.body.appendChild(containerBackground);
         
         html2canvas(receiptContent, {
-          scale: 2, // Meilleure qualité
+          scale: 2, 
           useCORS: true,
           logging: false,
           allowTaint: true,
-          backgroundColor: '#000000', // Assurer que le fond est noir
+          backgroundColor: '#000000', 
           windowWidth: document.documentElement.offsetWidth,
           windowHeight: document.documentElement.offsetHeight,
           x: 0,
@@ -445,48 +440,47 @@ const BookingConfirmation = () => {
             background: 'black'
           });
           
-          // Définir une couleur de fond noire pour tout le document PDF
           pdf.setFillColor(0, 0, 0);
           pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight(), 'F');
           
           const pageWidth = pdf.internal.pageSize.getWidth();
           
           const contentRatio = canvas.height / canvas.width;
-          const imgWidth = pageWidth; // Pleine largeur
+          const imgWidth = pageWidth;
           const imgHeight = imgWidth * contentRatio;
           
-          pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight); // Commencer à 0,0 sans marge
+          pdf.addImage(imgData, 'JPEG', 0, 6, imgWidth, imgHeight); 
           
-          // Enregistrer le PDF
+          // Save the PDF
           pdf.save(`recu-reservation-${pdfBookingId}.pdf`);
           
-          // Nettoyer les éléments
+          // Clean up elements
           document.body.removeChild(containerBackground);
           cleanupAfterPDFGeneration(receiptContent, loadingNotification, true, orbitronFont);
         }).catch(error => {
-          console.error('Erreur lors de la génération du canvas:', error);
+          console.error('Error generating canvas:', error);
           handlePDFError(loadingNotification, orbitronFont);
         });
       }, 1000);
     } catch (error) {
-      console.error('Erreur lors de la préparation du PDF:', error);
+      console.error('Error preparing PDF:', error);
       handlePDFError(loadingNotification);
     }
   };
   
-  // Fonction pour gérer les erreurs PDF
+  // Function to handle PDF errors
   const handlePDFError = (loadingNotification, fontElement = null) => {
-    // Supprimer la notification de chargement
+    // Remove loading notification
     if (document.body.contains(loadingNotification)) {
       document.body.removeChild(loadingNotification);
     }
     
-    // Supprimer l'élément de police si ajouté
+    // Remove font element if added
     if (fontElement && document.head.contains(fontElement)) {
       document.head.removeChild(fontElement);
     }
     
-    // Afficher une notification d'erreur avec style amélioré
+    // Display error notification with improved style
     const errorNotification = document.createElement('div');
     errorNotification.style.position = 'fixed';
     errorNotification.style.bottom = '20px';
@@ -502,39 +496,39 @@ const BookingConfirmation = () => {
     
     document.body.appendChild(errorNotification);
     
-    // Supprimer la notification après 3 secondes
+    // Remove notification after 3 seconds
     setTimeout(() => {
       if (document.body.contains(errorNotification)) {
         document.body.removeChild(errorNotification);
       }
     }, 3000);
     
-    // Nettoyer tout élément PDF restant
+    // Clean up all remaining PDF elements
     const pdfContent = document.getElementById('pdf-content');
     if (pdfContent && document.body.contains(pdfContent)) {
       document.body.removeChild(pdfContent);
     }
   };
   
-  // Fonction pour nettoyer après la génération PDF
+  // Function to clean up after PDF generation
   const cleanupAfterPDFGeneration = (element, loadingNotification, success, fontElement = null) => {
-    // Supprimer l'élément du contenu PDF
+    // Remove PDF content element
     if (element && document.body.contains(element)) {
       document.body.removeChild(element);
     }
     
-    // Supprimer la notification de chargement
+    // Remove loading notification
     if (document.body.contains(loadingNotification)) {
       document.body.removeChild(loadingNotification);
     }
     
-    // Supprimer l'élément de police si ajouté
+    // Remove font element if added
     if (fontElement && document.head.contains(fontElement)) {
       document.head.removeChild(fontElement);
     }
     
     if (success) {
-      // Afficher une notification de succès avec style amélioré
+      // Display success notification 
       const successNotification = document.createElement('div');
       successNotification.style.position = 'fixed';
       successNotification.style.bottom = '20px';
@@ -551,7 +545,7 @@ const BookingConfirmation = () => {
       
       document.body.appendChild(successNotification);
       
-      // Supprimer la notification après 3 secondes
+      // Remove notification after 3 seconds
       setTimeout(() => {
         if (document.body.contains(successNotification)) {
           document.body.removeChild(successNotification);
@@ -560,30 +554,30 @@ const BookingConfirmation = () => {
     }
   };
 
-  // Gérer le clic sur le bouton explorer plus
+  // Handle click on explore more button
   const handleExploreMore = () => {
-    // Force la navigation avec un rafraîchissement de la page
+    // Force navigation with page refresh
     window.location.href = '/cars';
   };
 
-  // Si pas de données de réservation, retourner à la page des voitures
+  // If no booking data, return to vehicles page
   if (!bookingDetails || !carDetails) {
-    return null; // Redirigera dans useEffect
+    return null; 
   }
 
   return (
     <div className="min-h-screen bg-black text-white pt-20 font-['Orbitron'] relative">
-      {/* Section Héro */}
+      {/* Hero Section */}
       <div className="w-full py-20 relative overflow-hidden">
-        {/* Éléments d'arrière-plan */}
+        {/* Background elements */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90 z-0"></div>
         <div className="absolute inset-0 opacity-10 z-0 bg-[url('/patterns/grid-pattern.svg')] bg-center"></div>
         
-        {/* Particules flottantes et effets lumineux */}
+        {/* Static light effects */}
         <div className="absolute inset-0 pointer-events-none z-100">
-          <FloatingParticles />
           <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-[100px]"></div>
           <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px]"></div>
+          <div className="absolute top-1/2 left-1/4 w-48 h-48 bg-purple-500/5 rounded-full blur-[80px]"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
@@ -606,7 +600,7 @@ const BookingConfirmation = () => {
               {t('bookingSuccessDescription')}
             </p>
             
-            {/* Boutons d'action déplacés en haut */}
+            {/* Action buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
                 onClick={handleDownloadReceipt}
@@ -635,7 +629,7 @@ const BookingConfirmation = () => {
         <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
       </div>
 
-      {/* Détails de la confirmation */}
+      {/* Booking Details Section */}
       <div ref={detailsSectionRef} className="py-16 px-4 relative overflow-hidden">
         {/* Background effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -646,7 +640,7 @@ const BookingConfirmation = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/90 pointer-events-none"></div>
         
         <div className="container mx-auto max-w-4xl relative z-10">
-          {/* Titre de section */}
+          {/* Section title */}
           <div className="text-center mb-12">
             <div className="relative">
               <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl"></div>
@@ -657,10 +651,10 @@ const BookingConfirmation = () => {
             </div>
           </div>
           
-          {/* Carte d'informations sur la voiture */}
+          {/* Car information card */}
           <div className="mb-12 bg-gradient-to-b from-gray-900/60 to-black/60 rounded-xl overflow-hidden shadow-[0_0_25px_rgba(6,182,212,0.1)] border border-cyan-900/30 backdrop-blur-sm hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] transition-all duration-500 transform hover:scale-[1.01] group">
             <div className="flex flex-col md:flex-row">
-              {/* Image de la voiture */}
+              {/* Car image */}
               <div className="md:w-2/5 relative overflow-hidden">
                 {carImage ? (
                   <img 
@@ -685,11 +679,8 @@ const BookingConfirmation = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
               
-              {/* Détails de la voiture */}
+              {/* Car details */}
               <div className="md:w-3/5 p-8 relative">
-                {/* Corner accents */}
-                <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50"></div>
-                <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50"></div>
                 
                 <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-4">
                   {carDetails.name}
@@ -707,7 +698,7 @@ const BookingConfirmation = () => {
                 </div>
                 
                 <div className="space-y-5">
-                  {/* Période de location */}
+                  {/* Rental period */}
                   <div className="flex items-start group">
                     <div className="w-10 h-10 rounded-full bg-cyan-900/20 flex items-center justify-center text-cyan-400 mr-4 mt-1 transition-all duration-300 group-hover:bg-cyan-900/40">
                       <CalendarIcon />
@@ -721,7 +712,7 @@ const BookingConfirmation = () => {
                     </div>
                   </div>
                   
-                  {/* Lieux */}
+                  {/* Locations */}
                   <div className="flex items-start group">
                     <div className="w-10 h-10 rounded-full bg-purple-900/20 flex items-center justify-center text-purple-400 mr-4 mt-1 transition-all duration-300 group-hover:bg-purple-900/40">
                       <LocationIcon />
@@ -741,13 +732,10 @@ const BookingConfirmation = () => {
             </div>
           </div>
           
-          {/* Détails de réservation */}
+          {/* Booking details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {/* Options */}
             <div className="p-8 bg-gradient-to-b from-gray-900/60 to-black/60 rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.1)] border border-cyan-900/30 backdrop-blur-sm hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] transition-all duration-500 transform hover:scale-[1.02] relative group">
-              {/* Corner accents */}
-              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50"></div>
-              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50"></div>
               
               <div className="flex items-center mb-6">
                 <div className="w-12 h-12 rounded-full bg-blue-900/20 flex items-center justify-center text-blue-400 mr-4 transition-all duration-300 group-hover:bg-blue-900/40">
@@ -777,11 +765,8 @@ const BookingConfirmation = () => {
               </div>
             </div>
             
-            {/* Résumé du paiement */}
+            {/* Payment summary */}
             <div ref={paymentSectionRef} className="p-8 bg-gradient-to-b from-gray-900/60 to-black/60 rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.1)] border border-cyan-900/30 backdrop-blur-sm hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] transition-all duration-500 transform hover:scale-[1.02] relative group">
-              {/* Corner accents */}
-              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50"></div>
-              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50"></div>
               
               <div className="flex items-center mb-6">
                 <div className="w-12 h-12 rounded-full bg-green-900/20 flex items-center justify-center text-green-400 mr-4 transition-all duration-300 group-hover:bg-green-900/40">
@@ -807,7 +792,7 @@ const BookingConfirmation = () => {
                   </span>
                 </div>
                 
-                {/* Calculer le coût des options */}
+                {/* Calculate option cost */}
                 {bookingDetails.options && bookingDetails.options.length > 0 && (
                   <div className="flex justify-between items-center border-b border-blue-900/30 pb-3 group/item hover:border-green-500/50 transition-colors duration-300">
                     <span className="text-white group-hover/item:text-green-100 transition-colors duration-300">{t('additionalOptions')}</span>
@@ -829,6 +814,11 @@ const BookingConfirmation = () => {
         </div>
       </div>
       
+      {/* Animated Divider */}
+      <div className="relative h-px w-full overflow-hidden">
+        <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
+      </div>
+      
       {/* CTA Section */}
       <section className="py-16 px-4 relative overflow-hidden">
         {/* Background with overlay */}
@@ -840,9 +830,10 @@ const BookingConfirmation = () => {
             className="w-full h-full object-cover"
           />
           
-          {/* Animated particles */}
+          {/* Decorative elements */}
           <div className="absolute inset-0 pointer-events-none">
-            <FloatingParticles count={15} />
+            <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-cyan-500/5 rounded-full blur-[100px]"></div>
+            <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-blue-500/5 rounded-full blur-[100px]"></div>
           </div>
         </div>
         

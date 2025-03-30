@@ -4,14 +4,14 @@ import { useLanguage } from '../../../context/LanguageContext';
 import { useTranslations } from '../../../translations';
 
 const FeatureCard = ({ feature, iconType, icon, description = "" }) => {
-  // Utiliser les hooks pour la traduction
+  // Use hooks for translation
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Déterminer l'icône à afficher en fonction de iconType ou utiliser l'icône personnalisée fournie
+  // Determine which icon to display based on iconType or use the provided custom icon
   const displayIcon = iconType ? featureIcons[iconType] || featureIcons.default : icon;
   
-  // Utiliser la description fournie ou une description par défaut traduite
+  // Use the provided description or a translated default description
   const featureDescription = description || t('defaultFeatureDescription');
   
   return (

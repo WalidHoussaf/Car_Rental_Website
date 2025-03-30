@@ -3,7 +3,7 @@ import Select from 'react-select';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
 
-// Icône de localisation
+// Location icon
 const LocationPin = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
@@ -11,7 +11,7 @@ const LocationPin = () => (
   </svg>
 );
 
-// Icône de destination
+// Destination icon
 const DestinationPin = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
@@ -20,7 +20,7 @@ const DestinationPin = () => (
   </svg>
 );
 
-// Coordonnées des emplacements
+// Location coordinates
 const LOCATIONS_COORDINATES = {
   'casablanca': { lat: 33.5731, lng: -7.5898 },
   'marrakech': { lat: 31.6295, lng: -7.9811 },
@@ -33,7 +33,7 @@ const LOCATIONS_COORDINATES = {
   'mohammedia': { lat: 33.6861, lng: -7.3828 }
 };
 
-// Composant pour la carte interactive utilisant OpenStreetMap avec Leaflet
+// Interactive map component using OpenStreetMap with Leaflet
 const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
@@ -42,18 +42,18 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
   const markersRef = useRef([]);
   const [mapLoaded, setMapLoaded] = useState(false);
 
-  // Chargement des ressources Leaflet
+  // Loading Leaflet resources
   useEffect(() => {
-    // Fonction pour charger les scripts et CSS nécessaires
+    // Function to load necessary scripts and CSS
     const loadLeafletResources = async () => {
-      // Vérifier si Leaflet est déjà chargé
+      // Check if Leaflet is already loaded
       if (window.L) {
         setMapLoaded(true);
         return;
       }
 
       try {
-        // Charger le CSS de Leaflet
+        // Load Leaflet CSS
         const linkElement = document.createElement('link');
         linkElement.rel = 'stylesheet';
         linkElement.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
@@ -61,25 +61,25 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
         linkElement.crossOrigin = '';
         document.head.appendChild(linkElement);
 
-        // Charger le script de Leaflet
+        // Load Leaflet script
         const scriptElement = document.createElement('script');
         scriptElement.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
         scriptElement.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
         scriptElement.crossOrigin = '';
         document.body.appendChild(scriptElement);
 
-        // Attendre que le script soit chargé
+        // Wait for the script to load
         scriptElement.onload = () => {
           setMapLoaded(true);
         };
       } catch (error) {
-        console.error('Erreur lors du chargement de Leaflet:', error);
+        console.error('Error loading Leaflet:', error);
       }
     };
 
     loadLeafletResources();
 
-    // Nettoyage
+    // Cleanup
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
@@ -88,16 +88,16 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
     };
   }, []);
 
-  // Initialisation de la carte après chargement de Leaflet
+  // Initialize map after Leaflet loads
   useEffect(() => {
     if (mapLoaded && mapContainerRef.current && !mapRef.current) {
-      // Créer la carte
+      // Create map
       const map = window.L.map(mapContainerRef.current, {
         zoomControl: true,
         attributionControl: false
       });
 
-      // Remplacer le thème sombre par un thème plus clair mais toujours élégant
+      // Replace dark theme with a lighter but still elegant theme
       window.L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         subdomains: 'abcd'
@@ -107,20 +107,20 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
     }
   }, [mapLoaded]);
 
-  // Mise à jour des marqueurs lorsque pickup/dropoff changent
+  // Update markers when pickup/dropoff change
   useEffect(() => {
     if (!mapLoaded || !mapRef.current) return;
 
     const map = mapRef.current;
     
-    // Nettoyer les marqueurs existants
+    // Clean existing markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
     if (pickup && LOCATIONS_COORDINATES[pickup]) {
       const pickupCoords = LOCATIONS_COORDINATES[pickup];
       
-      // Créer une icône personnalisée pour le point de prise en charge
+      // Create custom icon for pickup point
       const pickupIcon = window.L.divIcon({
         className: 'custom-map-marker',
         html: `
@@ -132,7 +132,7 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
         iconAnchor: [12, 12]
       });
 
-      // Ajouter le marqueur de prise en charge
+      // Add pickup marker
       const pickupMarker = window.L.marker([pickupCoords.lat, pickupCoords.lng], { 
         icon: pickupIcon,
         title: `${pickup.charAt(0).toUpperCase() + pickup.slice(1)} Branch` 
@@ -140,17 +140,17 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
       
       markersRef.current.push(pickupMarker);
 
-      // Si c'est le seul point, centrer sur lui
+      // If it's the only point, center on it
       if (sameLocation || !dropoff) {
         map.setView([pickupCoords.lat, pickupCoords.lng], 13);
       }
     }
 
-    // Ajouter le marqueur de dépôt si différent
+    // Add dropoff marker if different
     if (!sameLocation && dropoff && LOCATIONS_COORDINATES[dropoff]) {
       const dropoffCoords = LOCATIONS_COORDINATES[dropoff];
       
-      // Créer une icône personnalisée pour le point de dépôt
+      // Create custom icon for dropoff point
       const dropoffIcon = window.L.divIcon({
         className: 'custom-map-marker',
         html: `
@@ -162,7 +162,7 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
         iconAnchor: [12, 12]
       });
 
-      // Ajouter le marqueur de dépôt
+      // Add dropoff marker
       const dropoffMarker = window.L.marker([dropoffCoords.lat, dropoffCoords.lng], { 
         icon: dropoffIcon,
         title: `${dropoff.charAt(0).toUpperCase() + dropoff.slice(1)} Branch` 
@@ -170,7 +170,7 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
       
       markersRef.current.push(dropoffMarker);
 
-      // Si les deux points sont différents, ajuster la vue pour les voir tous les deux
+      // If the two points are different, adjust view to see both
       if (pickup !== dropoff) {
         const bounds = window.L.latLngBounds(
           [LOCATIONS_COORDINATES[pickup].lat, LOCATIONS_COORDINATES[pickup].lng],
@@ -380,7 +380,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
           
           {/* Map Preview */}
           <div className="backdrop-blur-sm bg-black/50 p-6 rounded-lg border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group">
-            {/* Effet de lueur au survol */}
+            {/* Luminous glow effect on hover */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 pointer-events-none"></div>
             
             <div className="relative">

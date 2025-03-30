@@ -11,11 +11,9 @@ const NotFound = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.svg')] bg-repeat opacity-10"></div>
         
-        {/* Animated Circles */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse-slow"></div>
         <div className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
         
-        {/* Grid Pattern */}
         <div className="absolute inset-0">
           <div className="h-full w-full bg-[linear-gradient(to_right,rgba(6,182,212,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(6,182,212,0.1)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20"></div>
         </div>
@@ -51,7 +49,6 @@ const NotFound = () => {
         </Link>
       </div>
       
-      {/* Decorative Elements */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1.5 bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent rounded-full blur-sm"></div>
     </div>
   );

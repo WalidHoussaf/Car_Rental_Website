@@ -123,41 +123,41 @@ const AboutPage = () => {
       </section>
       
       {/* Stats Section */}
-<section className="py-16 px-4 bg-gradient-to-b from-black/80 via-black/60 to-black/80 backdrop-blur-md relative overflow-hidden">
-  {/* Background patterns - reduced opacity */}
-  <div className="absolute inset-0 bg-[url('/patterns/grid-pattern.svg')] bg-center opacity-20"></div>
-         
-  {/* Simplified decorative elements */}
-  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
-  <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
- 
-  <div className="container mx-auto relative z-10 max-w-6xl">
-    <div className="text-center mb-12 relative">
-      {/* Reduced blur size */}
-      <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-2xl"></div>
-      <h2 className="text-4xl text-center uppercase font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
-        {t('ourAccomplishments')}
-      </h2>
-      <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto"></div>
-    </div>
-   
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-      {stats.map((stat, index) => (
-        <div
-          key={index}
-          className="p-8 border border-cyan-900/50 rounded-xl bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm relative group overflow-hidden will-change-transform"
-        >
-          {/* Simplified hover effects */}
-          <div className="text-4xl md:text-5xl font-bold font-['Orbitron'] mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
-            {stat.value}
-            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 group-hover:w-16 h-px bg-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+      <section className="py-16 px-4 bg-gradient-to-b from-black/80 via-black/60 to-black/80 backdrop-blur-md relative overflow-hidden">
+        {/* Background patterns */}
+        <div className="absolute inset-0 bg-[url('/patterns/grid-pattern.svg')] bg-center opacity-20"></div>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
+        
+        <div className="container mx-auto relative z-10 max-w-6xl">
+          <div className="text-center mb-12 relative">
+            <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-2xl"></div>
+            <h2 className="text-4xl text-center uppercase font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+              {t('ourAccomplishments')}
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto"></div>
           </div>
-          <div className="text-white text-lg md:text-xl font-['Rationale'] group-hover:text-cyan-300 transition-colors duration-300">{stat.label}</div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                className="p-8 border border-cyan-900/50 rounded-xl bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm relative group overflow-hidden will-change-transform transform transition-all duration-500 hover:scale-105 hover:shadow-[0_0_25px_rgba(6,182,212,0.2)]"
+              >
+                {/* Hover effects */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/40 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                <div className="text-4xl md:text-5xl font-bold font-['Orbitron'] mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+                  {stat.value}
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 group-hover:w-16 h-px bg-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                </div>
+                <div className="text-white text-lg md:text-xl font-['Rationale'] group-hover:text-cyan-300 transition-colors duration-300">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-</section>
+      </section>
       
       {/* Bottom Border Glow */}
       <div className="relative h-px w-full overflow-hidden">
@@ -178,7 +178,8 @@ const AboutPage = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-md p-8 rounded-xl border border-cyan-800/50 relative group overflow-hidden">  
+            <div className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-md p-8 rounded-xl border border-cyan-800/50 relative group overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-[0_0_25px_rgba(6,182,212,0.2)]">  
+              <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/40 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               <div className="relative z-10">
                 <h3 className="text-2xl mb-4 font-semibold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent relative inline-block">
                   {t('ourVision')}
@@ -190,7 +191,8 @@ const AboutPage = () => {
               </div>
             </div>
             
-            <div className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-md p-8 rounded-xl border border-cyan-800/50 relative group overflow-hidden">
+            <div className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-md p-8 rounded-xl border border-cyan-800/50 relative group overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-[0_0_25px_rgba(6,182,212,0.2)]">
+              <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/40 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               <div className="relative z-10">
                 <h3 className="text-2xl mb-4 font-semibold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent relative inline-block">
                   {t('ourMission')}
@@ -249,7 +251,7 @@ const AboutPage = () => {
                   
                   <h3 className="text-xl font-semibold mb-1 uppercase group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-cyan-400 transition-all duration-300">{member.name}</h3>
                   <p className="text-cyan-400 text-sm mb-3 font-['Orbitron']">{member.position}</p>
-                  <p className="text-gray-300 text-sm">{member.bio}</p>
+                  <p className="text-gray-300 text-sm text-justify">{member.bio}</p>
                 </div>
               </div>
             ))}

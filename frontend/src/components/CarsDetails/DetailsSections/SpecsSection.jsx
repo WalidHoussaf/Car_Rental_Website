@@ -17,7 +17,7 @@ const SpecsSection = ({ title, icon, specs, specKeys }) => {
         {specs && Object.entries(specs)
           .filter(([key]) => specKeys.includes(key))
           .map(([key, value]) => {
-            // Traduire les noms de spécifications
+            // Translate specification names
             const specKey = `spec_${key}`;
             const specName = t(specKey) !== specKey 
               ? t(specKey) 

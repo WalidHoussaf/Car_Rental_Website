@@ -29,13 +29,13 @@ const CarsPage = () => {
     }
   }, [location.pathname, location.search]);
   
-  // Reference to store current scroll position
+  // Reference to Store Current Scroll Position
   const scrollPositionRef = useRef(0);
   
-  // Reference for the cars section
+  // Reference for the Cars Section
   const carsSectionRef = useRef(null);
   
-  // State for filters
+  // State for Filters
   const [filters, setFilters] = useState({
     location: locationParam || 'all',
     category: 'all',
@@ -43,19 +43,19 @@ const CarsPage = () => {
     features: []
   });
   
-  // State for cars data
+  // State for Cars Data
   const [carsData, setCarsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('recommended');
   
-  // Update search when the URL changes
+  // Update Search when the URL Changes
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const search = queryParams.get('search');
     setSearchQuery(search || '');
   }, [location.search]);
   
-  // Function to update the URL with the search
+  // Function to Update the URL with the Search
   const handleSearchUpdate = useCallback((query) => {
     setSearchQuery(query);
     
@@ -70,7 +70,7 @@ const CarsPage = () => {
     navigate(`/cars?${newParams.toString()}`, { replace: true });
   }, [location.search, navigate]);
   
-  // Event listener for updating the search from the navbar
+  // Event Listener for Updating the Search from the Navbar
   useEffect(() => {
     const handleSearchEvent = (event) => {
       handleSearchUpdate(event.detail.query);
@@ -82,7 +82,7 @@ const CarsPage = () => {
     };
   }, [handleSearchUpdate]);
   
-  // Initialize the search from the URL on page load
+  // Initialize the Search from the URL on Page Load
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const search = queryParams.get('search');
@@ -91,7 +91,7 @@ const CarsPage = () => {
     }
   }, []);
   
-  // Initialize cars data
+  // Initialize Cars Data
   useEffect(() => {
     setLoading(true);
     setTimeout(() => {
@@ -101,33 +101,33 @@ const CarsPage = () => {
     }, 800);
   }, []);
   
-  // Handle scroll to cars section
+  // Handle Scroll to Cars Section
   const scrollToCarsSection = () => {
     if (carsSectionRef.current) {
       carsSectionRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
   
-  // Handle navigation to About Us page
+  // Handle Navigation to About Us Page
   const navigateToAboutUs = () => {
     navigate('/about');
   };
   
-  // Function to navigate to a page with scrolling to the top
+  // Function to Navigate to a Page with Scrolling to the Top
   const navigateWithScroll = (path) => {
     window.scrollTo(0, 0);
     navigate(path);
   };
   
-  // Handle filter changes
+  // Handle Filter Changes
   const handleFilterChange = (filterType, value) => {
-    // Save current scroll position before navigation
+    // Save Current Scroll Position before Navigation
     scrollPositionRef.current = window.pageYOffset;
     
     const newFilters = { ...filters, [filterType]: value };
     setFilters(newFilters);
     
-    // Update URL if location filter changes
+    // Update URL if Location Filter Changes
     if (filterType === 'location' && value !== 'all') {
       navigate(`/cars?location=${value}`, { replace: true });
     } else if (filterType === 'location' && value === 'all') {
@@ -135,9 +135,9 @@ const CarsPage = () => {
     }
   };
   
-  // Toggle feature filter
+  // Toggle Feature Filter
   const toggleFeature = (feature) => {
-    // Save current scroll position before navigation
+    // Save Current Scroll Position before Navigation
     scrollPositionRef.current = window.pageYOffset;
     
     const newFeatures = filters.features.includes(feature)
@@ -147,9 +147,9 @@ const CarsPage = () => {
     handleFilterChange('features', newFeatures);
   };
   
-  // Reset filters
+  // Reset Filters
   const resetFilters = () => {
-    // Save current scroll position before navigation
+    // Save Current Scroll Position before Navigation
     scrollPositionRef.current = window.pageYOffset;
     
     setFilters({
@@ -161,11 +161,11 @@ const CarsPage = () => {
     navigate('/cars', { replace: true });
   };
   
-  // Filter cars based on current filters
+  // Filter Cars Based on Current Filters
   const filteredCars = carsData.filter(car => {
-    // Filter by location
+    // Filter by Location
     if (filters.location !== 'all') {
-      // Handle both string and array locations
+      // Handle Both String and Array Locations
       if (Array.isArray(car.location)) {
         if (!car.location.includes(filters.location)) {
           return false;
@@ -175,28 +175,28 @@ const CarsPage = () => {
       }
     }
     
-    // Filter by category
+    // Filter by Category
     if (filters.category !== 'all' && car.category !== filters.category) {
       return false;
     }
     
-    // Filter by price range
+    // Filter by Price Range
     if (car.price < filters.priceRange[0] || car.price > filters.priceRange[1]) {
       return false;
     }
     
-    // Filter by features
+    // Filter by Features
     if (filters.features.length > 0 && !filters.features.some(feature => 
       car.features.some(carFeature => carFeature.toLowerCase().includes(feature.toLowerCase()))
     )) {
       return false;
     }
     
-    // Filter by search query
+    // Filter by Search Query
     if (searchQuery && searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase().trim();
       
-      // List of car brands, including full and partial matches
+      // List of Car Brands, Including Full and Partial Matches
       const carBrands = {
         simple: ["audi", "bmw", "mercedes", "tesla", "porsche", "bentley", "ferrari", 
                  "lamborghini", "maserati", "lexus", "cadillac", "mclaren"],
@@ -204,27 +204,27 @@ const CarsPage = () => {
         parts: ["range", "rover", "rolls", "royce", "aston", "martin"]
       };
 
-      // Case 1: Exact search for a composite brand (e.g., 'range rover')
+      // Case 1: Exact Search for a Composite Brand (e.g., 'range rover')
       if (carBrands.composed.includes(query)) {
         return car.name.toLowerCase().includes(query);
       }
-      // Case 2: Search for a part of a composite brand (e.g., 'range' or 'rover')
+      // Case 2: Search for a Part of a Composite Brand (e.g., 'range' or 'rover')
       else if (carBrands.parts.includes(query)) {
-        // Check if it's a word that is part of a composite brand
+        // Check if it's a Word That is Part of a Composite Brand
         const relatedBrands = carBrands.composed.filter(brand => brand.includes(query));
         if (relatedBrands.length > 0) {
-          // Check if any of the associated composite brands are in the name
+          // Check if Any of the Associated Composite Brands are in the Name
           return relatedBrands.some(brand => car.name.toLowerCase().includes(brand));
         }
       }
-      // Case 3: Search for a simple brand (e.g., 'audi')
+      // Case 3: Search for a Simple Brand (e.g., 'audi')
       else if (carBrands.simple.includes(query)) {
-        // Check if the exact brand is in the car's name
+        // Check if the Exact Brand is in the Car's Name
         const carNameWords = car.name.toLowerCase().split(/\s+/);
         return carNameWords.some(word => word === query);
       }
       
-      // Case 4: Standard search for any other term
+      // Case 4: Standard Search for Any Other Term
       const nameMatch = car.name.toLowerCase().includes(query);
       const descriptionMatch = car.description ? car.description.toLowerCase().includes(query) : false;
       const featuresMatch = car.features.some(feature => 
@@ -238,7 +238,7 @@ const CarsPage = () => {
     return true;
   });
   
-  // Sort cars
+  // Sort Cars
   const sortedCars = [...filteredCars].sort((a, b) => {
     switch (sortBy) {
       case 'price-low':
@@ -262,9 +262,7 @@ const CarsPage = () => {
       
       {/* Main Content */}
       <section ref={carsSectionRef} id="cars-section" className="relative py-16 px-4 bg-gradient-to-b from-black via-black/95 to-black/90 overflow-hidden">
-        {/* Cyan floating particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Light points */}
           <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.svg')] bg-repeat opacity-10"></div>
         </div>
         
@@ -537,7 +535,7 @@ const CarsPage = () => {
         </div>
       </section>
 
-      {/* Call To Action with improved visuals */}
+      {/* Call To Action */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/80 to-black">
          

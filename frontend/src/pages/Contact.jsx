@@ -95,11 +95,11 @@ const ContactPage = () => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Simulate form submission
+    // Simulate Form Submission
     setSubmitStatus('loading');
     setTimeout(() => {
       setSubmitStatus('success');
-      // Reset form after success
+      // Reset Form after Success
       setFormData({
         name: '',
         email: '',
@@ -110,7 +110,7 @@ const ContactPage = () => {
     }, 1500);
   };
   
-  // Contact information
+  // Contact Information
   const contactInfo = [
     {
       icon: (
@@ -195,7 +195,7 @@ const ContactPage = () => {
             
       {/* Contact Information */}
       <section ref={contactFormRef} className="py-16 px-4 relative overflow-hidden">
-        {/* Background effects */}
+        {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <GlowingGrid containerRef={contactFormRef} />
           <div className="absolute top-1/4 right-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -349,17 +349,17 @@ const ContactPage = () => {
                     key={index} 
                     className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm p-6 rounded-lg border border-cyan-900/50 shadow-lg relative group overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)]"
                   >
-                    {/* Glow effect */}
+                    {/* Glow Effect */}
                     <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                     
-                    {/* Hover effect */}
+                    {/* Hover Effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm -z-10 group-hover:bg-gradient-to-r group-hover:from-cyan-500/10 group-hover:via-cyan-500/5 group-hover:to-cyan-500/10"></div>
                     
-                    {/* Border accents */}
+                    {/* Border Accents */}
                     <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent group-hover:via-cyan-400/60 transition-colors duration-500"></div>
                     <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent group-hover:via-cyan-400/60 transition-colors duration-500"></div>
                     
-                    {/* Corner accents */}
+                    {/* Corner Accents */}
                     <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50"></div>
                     <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50"></div>
                     
@@ -389,7 +389,7 @@ const ContactPage = () => {
                     key={index} 
                     className="bg-gradient-to-b from-gray-900/40 to-black/20 backdrop-blur-sm p-4 rounded-lg border border-cyan-900/30 relative group overflow-hidden transition-all duration-300 hover:border-cyan-500/50"
                   >
-                    {/* Animated hover line */}
+                    {/* Animated Hover Line */}
                     <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-transparent group-hover:w-full transition-all duration-500"></div>
                     
                     <h4 className="text-lg text-cyan-400 mb-1">{loc.city}</h4>
@@ -400,7 +400,7 @@ const ContactPage = () => {
               
               <div className="mt-12">
                 <div className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm p-6 rounded-lg border border-cyan-900/50 shadow-lg relative group overflow-hidden">
-                  {/* Glow effect */}
+                  {/* Glow Effect */}
                   <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/10 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                   
                   <h3 className="text-xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
@@ -432,10 +432,10 @@ const ContactPage = () => {
       
       {/* Map Section */}
       <section ref={mapSectionRef} className="py-16 px-4 bg-gradient-to-b from-black/80 via-black/60 to-black/80 backdrop-blur-md relative overflow-hidden">
-        {/* Background patterns */}
+        {/* Background Patterns */}
         <div className="absolute inset-0 bg-[url('/patterns/grid-pattern.svg')] bg-center opacity-30"></div>
         
-        {/* Decorative elements */}
+        {/* Decorative Elements */}
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
         
@@ -457,7 +457,7 @@ const ContactPage = () => {
           <div className="relative h-96 rounded-xl overflow-hidden border border-cyan-900/50 shadow-lg group">
             <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             
-            {/* Corner accents */}
+            {/* Corner Accents */}
             <div className="absolute top-3 left-3 w-10 h-10 border-t-2 border-l-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
             <div className="absolute bottom-3 right-3 w-10 h-10 border-b-2 border-r-2 border-cyan-400/20 opacity-30 group-hover:opacity-100 transition-all duration-500 group-hover:border-cyan-400/50 z-10"></div>
             
@@ -478,7 +478,7 @@ const ContactPage = () => {
       
       {/* Newsletter Signup Section */}
       <section className="mt-24 py-16 px-4 bg-gradient-to-b from-black/80 via-black/70 to-black/80 backdrop-blur-lg relative overflow-hidden">
-        {/* Background image */}
+        {/* Background Image */}
         <div className="absolute inset-0 opacity-20 z-0">
           <img 
             src={assets.contact?.stayconnected || "/api/placeholder/1920/600"} 
@@ -487,14 +487,14 @@ const ContactPage = () => {
           />
         </div>
         
-        {/* Floating particles and decorative elements */}
+        {/* Floating Particles */}
         <div className="absolute inset-0 pointer-events-none">
           <FloatingParticles count={15} />
           <div className="absolute top-20 left-20 w-48 h-48 rounded-full bg-cyan-500/5 blur-[80px]"></div>
           <div className="absolute bottom-20 right-20 w-64 h-64 rounded-full bg-blue-500/5 blur-[100px]"></div>
         </div>
         
-        {/* Decorative elements */}
+        {/* Decorative Elements */}
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
         

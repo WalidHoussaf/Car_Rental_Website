@@ -8,10 +8,10 @@ const FeaturesFilter = ({ filters, toggleFeature }) => {
   const t = useTranslations(language);
   const [showAllFeatures, setShowAllFeatures] = useState(false);
   
-  // Nombre de fonctionnalités à afficher par défaut
+  // Default number of features to display
   const defaultVisibleCount = 6;
   
-  // Fonctionnalités visibles en fonction de l'état
+  // Visible features based on current state
   const visibleFeatures = showAllFeatures 
     ? featureOptions 
     : featureOptions.slice(0, defaultVisibleCount);
@@ -51,7 +51,7 @@ const FeaturesFilter = ({ filters, toggleFeature }) => {
           </div>
         ))}
         
-        {/* Bouton Afficher plus/moins */}
+        {/* Show more/less button */}
         {featureOptions.length > defaultVisibleCount && (
           <button
             onClick={() => setShowAllFeatures(!showAllFeatures)}

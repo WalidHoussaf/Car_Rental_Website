@@ -9,23 +9,23 @@ const LoginPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Form state
+  // Form State
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
   });
   
-  // Error state
+  // Error State
   const [errors, setErrors] = useState({});
   
-  // Loading state for submit button
+  // Loading State for Submit Button
   const [isLoading, setIsLoading] = useState(false);
   
-  // Success state
+  // Success State
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Handle input changes
+  // Handle Input Changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prevData => ({
@@ -33,7 +33,7 @@ const LoginPage = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear error when user types
+    // Clear Error when User Types
     if (errors[name]) {
       setErrors(prevErrors => ({
         ...prevErrors,
@@ -42,7 +42,7 @@ const LoginPage = () => {
     }
   };
 
-  // Validate form
+  // Validate Form
   const validateForm = () => {
     const newErrors = {};
     
@@ -59,7 +59,7 @@ const LoginPage = () => {
     return newErrors;
   };
 
-  // Handle form submission
+  // Handle Form Submission
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -70,40 +70,36 @@ const LoginPage = () => {
       return;
     }
     
-    // Simulate login process
+    // Simulate Login Process
     setIsLoading(true);
     
     setTimeout(() => {
       setIsLoading(false);
       setIsSuccess(true);
       
-      // Reset success message after delay
+      // Reset Success Message after Delay
       setTimeout(() => {
         setIsSuccess(false);
-        // Here you would typically redirect to dashboard/home
       }, 2000);
     }, 1500);
   };
 
-  // Handle social login redirects
+  // Handle Social Login Redirects
   const handleGoogleLogin = () => {
     window.location.href = "https://accounts.google.com/o/oauth2/auth";
-    // In a real implementation, you would include more OAuth parameters
   };
 
   const handleFacebookLogin = () => {
     window.location.href = "https://www.facebook.com/v13.0/dialog/oauth";
-    // In a real implementation, you would include more OAuth parameters
   };
 
   return (
     <div className="bg-black text-white min-h-screen font-['Orbitron'] relative overflow-hidden">
-      {/* Arrière-plan amélioré */}
+      {/* Background Effects */}
       <div className="absolute inset-0 z-0">
-        {/* Overlay de dégradé */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black/90" />
-        
-        {/* Vidéo d'arrière-plan */}
+
+        {/* Background Video*/}
         <video
           autoPlay
           muted
@@ -116,17 +112,17 @@ const LoginPage = () => {
         </video>
       </div>
 
-      {/* Contenu */}
+      {/* Main Content */}
       <div className="relative z-20 min-h-screen flex flex-col items-center justify-center px-4 py-12">        
-        {/* Carte de formulaire de connexion */}
+        {/* Login Form Card */}
         <div className="w-full max-w-md bg-gradient-to-b from-black/90 to-black/80 backdrop-blur-xl rounded-xl p-8 shadow-2xl border border-cyan-800/20 relative overflow-hidden z-10 animate-fade-in-up">
-          {/* Décoration de bordure lumineuse */}
+          {/* Glowing Borders */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent"></div>
           <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent"></div>
           <div className="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent"></div>
           <div className="absolute right-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent"></div>
           
-          {/* En-tête du formulaire */}
+          {/* Form Header */}
           <div className="text-center mb-8 relative">
             <h1 className="text-3xl md:text-4xl font-regular mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
               {t('welcomeBack')}
@@ -137,14 +133,14 @@ const LoginPage = () => {
             <div className="w-20 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto mt-4"></div>
           </div>
 
-          {/* Message de succès */}
+          {/* Success Message */}
           {isSuccess && (
             <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/10 to-green-500/10 border border-cyan-500/50 rounded-md text-center">
               <p className="text-cyan-400">{t('loginSuccessful')}</p>
             </div>
           )}
 
-          {/* Formulaire de connexion */}
+          {/* Login Form */}
           <form onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-cyan-300 mb-1">{t('emailAddress')}</label>
@@ -235,7 +231,7 @@ const LoginPage = () => {
               )}
             </button>
 
-            {/* Boutons de connexion sociale */}
+            {/* Social Login Buttons */}
             <div className="mt-8">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -273,7 +269,7 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* Lien d'inscription */}
+            {/* Login Link */}
             <div className="text-center mt-8">
               <p className="text-sm text-gray-400">
                 {t('noAccount')} <Link to="/register" className="text-cyan-400 hover:text-white transition-colors duration-300 relative group">
@@ -286,7 +282,6 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* Séparateur animé */}
       <div className="relative h-px w-full overflow-hidden">
         <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse"></div>
       </div>

@@ -1,4 +1,4 @@
-// Traductions par langue et par clé
+// Translations by language and key
 export const translations = {
   en: {
     // Navigation
@@ -946,7 +946,7 @@ export const translations = {
   }
 };
 
-// Hook pour obtenir les traductions
+// Hook to get translations
 export const useTranslations = (language) => {
   const getTranslation = (key, replacements) => {
     const keys = key.split('.');
@@ -956,11 +956,11 @@ export const useTranslations = (language) => {
       if (value && value[k]) {
         value = value[k];
       } else {
-        return key; // Retourne la clé si la traduction n'existe pas
+        return key; // Returns the key if translation doesn't exist
       }
     }
     
-    // Si des remplacements sont fournis, remplacer les placeholders
+    // If replacements are provided, replace placeholders
     if (replacements && typeof value === 'string') {
       return Object.keys(replacements).reduce((result, placeholder) => {
         const regex = new RegExp(`{${placeholder}}`, 'g');

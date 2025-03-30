@@ -263,7 +263,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
         
         {/* Price Summary */}
         <div className="mt-10 backdrop-blur-sm bg-black/50 p-6 rounded-lg border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group">
-          {/* Effet de lueur au survol */}
+          {/* Luminous glow effect on hover */}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 pointer-events-none"></div>
           
           <div className="relative">

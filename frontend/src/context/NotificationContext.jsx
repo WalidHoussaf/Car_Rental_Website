@@ -10,7 +10,7 @@ export const useNotification = () => {
 };
 
 export const NotificationProvider = ({ children }) => {
-  // Configure toastify (you can customize this)
+  // Configure toastify 
   const toastConfig = {
     position: "top-right",
     autoClose: 5000,

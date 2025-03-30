@@ -7,7 +7,7 @@ const GlowingGrid = ({ containerRef }) => {
   const mousePosition = useRef({ x: null, y: null });
   const hoverEffects = useRef([]);
 
-  // Initialiser la grille
+  // Initialize the grid
   const initGrid = (canvas, containerWidth, containerHeight) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -33,7 +33,7 @@ const GlowingGrid = ({ containerRef }) => {
     }
   };
   
-  // Créer un effet de brillance sur les clics
+  // Create a glow effect on clicks
   const createHoverEffect = (x, y) => {
     hoverEffects.current.push({
       x,
@@ -45,7 +45,7 @@ const GlowingGrid = ({ containerRef }) => {
     });
   };
 
-  // Boucle d'animation
+  // Animation loop
   const animate = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -55,7 +55,7 @@ const GlowingGrid = ({ containerRef }) => {
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Dessiner les lignes de connexion
+    // Draw connection lines
     for (let i = 0; i < gridPoints.current.length; i++) {
       const point = gridPoints.current[i];
       point.size = point.baseSize + Math.sin(Date.now() * point.pulseSpeed + point.pulseOffset) * 0.5;
@@ -78,9 +78,9 @@ const GlowingGrid = ({ containerRef }) => {
       }
     }
     
-    // Dessiner les points
+    // Draw points
     gridPoints.current.forEach(point => {
-      // Vérifier si le point est affecté par la position de la souris
+      // Check if the point is affected by the mouse position
       if (mousePosition.current.x !== null && mousePosition.current.y !== null) {
         const dx = point.x - mousePosition.current.x;
         const dy = point.y - mousePosition.current.y;
@@ -109,7 +109,7 @@ const GlowingGrid = ({ containerRef }) => {
       }
     });
     
-    // Animer les effets de survol
+    // Animate hover effects
     for (let i = hoverEffects.current.length - 1; i >= 0; i--) {
       const effect = hoverEffects.current[i];
       
@@ -159,7 +159,7 @@ const GlowingGrid = ({ containerRef }) => {
     canvas.width = width;
     canvas.height = height;
     
-    // Réinitialiser la grille avec les nouvelles dimensions
+    // Reinitialize the grid with new dimensions
     initGrid(canvas, width, height);
   };
   
@@ -183,26 +183,26 @@ const GlowingGrid = ({ containerRef }) => {
     createHoverEffect(x, y);
   };
   
-  // Effets pour gérer le cycle de vie du composant
+  // Effects to manage component lifecycle
   useEffect(() => {
     if (!containerRef.current || !canvasRef.current) return;
     
-    // Initialiser les dimensions et la grille
+    // Initialize dimensions and grid
     updateDimensions();
     
-    // Démarrer l'animation
+    // Start animation
     animate();
     
-    // Ajouter les écouteurs d'événements
+    // Add event listeners
     window.addEventListener('resize', updateDimensions);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('click', handleClick);
     
-    // Observer les changements de taille du conteneur
+    // Observe container size changes
     const resizeObserver = new ResizeObserver(updateDimensions);
     resizeObserver.observe(containerRef.current);
     
-    // Nettoyage
+    // Cleanup
     return () => {
       window.removeEventListener('resize', updateDimensions);
       window.removeEventListener('mousemove', handleMouseMove);

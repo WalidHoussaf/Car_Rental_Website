@@ -14,21 +14,21 @@ const CarDetailPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Scroll to top on component mount
+  // Scroll to Top on Component Mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
   
-  // Fonction pour naviguer avec défilement vers le haut
+  // Function to Scroll Navigation to the Top
   const navigateWithScroll = (path) => {
     window.scrollTo(0, 0);
     navigate(path);
   };
   
-  // Find the car by ID
+  // Find the Car by ID
   const car = sampleCars.find(car => car.id === parseInt(id));
   
-  // If car is not found, show the error UI
+  // If Car is not Found, Show the Error UI
   if (!car) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -53,10 +53,10 @@ const CarDetailPage = () => {
     );
   }
   
-  // Resolve the car image paths
+  // Resolve the Car Image Paths
   const processedCar = resolveImagePaths([car], 'image')[0];
   
-  // Resolve gallery paths as per your requirement
+  // Resolve Gallery Paths as per your Requirement
   const [resolvedCar] = resolveGalleryPaths([car]);
   
   return (
@@ -150,7 +150,7 @@ const CarDetailPage = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
                     
-                    {/* Badge for category */}
+                    {/* Badge for Category */}
                     <div className="absolute top-3 left-3">
                     <div className="px-3 py-1 rounded-full bg-blue-500/80 backdrop-blur-sm text-xs text-black font-bold bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] uppercase tracking-wider">
                       {categoryTranslations[processedRelatedCar.category] 

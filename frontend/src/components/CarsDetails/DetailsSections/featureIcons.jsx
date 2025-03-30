@@ -12,7 +12,7 @@ import {
   Bluetooth as BluetoothIcon
 } from 'lucide-react';
 
-// Collection d'icônes disponibles
+// Collection of available icons
 export const featureIcons = {
   performance: <GaugeIcon size={24} />,
   battery: <BatteryChargingIcon size={24} />,

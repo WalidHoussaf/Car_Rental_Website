@@ -14,7 +14,7 @@ const Booking = () => {
   const navigate = useNavigate();
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [bookingStep, setBookingStep] = useState(1); // 1: Dates, 2: Location, 3: Options, 4: Summary
+  const [bookingStep, setBookingStep] = useState(1); 
   const { language } = useLanguage();
   const t = useTranslations(language);
   
@@ -29,37 +29,31 @@ const Booking = () => {
     totalPrice: 0
   });
   
-  // On component mount, get car details
+  // Load car data on component mount
   useEffect(() => {
-    // Simulate API call to get car details
     setLoading(true);
-    console.log('Car ID from URL:', id, typeof id);
     
     setTimeout(() => {
       if (!id) {
-        console.log('No car ID provided in URL');
         setLoading(false);
         return;
       }
       
       const parsedId = parseInt(id);
-      console.log('Using ID:', parsedId);
-      
       const foundCar = sampleCars.find(c => c.id === parsedId);
-      console.log('Found car:', foundCar);
       
       if (foundCar) {
-        // Cloner l'objet pour éviter les références
+        // Clone the object to avoid reference issues
         const carWithResolvedImage = {...foundCar};
         
-        // Traiter les images qui sont des références
+        // Process images that are references
         if (foundCar.image && typeof foundCar.image === 'string' && foundCar.image.includes('cars.')) {
-          // Construire un chemin d'image par défaut
+          // Build a default image path
           const carNumber = foundCar.image.split('cars.car')[1];
           if (carNumber) {
             carWithResolvedImage.image = `/cars/car${carNumber}.png`;
           } else {
-            // Fallback si format inattendu
+            // Fallback for unexpected format
             carWithResolvedImage.image = `/api/placeholder/500/300?text=${encodeURIComponent(foundCar.name)}`;
           }
         }
@@ -81,7 +75,6 @@ const Booking = () => {
     }, 800);
   }, [id]);
   
-  // Handle date selection
   const handleDateSelection = (startDate, endDate) => {
     // Calculate total days
     const start = new Date(startDate);
@@ -103,7 +96,6 @@ const Booking = () => {
     setBookingStep(2);
   };
   
-  // Handle location selection
   const handleLocationSelection = (pickup, dropoff) => {
     setBookingDetails(prev => ({
       ...prev,
@@ -114,9 +106,7 @@ const Booking = () => {
     setBookingStep(3);
   };
   
-  // Handle option selection
   const handleOptionSelection = (options, additionalPrice) => {
-    // Base price calculation
     const basePrice = car ? car.price * bookingDetails.totalDays : 0;
     
     setBookingDetails(prev => ({
@@ -128,12 +118,8 @@ const Booking = () => {
     setBookingStep(4);
   };
   
-  // Handle booking submission
   const handleBookingSubmit = () => {
-    // Here you would usually send the booking details to your backend
-    console.log('Booking submitted:', bookingDetails);
-    
-    // Redirect to confirmation page
+    // Navigate to confirmation page with booking data
     navigate('/booking-confirmation', { 
       state: { 
         bookingDetails,
@@ -151,7 +137,6 @@ const Booking = () => {
     setBookingStep(prev => Math.max(prev - 1, 1));
   };
   
-  // If loading or car not found
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -212,7 +197,7 @@ const Booking = () => {
             )}
           </div>
           
-          {/* Booking Summary - Définir une taille fixe */}
+          {/* Booking Summary */}
           <div className="lg:w-96 lg:min-w-[384px] lg:max-w-[384px] w-full">
             <BookingSummary 
               car={car}

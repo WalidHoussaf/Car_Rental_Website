@@ -1,36 +1,36 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Créer le contexte
+// Create the context
 const LanguageContext = createContext();
 
-// Hook personnalisé pour utiliser le contexte de langue
+// Custom hook to use the language context
 export const useLanguage = () => {
   return useContext(LanguageContext);
 };
 
 export const LanguageProvider = ({ children }) => {
-  // Récupérer la langue stockée ou utiliser 'en' par défaut
+  // Get stored language or use 'en' as default
   const [language, setLanguage] = useState(() => {
     const savedLanguage = localStorage.getItem('language');
     return savedLanguage || 'en';
   });
 
-  // Sauvegarder la langue dans localStorage quand elle change
+  // Save language to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('language', language);
-    // Mettre à jour l'attribut lang du document HTML
+    // Update the lang attribute of the HTML document
     document.documentElement.lang = language;
   }, [language]);
 
-  // Changer la langue
+  // Change the language
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'fr' : 'en');
   };
 
-  // Vérifier si la langue actuelle est le français
+  // Check if current language is French
   const isFrench = language === 'fr';
 
-  // Valeur du contexte
+  // Context value
   const value = {
     language,
     setLanguage,

@@ -4,7 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
 
-// Composant icône de calendrier
+// Calendar icon component
 const CalendarIconSmall = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
     <path className="stroke-current stroke-1" strokeLinecap="round" d="M6 2v4M18 2v4" strokeWidth="1.2" />
@@ -136,7 +136,7 @@ const BookingCalendar = ({ car, onDateSelection }) => {
           
           {/* Preview Section */}
           <div className="backdrop-blur-sm bg-black/50 p-6 rounded-lg border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group">
-            {/* Effet de lueur au survol */}
+            {/* Luminous glow effect on hover */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 pointer-events-none"></div>
             
             <div className="relative">

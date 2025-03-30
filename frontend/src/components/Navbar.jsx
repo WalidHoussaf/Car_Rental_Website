@@ -56,14 +56,14 @@ const Navbar = () => {
     }
     
     if (searchValue.trim() !== '') {
-      // Si déjà sur la page cars, utiliser handleSearchUpdate depuis le contexte de la page
+      // If already on the cars page, use handleSearchUpdate from the page context
       if (isOnCarsPage) {
-        // Envoyer l'événement personnalisé avec la valeur de recherche
+        // Send custom event with search value
         window.dispatchEvent(new CustomEvent('update-search', { 
           detail: { query: searchValue.trim() }
         }));
       } else {
-        // Sinon, naviguer vers la page cars avec le paramètre de recherche
+        // Navigate to cars page with search parameter
         navigate(`/cars?search=${encodeURIComponent(searchValue.trim())}`);
       }
       setIsSearchOpen(false); // Close search box after search
@@ -109,7 +109,7 @@ const Navbar = () => {
             {isOnCarsPage && (
               <button 
                 onClick={toggleSearch}
-                className="p-2 text-gray-300 hover:text-white transition-colors duration-300"
+                className="p-2 text-gray-300 hover:text-white transition-colors duration-300 cursor-pointer"
                 aria-label="Search"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

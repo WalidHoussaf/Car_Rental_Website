@@ -9,7 +9,7 @@ const RegisterPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Form state
+  // Form State
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -20,13 +20,13 @@ const RegisterPage = () => {
     agreeTerms: false
   });
   
-  // Error state
+  // Error State
   const [errors, setErrors] = useState({});
   
-  // Success state
+  // Success State
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Handle input changes
+  // Handle Input Changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prevData => ({
@@ -34,7 +34,7 @@ const RegisterPage = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear error when user types
+    // Clear Error when User Types
     if (errors[name]) {
       setErrors(prevErrors => ({
         ...prevErrors,
@@ -43,7 +43,7 @@ const RegisterPage = () => {
     }
   };
 
-  // Validate form with translated error messages
+  // Validate form with Translated Error Messages
   const validateForm = () => {
     const newErrors = {};
     
@@ -84,7 +84,7 @@ const RegisterPage = () => {
     return newErrors;
   };
 
-  // Handle form submission
+  // Handle form Submission
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -95,11 +95,11 @@ const RegisterPage = () => {
       return;
     }
     
-    // Simulate form submission
+    // Simulate Form Submission
     setTimeout(() => {
       setIsSuccess(true);
       
-      // Reset form after successful submission
+      // Reset Form After Successful Submission
       setTimeout(() => {
         setFormData({
           firstName: '',
@@ -115,7 +115,7 @@ const RegisterPage = () => {
     }, 1000);
   };
 
-  // Common input styling
+  // Common Input Styling
   const inputClassName = (name) => `w-full bg-black/40 border ${
     errors[name] ? 'border-red-500' : 'border-cyan-900/40'
   } rounded-md px-4 h-12 text-white 
@@ -130,12 +130,10 @@ const RegisterPage = () => {
 
   return (
     <div className="bg-black text-white min-h-screen font-['Orbitron'] relative overflow-hidden">
-      {/* Arrière-plan amélioré */}
+      {/* Background Elements */}
       <div className="absolute inset-0 z-0">
-        {/* Overlay de dégradé */}
         <div className="absolute inset-0 bg-gradient-to-br from-black via-black/80 to-black" />
-        
-        {/* Vidéo d'arrière-plan */}
+        {/* Background Video */}
         <video
           autoPlay
           muted
@@ -148,20 +146,18 @@ const RegisterPage = () => {
         </video>
       </div>
 
-      {/* Contenu principal */}
+      {/* Main Content */}
       <div className="relative z-20 min-h-screen flex flex-col items-center justify-center px-4 py-10">
 
-        
-        {/* Formulaire d'inscription */}
         <div className="w-full max-w-xl bg-gradient-to-b from-black/90 via-black/80 to-black/90 backdrop-blur-xl rounded-xl p-8 shadow-2xl border border-cyan-900/20 relative z-10 animate-fade-in-up overflow-hidden">
           
-          {/* Bordures lumineuses */}
+          {/* Glowing Borders */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
           <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent"></div>
           <div className="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent"></div>
           <div className="absolute right-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent"></div>
           
-          {/* En-tête du formulaire */}
+          {/* Form Header */}
           <div className="text-center mb-8 relative">
             <h1 className="text-3xl md:text-4xl font-regular mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
               {t('createYourAccount')}
@@ -172,14 +168,14 @@ const RegisterPage = () => {
             <div className="w-32 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto mt-4"></div>
           </div>
 
-          {/* Message de succès */}
+          {/* Success Message */}
           {isSuccess && (
             <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/10 to-green-500/10 border border-cyan-500/30 rounded-md text-center animate-fade-in">
               <p className="text-cyan-300">{t('registrationSuccessful')}</p>
             </div>
           )}
 
-          {/* Formulaire d'inscription */}
+          {/* Registration Form */}
           <form onSubmit={handleSubmit} className="animate-fade-in relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
               <div className="mb-5 group">
@@ -306,15 +302,13 @@ const RegisterPage = () => {
               type="submit"
               className="w-full px-6 py-3.5 text-base font-medium text-black bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white rounded-md transform transition-all duration-500 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/30 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none cursor-pointer relative overflow-hidden group"
             >
-              {/* Effet de lueur au survol */}
               <span className="absolute inset-0 bg-white/30 opacity-0 group-hover:opacity-10 transition-opacity"></span>
-              {/* Effet subtil de ligne en bas */}
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/10"></span>
               
               {t('signUp')}
             </button>
 
-            {/* Lien vers la connexion */}
+            {/* Link to Login */}
             <div className="text-center mt-8 relative">
               <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent -z-10"></div>
               <span className="px-4 bg-black/60 backdrop-blur-sm relative inline-block">
@@ -331,7 +325,6 @@ const RegisterPage = () => {
         </div>
       </div>
       
-      {/* Séparateur animé */}
       <div className="relative h-px w-full overflow-hidden">
         <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse"></div>
       </div>
