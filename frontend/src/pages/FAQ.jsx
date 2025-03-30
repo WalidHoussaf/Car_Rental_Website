@@ -524,6 +524,11 @@ const FAQPage = () => {
         </div>
       </section>
       
+      {/* Bottom Border Glow */}
+      <div className="relative h-px w-full overflow-hidden">
+        <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-white via-cyan-400 to-white opacity-70"></div>
+      </div>
+      
       {/* CTA Section */}
       <section className="py-16 px-4 relative overflow-hidden">
         {/* Background with Overlay */}

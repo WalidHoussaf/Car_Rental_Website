@@ -1,3 +1,9 @@
+# Car Rental Website
+
+© 2025 Walid Houssaf. All rights reserved.
+
+This car rental website project was developed by Walid Houssaf.
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
