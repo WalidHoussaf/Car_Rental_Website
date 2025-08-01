@@ -198,18 +198,37 @@ export const assets = {
     data: {
         featuredCars: [
             {
-                id: 1,
-                name: "Tesla Cybertruck",
-                category: "Electric",
-                price: 199,
-                image: "cars.tesla", 
-                features: ["Autopilot", "0-60 in 2.6s", "340mi Range", " 350 kW DC fast charging", " Driver Assistance "],
+                id: 7,
+                name: "Bentley Continental GT",
+                category: "luxury",
+                price: 600,
+                image: "cars.car7",
+                features: ["Handcrafted interior", "Air suspension", "Naim audio system"],
+                specifications: {
+                    engine: "6.0L Twin-Turbo W12",
+                    power: "626 hp",
+                    torque: "664 lb-ft",
+                    acceleration: "0-60 mph in 3.6s",
+                    fuelEconomy: "15 mpg combined",
+                    seatingCapacity: 4,
+                    luggage: 2,
+                    doors: 2,
+                    transmission: "8-Speed Dual-Clutch"
+                }
+            },
+            {
+                id: 9,
+                name: "Tesla Model S Plaid",
+                category: "luxury",
+                price: 450,
+                image: "cars.car9",
+                features: ["1,020 horsepower", "Autopilot", "0-60 in 1.99s", "390mi range", "Premium sound system"],
                 specifications: {
                     engine: "Tri-Motor Electric",
-                    power: "845 hp",
-                    torque: "930 lb-ft",
-                    acceleration: "0-60 mph in 2.6s",
-                    range: "340 miles",
+                    power: "1,020 hp",
+                    torque: "1,050 lb-ft",
+                    acceleration: "0-60 mph in 1.99s",
+                    range: "390 miles",
                     seatingCapacity: 5,
                     luggage: 3,
                     doors: 4,
@@ -217,41 +236,22 @@ export const assets = {
                 }
             },
             {
-                id: 2,
-                name: "BMW i7",
-                category: "Hybrid Sport",
-                price: 299,
-                image: "cars.bmw",
-                features: ["544 horsepower", "0 to 100 in 4.7 seconds", "Leather Seats", "Panoramic Roof", "Driver Assistance"],
+                id: 10,
+                name: "Lamborghini Urus",
+                category: "suv",
+                price: 550,
+                image: "cars.car10",
+                features: ["650 horsepower", "Sport exhaust", "Carbon ceramic brakes", "Adaptive air suspension"],
                 specifications: {
-                    engine: "3.0L Inline-6 with Electric Motor",
-                    power: "544 hp",
-                    torque: "553 lb-ft",
-                    acceleration: "0-60 mph in 4.5s",
-                    range: "50 miles (electric only)",
-                    seatingCapacity: 5,
-                    luggage: 3,
-                    doors: 4,
-                    transmission: "8-Speed Automatic"
-                }
-            },
-            {
-                id: 3,
-                name: "Mercedes G-Class",
-                category: "Luxury SUV",
-                price: 349,
-                image: "cars.mercedes",
-                features: ["Off-Road Ready", "416hp V8", "Premium Interior", "9-Speed Auto", "Driver Assistance"],
-                specifications: {
-                    engine: "4.0L Biturbo V8",
-                    power: "416 hp",
-                    torque: "450 lb-ft",
-                    acceleration: "0-60 mph in 5.6s",
-                    fuelEconomy: "17 mpg combined",
+                    engine: "4.0L Twin-Turbo V8",
+                    power: "650 hp",
+                    torque: "627 lb-ft",
+                    acceleration: "0-60 mph in 3.5s",
+                    fuelEconomy: "14 mpg combined",
                     seatingCapacity: 5,
                     luggage: 4,
                     doors: 5,
-                    transmission: "9-Speed Automatic"
+                    transmission: "8-Speed Automatic"
                 }
             }
         ],

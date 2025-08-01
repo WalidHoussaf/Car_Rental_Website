@@ -1,5 +1,4 @@
 import React, { useState, useEffect} from 'react';
-import Select from 'react-select';
 import { Link } from 'react-router-dom';
 import { assets, resolveImagePaths } from '../assets/assets';
 import HowItWorks from '../components/Home/HowItWorks';
@@ -16,17 +15,7 @@ const HomePage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Location Options 
-  const locationOptions = [
-    { value: "", label: t('selectLocation'), disabled: true },
-    { value: "mohammedia", label: "Mohammedia" },
-    { value: "casablanca", label: "Casablanca" },
-    { value: "marrakesh", label: "Marrakesh" },
-    { value: "kenitra", label: "Kénitra" },
-    { value: "rabat", label: "Rabat" },
-    { value: "agadir", label: "Agadir" },
-    { value: "tangier", label: "Tangier" },
-  ];
+
 
   // Hero Slides Captions 
   const heroMessages = [
@@ -44,95 +33,14 @@ const HomePage = () => {
     }
   ];
   
-  // Hero Booking Form States
-  const [pickupLocation, setPickupLocation] = useState('');
-  const [dropoffLocation, setDropoffLocation] = useState('');
-  const [pickupDate, setPickupDate] = useState('');
-  const [dropoffDate, setDropoffDate] = useState('');
-  
-  // Min Date to Prevent Past Date Selection
-  const getTodayFormatted = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    let month = today.getMonth() + 1;
-    let day = today.getDate();
-    
-    // Add a Zero in Front of Months/Days if Necessary
-    month = month < 10 ? `0${month}` : month;
-    day = day < 10 ? `0${day}` : day;
-    
-    return `${year}-${month}-${day}`;
-  };
-  
-  const today = getTodayFormatted();
+
 
   // Get Data From Assets.js
   const featuredCars = resolveImagePaths(assets.data.featuredCars, 'image');
   const destinations = resolveImagePaths(assets.data.destinations, 'image');
   const testimonials = resolveImagePaths(assets.data.testimonials, 'photo');
 
-  // Custom Styles For Select
-  const customStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      height: '2.75rem',
-      minHeight: '2.75rem',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      borderColor: '#374151',
-      borderRadius: '0.375rem',
-      fontFamily: 'Orbitron, sans-serif',
-      color: 'white',
-      boxShadow: state.isFocused ? '0 0 0 2px rgba(59, 130, 246, 0.5)' : 'none',
-      '&:hover': {
-        borderColor: '#4B5563',
-      }
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: 'black',
-      fontFamily: 'Orbitron, sans-serif',
-      maxHeight: '240px',
-      overflowY: 'hidden',
-    }),
-    menulist: (provided) => ({
-      ...provided,
-      maxHeight: '240px',
-      overflowY: 'auto',
-      paddingRight: '8px',
-      scrollbarWidth: 'thin',
-      scrollbarColor: 'rgba(255, 255, 255, 0.5) transparent',
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected ? 'rgba(59, 130, 246, 0.3)' : 'black',
-      color: 'white',
-      fontFamily: 'Orbitron, sans-serif',
-      padding: '4px 8px',
-      fontSize: '0.875rem',
-      lineHeight: '1.2',
-      '&:hover': {
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-      }
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: 'white',
-      fontFamily: 'Orbitron, sans-serif',
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      color: '#FFFFFF',
-      fontFamily: 'Orbitron, sans-serif',
-    }),
-  };
 
-  // Convert Location Options For react-select
-  const selectLocationOptions = locationOptions
-    .filter(option => option.value !== "")
-    .map(option => ({
-      value: option.value,
-      label: option.label
-    }));
 
   // Auto-Rotate Hero Captions
   useEffect(() => {
@@ -142,20 +50,7 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, [heroMessages.length]);
 
-  // Handle Pickup Date Change
-  const handlePickupDateChange = (e) => {
-    const newPickupDate = e.target.value;
-    setPickupDate(newPickupDate);
 
-    if (dropoffDate && new Date(dropoffDate) < new Date(newPickupDate)) {
-      setDropoffDate('');
-    }
-  };
-
-  // Generate Minimum Dropoff Date
-  const getMinDropoffDate = () => {
-    return pickupDate ? pickupDate : today;
-  };
 
   return (
     <div className="bg-black text-white min-h-screen font-['Orbitron'] relative">
@@ -190,98 +85,30 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Booking Form Card */}
-          <div className="w-full max-w-5xl bg-black/80 backdrop-blur-md rounded-xl p-6 shadow-2xl border border-gray-800 relative">
-            <h2 className="text-2xl font-semibold mb-6 text-center font-['Orbitron']">{t('findYourPerfectRide')}</h2>
+          {/* Enhanced CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mt-8">
+            <Link
+              to="/cars"
+              className="px-8 py-4 rounded-md bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-cyan-600/20 hover:shadow-cyan-500/30 cursor-pointer transform hover:scale-105 flex items-center gap-3 text-lg font-semibold"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              {t('exploreOurFleet')}
+            </Link>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">{t('pickupLocation')}</label>
-                <Select
-                  options={selectLocationOptions}
-                  value={selectLocationOptions.find(option => option.value === pickupLocation)}
-                  onChange={(selectedOption) => setPickupLocation(selectedOption.value)}
-                  styles={customStyles}
-                  theme={(theme) => ({
-                    ...theme,
-                    colors: {
-                      ...theme.colors,
-                      primary: 'rgba(59, 130, 246, 0.5)',
-                      primary25: 'rgba(59, 130, 246, 0.1)',
-                    }
-                  })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">{t('returnLocation')}</label>
-                <Select
-                  options={selectLocationOptions}
-                  value={selectLocationOptions.find(option => option.value === dropoffLocation)}
-                  onChange={(selectedOption) => setDropoffLocation(selectedOption.value)}
-                  styles={customStyles}
-                  theme={(theme) => ({
-                    ...theme,
-                    colors: {
-                      ...theme.colors,
-                      primary: 'rgba(59, 130, 246, 0.5)',
-                      primary25: 'rgba(59, 130, 246, 0.1)',
-                    }
-                  })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">{t('selectDates')}</label>
-                <input
-                  type="date"
-                  value={pickupDate}
-                  onChange={handlePickupDateChange}
-                  min={today}
-                  className="w-full bg-black/80 border border-gray-700 rounded-md px-4 h-11 text-white 
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 
-                    font-['Orbitron'] 
-                    text-sm
-                    transition-all duration-300
-                    hover:border-blue-500
-                    hover:bg-black/90"
-                  style={{
-                    colorScheme: 'dark'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">{language === 'en' ? 'Return Date' : 'Date de retour'}</label>
-                <input
-                  type="date"
-                  value={dropoffDate}
-                  onChange={(e) => setDropoffDate(e.target.value)}
-                  min={getMinDropoffDate()}
-                  className="w-full bg-black/80 border border-gray-700 rounded-md px-4 h-11 text-white 
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 
-                    font-['Orbitron'] 
-                    text-sm
-                    transition-all duration-300
-                    hover:border-blue-500
-                    hover:bg-black/90"
-                  style={{
-                    colorScheme: 'dark'
-                  }}
-                  disabled={!pickupDate}
-                />
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-center">
-              <Link
-                to="/cars"
-                className="bg-gradient-to-r from-white to-cyan-500 hover:from-cyan-500 hover:to-white text-black font-bold py-3 px-10 rounded-md transition-all duration-300 font-['Orbitron'] transform hover:scale-105 shadow-lg shadow-cyan-500/5"
-              >
-                {t('exploreOurFleet')}
-              </Link>
-            </div>
+            <Link
+              to="/contact"
+              className="px-8 py-4 rounded-md bg-transparent border border-cyan-500/50 hover:border-cyan-400 text-cyan-400 hover:text-cyan-300 font-['Orbitron'] transition-all duration-300 cursor-pointer transform hover:scale-105 flex items-center gap-3 text-lg font-semibold"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              {language === 'en' ? 'Contact Us Now' : 'Contactez-nous Maintenant'}
+            </Link>
           </div>
+
+
         </div>
       </div>
 

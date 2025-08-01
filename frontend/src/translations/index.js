@@ -247,8 +247,8 @@ export const translations = {
     operationsDirector: "Operations Director",
     customerExperience: "Customer Experience",
     walidBio: "With over 15 years in the luxury automotive industry, Walid founded Drift to revolutionize car rentals in Morocco. His passion for cars and technology drives our vision forward.",
-    zinebBio: "Leading our day-to-day operations across all locations, ensuring every rental experience exceeds expectations. Zineb's attention to detail and customer focus are unmatched.",
-    miaBio: "Creating seamless experiences from booking to return, Mia ensures our customers' journey is as smooth as our vehicles.",
+    amalBio: "Leading our day-to-day operations across all locations, ensuring every rental experience exceeds expectations. Amal's attention to detail and customer focus are unmatched.",
+    khadijaBio: "Creating seamless experiences from booking to return, Khadija ensures our customers' journey is as smooth as our vehicles.",
     
     // FAQ Page
     frequentlyAskedQuestions: "FREQUENTLY ASKED QUESTIONS",
@@ -719,8 +719,8 @@ export const translations = {
     operationsDirector: "Directrice des Opérations",
     customerExperience: "Expérience Client",
     walidBio: "Avec plus de 15 ans d'expérience dans l'industrie automobile de luxe, Walid a fondé Drift pour révolutionner la location de voitures au Maroc. Sa passion pour les voitures et la technologie fait avancer notre vision.",
-    zinebBio: "Dirigeant nos opérations quotidiennes dans tous nos sites, assurant que chaque expérience de location dépasse les attentes. L'attention aux détails et l'orientation client de Zineb sont inégalées.",
-    miaBio: "Créant des expériences fluides de la réservation au retour, Mia s'assure que le parcours de nos clients est aussi agréable que nos véhicules.",
+    amalBio: "Dirigeant nos opérations quotidiennes dans tous nos sites, assurant que chaque expérience de location dépasse les attentes. L'attention aux détails et l'orientation client de Amal sont inégalées.",
+    khadijaBio: "Créant des expériences fluides de la réservation au retour, Khadija s'assure que le parcours de nos clients est aussi agréable que nos véhicules.",
     
     // FAQ Page
     frequentlyAskedQuestions: "FOIRE AUX QUESTIONS",

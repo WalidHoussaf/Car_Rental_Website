@@ -21,15 +21,15 @@ const AboutPage = () => {
       image: assets.about?.team?.walid || "/api/placeholder/300/300"
     },
     {
-      name: "Zineb El Qodsi",
+      name: "Amal Rekik",
       position: t('operationsDirector'),
-      bio: t('zinebBio'),
+      bio: t('amalBio'),
       image: assets.about?.team?.zineb || "/api/placeholder/300/300"
     },
     {
-      name: "Mia Chen",
+      name: "Khadija Zouari",
       position: t('customerExperience'),
-      bio: t('miaBio'),
+      bio: t('khadijaBio'),
       image: assets.about?.team?.mia || "/api/placeholder/300/300"
     }
   ];
