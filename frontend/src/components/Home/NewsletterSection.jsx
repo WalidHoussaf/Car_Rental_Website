@@ -17,28 +17,25 @@ const NewsletterSection = () => {
     <section className="relative py-16 px-4 bg-black overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 via-black to-purple-900/10 pointer-events-none"></div>
-      
-      {/* Grid Lines Background */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="h-full w-full" style={{
-          backgroundImage: 'linear-gradient(to right, #3B82F6 1px, transparent 1px), linear-gradient(to bottom, #8B5CF6 1px, transparent 1px)',
-          backgroundSize: '40px 40px'
-        }}></div>
-      </div>
-      
+     
       <div className="max-w-7xl mx-auto relative z-10">
-        <h2 className="text-2xl md:text-4xl font-semibold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
-          {t('stayConnected')}
-        </h2>
-        
+        <div className="text-center mb-6">
+          <div className="inline-block">
+            <h2 className="text-2xl md:text-4xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
+              {t('stayConnected')}
+            </h2>
+            <div className="h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full"></div>
+          </div>
+        </div>
+       
         <p className="text-gray-300 mb-8 max-w-2xl mx-auto text-center font-['Orbitron'] text-sm md:text-base">
           {t('newsletterDescription')}
         </p>
-        
+       
         <div className="relative max-w-2xl mx-auto">
-          {/* Tech Border Effect */}
+          {/* Tech Border */}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-white rounded-lg opacity-50 blur-sm group-hover:opacity-75 transition duration-300"></div>
-          
+         
           <form onSubmit={handleSubmit} className="relative flex flex-col sm:flex-row gap-4 justify-center bg-black/50 p-2 rounded-lg backdrop-blur-sm border border-gray-800">
             <input
               type="email"
@@ -52,16 +49,16 @@ const NewsletterSection = () => {
               type="submit"
               className="group relative px-6 py-3 bg-gradient-to-r from-cyan-400 to-white text-black font-medium rounded-md transition-all duration-300 transform hover:scale-105 overflow-hidden font-['Orbitron'] cursor-pointer"
             >
-              {/* Button Glow Effect */}
+             
               <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 via-cyan-400/30 to-purple-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
-              
+             
               {/* Digital Noise On Hover */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div 
-                    key={i} 
+                  <div
+                    key={i}
                     className="absolute h-px w-full bg-blue-400/30"
-                    style={{ 
+                    style={{
                       top: `${Math.random() * 100}%`,
                       animation: 'scanline 3s linear infinite',
                       animationDelay: `${i * 0.5}s`
@@ -69,7 +66,7 @@ const NewsletterSection = () => {
                   ></div>
                 ))}
               </div>
-              
+             
               <span className="relative z-10 flex items-center justify-center pl-2">
                 {t('subscribe')}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 transform transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
@@ -78,14 +75,7 @@ const NewsletterSection = () => {
               </span>
             </button>
           </form>
-          
-          {/* Tech corner accents */}
-          <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-white opacity-70"></div>
-          <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-cyan-500 opacity-70"></div>
-          <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-cyan-500 opacity-70"></div>
-          <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-white opacity-70"></div>
         </div>
-        
         <p className="text-gray-500 text-sm text-center mt-4 font-['Orbitron']">
           {t('privacyNotice')}
         </p>

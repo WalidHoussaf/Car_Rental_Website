@@ -101,8 +101,8 @@ import loginbg from './hero/loginbg.mp4'
 import heroImage from './about/heroImage.png'
 import storyImage from './about/storyImage.png'
 import walid from './about/team/walid.png'
-import zineb from './about/team/zineb.png'
-import mia from './about/team/mia.png'
+import amal from './about/team/amal.png'
+import khadija from './about/team/khadija.png'
 import ctaBackground from './about/ctaBackground.png'
 import heroImage1 from './contact/heroImage.png'
 import ctaBackground1 from './contact/ctaBackground1.png'
@@ -190,8 +190,8 @@ export const assets = {
         ctaBackground,
         team: {
             walid,
-            zineb,
-            mia
+            amal,
+            khadija
         }
         
     },

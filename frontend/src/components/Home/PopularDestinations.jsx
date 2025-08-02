@@ -7,13 +7,13 @@ const PopularDestinations = ({ destinations }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
 
-  // Fonction pour obtenir le nom traduit d'une destination
+  // Function to get the translated name of a destination
   const getTranslatedName = (destination) => {
     const key = `destination_${destination.name.toLowerCase().replace(/\s+/g, '_')}`;
     return t(key) || destination.name;
   };
 
-  // Fonction pour obtenir la description traduite d'une destination
+  // Function to get the translated description of a destination
   const getTranslatedDescription = (destination) => {
     const key = `destination_${destination.name.toLowerCase().replace(/\s+/g, '_')}_desc`;
     return t(key) || destination.description || t('exploreDestination');
@@ -24,18 +24,21 @@ const PopularDestinations = ({ destinations }) => {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-cyan-900/10 via-black to-blue-900/10 pointer-events-none"></div>
   
-      {/* Grid Lines Background */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="h-full w-full" style={{
-          backgroundImage: 'linear-gradient(to right, #8B5CF6 1px, transparent 1px), linear-gradient(to bottom, #8B5CF6 1px, transparent 1px)',
-          backgroundSize: '40px 40px'
-        }}></div>
-      </div>
-
       <div className="max-w-7xl mx-auto relative z-10">
-        <h2 className="text-2xl md:text-5xl font-semibold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
-          {t('popularDestinations')}
-        </h2>
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <h2 className="text-2xl md:text-5xl font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
+            {t('popularDestinations')}
+          </h2>
+      
+          <div className="h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full mb-6 max-w-md mx-auto"></div>
+        
+          {/* Description */}
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-8 font-['Orbitron'] leading-relaxed">
+            {t('popularDestinationsDescription') || 'Discover the most sought-after destinations where luxury meets adventure. Each location offers premium vehicles and unforgettable experiences.'}
+          </p>
+          
+        </div>
     
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {destinations.map((destination, index) => (
@@ -107,6 +110,21 @@ const PopularDestinations = ({ destinations }) => {
               </div>
             </div>
           ))}
+        </div>
+        
+        {/* CTA Button */}
+        <div className="text-center mt-16">
+          <Link
+            to="/cars"
+            className="inline-flex items-center px-8 py-4 text-lg font-medium text-black bg-gradient-to-r from-white to-cyan-400 border border-cyan-500/50 rounded-lg hover:from-cyan-400 hover:to-white transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.4)] group"
+          >
+            <span className="relative z-10 font-['Orbitron'] mr-2">
+              {t('exploreAllDestinations') || 'Explore All Destinations'}
+            </span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </Link>
         </div>
       </div>
     </section>

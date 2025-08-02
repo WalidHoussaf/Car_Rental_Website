@@ -27,11 +27,14 @@ export const translations = {
     findYourPerfectRide: "Find Your Perfect Ride",
     from: "From",
     day: "/day",
+    featuredCarsDescription: "A showcase of top-rated cars, highlighting performance, style, and innovation.",
     
     // Popular Destinations section
     popularDestinations: "Popular Destinations",
     discoverRides: "Discover Rides",
     exploreDestination: "Explore the futuristic cityscape and iconic landmarks.",
+    popularDestinationsDescription: "A selection of top travel destinations known for their beauty and popularity.",
+    exploreAllDestinations: "Explore All Destinations",
     
     // Destinations names and descriptions
     destination_mohammedia: "Mohammedia",
@@ -499,12 +502,15 @@ export const translations = {
     findYourPerfectRide: "Trouvez Votre Véhicule Parfait",
     from: "À partir de",
     day: "/jour",
+    featuredCarsDescription: "Une sélection de voitures vedettes, mettant en valeur la performance, le style et l'innovation.",
     
     // Popular Destinations section
     popularDestinations: "Destinations Populaires",
     discoverRides: "Découvrir les Véhicules",
     exploreDestination: "Explorez les paysages futuristes et les monuments emblématiques.",
-    
+    popularDestinationsDescription: "Une sélection de destinations touristiques populaires connues pour leur beauté et leur popularité.",
+    exploreAllDestinations: "Explorer toutes les destinations",
+
     // Destinations names and descriptions
     destination_mohammedia: "Mohammedia",
     destination_mohammedia_desc: "Découvrez les magnifiques plages de Mohammedia avec style.",

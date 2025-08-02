@@ -85,7 +85,7 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Enhanced CTA Buttons */}
+          {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mt-8">
             <Link
               to="/cars"

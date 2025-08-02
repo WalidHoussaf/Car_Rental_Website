@@ -17,7 +17,7 @@ const FeaturedCars = ({ featuredCars }) => {
       transmission: '9-Speed Automatic'
     };
 
-    // Car specific overrides based on model
+    // Car Sample for now until the backend is ready
     const specsByModel = {
       'Tesla Cybertruck': {
         horsepower: '845',
@@ -69,27 +69,30 @@ const FeaturedCars = ({ featuredCars }) => {
 
   return (
     <section className="relative py-24 px-4 bg-black overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-blue-900/10 to-purple-900/10 pointer-events-none"></div>
-      {/* Grid Lines Background */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="h-full w-full" style={{
-         backgroundImage: 'linear-gradient(to right, #3B82F6 1px, transparent 1px), linear-gradient(to bottom, #3B82F6 1px, transparent 1px)',
-         backgroundSize: '40px 40px'
-        }}></div>
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-cyan-900/10 to-cyan-700/10 pointer-events-none"></div>
+
   
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-center mb-16">
-          <h2 className="text-2xl md:text-5xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-6 md:mb-0">
-            {t('featuredCars')}
-          </h2>
+          <div className="text-center md:text-left mb-6 md:mb-0">
+            <h2 className="text-2xl md:text-5xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-4 leading-[1.2]">
+              {t('featuredCars')}
+            </h2>
+            
+            <div className="h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full mb-4 max-w-md mx-auto md:mx-0"></div>
+            
+            {/* Description */}
+            <p className="text-gray-300 text-lg max-w-2xl font-['Orbitron'] leading-relaxed">
+              {t('featuredCarsDescription') || 'Experience the pinnacle of automotive excellence with our handpicked selection of premium vehicles.'}
+            </p>
+          </div>
       
           <Link
             to="/cars"
-            className="group flex items-center space-x-2 px-6 py-3 rounded-md border border-cyan-500/50 bg-black/50 backdrop-blur-sm hover:bg-blue-900/20 transition-all duration-300 hover:shadow-[0_0_15px_rgba(59,130,246,0.4)]"
+            className="inline-flex items-center px-6 py-3 text-black bg-gradient-to-r from-white to-cyan-400 border border-cyan-500/50 rounded-lg hover:from-cyan-400 hover:to-white transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] group"
           >
-            <span className="text-white group-hover:text-cyan-400 transition-colors duration-300 font-['Orbitron'] text-sm">{t('viewAllVehicles')}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white group-hover:text-cyan-400 transition-colors duration-300 transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+            <span className="font-['Orbitron'] text-sm font-medium mr-2">{t('viewAllVehicles')}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </Link>
@@ -101,10 +104,10 @@ const FeaturedCars = ({ featuredCars }) => {
             return (
             <div
               key={car.id}
-                className="relative bg-black rounded-xl overflow-hidden border border-blue-900/30 shadow-lg transform transition-all duration-500 hover:scale-[1.02] hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] group"
+                className="relative bg-black rounded-xl overflow-hidden border border-cyan-900/30 shadow-lg transform transition-all duration-500 hover:scale-[1.02] hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] group"
               >
-                {/* Animated Glow Effect on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+               
+                <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-cyan-700/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
               
               {/* Car Image Container */}
                 <div className="relative h-56 overflow-hidden">
@@ -117,10 +120,10 @@ const FeaturedCars = ({ featuredCars }) => {
                 
                 {/* Category Tag */}
                   <div className="absolute bottom-4 left-4 z-20 flex items-center space-x-2">
-                    <div className="px-4 py-1 rounded-full bg-blue-900/80 backdrop-blur-sm border border-blue-500/50 text-white font-medium font-['Orbitron'] text-sm group-hover:bg-blue-800/90 group-hover:border-cyan-400/60 transition-all duration-300">
+                    <div className="px-4 py-1 rounded-full bg-cyan-900/80 backdrop-blur-sm border border-cyan-500/50 text-white font-medium font-['Orbitron'] text-sm group-hover:bg-cyan-800/90 group-hover:border-cyan-400/60 transition-all duration-300">
                     {car.category}
                     </div>
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-gray-600 group-hover:border-blue-500/50 transition-colors duration-300 transform group-hover:rotate-12">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-gray-600 group-hover:border-cyan-500/50 transition-colors duration-300 transform group-hover:rotate-12">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white group-hover:text-cyan-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                       </svg>
@@ -130,7 +133,7 @@ const FeaturedCars = ({ featuredCars }) => {
               
               {/* Car Details */}
                 <div className="p-6 relative">
-                  {/* Subtle animated line on hover */}
+                  
                   <div className="absolute top-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300 ease-in-out"></div>
                   
                   <h3 className="text-xl font-semibold mb-4 text-white font-['Orbitron'] group-hover:text-cyan-400 transition-colors duration-300">{car.name}</h3>
@@ -170,24 +173,21 @@ const FeaturedCars = ({ featuredCars }) => {
                     </div>
                 </div>
                 
-                  {/* Subtle animated line before price */}
                   <div className="w-full h-0.5 bg-gray-800/50 mb-6 overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 w-0 group-hover:w-full transition-all duration-200 ease-in-out"></div>
+                    <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 w-0 group-hover:w-full transition-all duration-200 ease-in-out"></div>
                 </div>
                 
                 {/* Price and CTA */}
                   <div className="flex justify-between items-center">
                     <div className="transform transition-all duration-300 group-hover:scale-105 group-hover:translate-x-1">
                       <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] group-hover:text-cyan-400 transition-colors duration-300">${car.price}</span>
-                      <span className="text-sm text-gray-400 font-['Orbitron'] transition-colors duration-300">{t('day')}</span>
+                      <span className="text-sm text-gray-400 font-['Orbitron'] transition-colors duration-300">/{t('day')}</span>
                   </div>
                   
                   <Link
                     to={`/cars/${car.id}`}
-                      className="relative px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-all duration-300 font-['Orbitron'] overflow-hidden group-hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+                      className="relative px-6 py-2 text-sm font-medium text-black bg-gradient-to-r from-white to-cyan-400 border border-cyan-500/50 rounded-lg hover:from-cyan-400 hover:to-white transition-all duration-300 font-['Orbitron'] transform hover:scale-105 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)]"
                     >
-                      {/* Button glow effect */}
-                      <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></span>
                       <span className="relative z-10">{t('details')}</span>
                   </Link>
                   </div>

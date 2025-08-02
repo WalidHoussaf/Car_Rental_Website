@@ -5,7 +5,7 @@ import { assets } from '../assets/assets';
 import '../styles/animations.css';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
-import FloatingParticles from '../components/Ui/FloatingParticles';
+
 import GlowingGrid from '../components/Ui/GlowingGrid';
 
 const ContactPage = () => {
@@ -487,9 +487,8 @@ const ContactPage = () => {
           />
         </div>
         
-        {/* Floating Particles */}
+        {/* Background Effects */}
         <div className="absolute inset-0 pointer-events-none">
-          <FloatingParticles count={15} />
           <div className="absolute top-20 left-20 w-48 h-48 rounded-full bg-cyan-500/5 blur-[80px]"></div>
           <div className="absolute bottom-20 right-20 w-64 h-64 rounded-full bg-blue-500/5 blur-[100px]"></div>
         </div>

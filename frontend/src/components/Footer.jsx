@@ -67,13 +67,7 @@ const Footer = () => {
 
   return (
     <footer className="relative bg-black text-white overflow-hidden">
-      {/* Tech Grid Background */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="h-full w-full" style={{
-          backgroundImage: 'linear-gradient(to right, #3B82F6 1px, transparent 1px), linear-gradient(to bottom, #8B5CF6 1px, transparent 1px)',
-          backgroundSize: '40px 40px'
-        }}></div>
-      </div>
+
       
       {/* Top Border Glow */}
       <div className="relative h-px w-full overflow-hidden">

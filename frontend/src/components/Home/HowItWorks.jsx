@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import FloatingParticles from '../Ui/FloatingParticles';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
 
@@ -12,15 +11,17 @@ const HowItWorks = () => {
   return (
     <section ref={howItWorksRef} className="relative py-20 px-4 bg-black overflow-hidden">
       {/* Background effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <FloatingParticles containerRef={howItWorksRef} />
-      </div>
       <div className="absolute inset-0 bg-gradient-to-b from-blue-900/5 to-purple-900/10 pointer-events-none"></div>
       
       <div className="max-w-7xl mx-auto relative z-100">
-        <h2 className="text-2xl md:text-5xl font-semibold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
-          {t('howItWorks')}
-        </h2>
+        <div className="text-center mb-16">
+          <div className="inline-block">
+            <h2 className="text-2xl md:text-5xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
+              {t('howItWorks')}
+            </h2>
+            <div className="h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full"></div>
+          </div>
+        </div>
 
         <div className="relative">
           {/* Timeline */}

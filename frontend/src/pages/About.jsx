@@ -24,13 +24,13 @@ const AboutPage = () => {
       name: "Amal Rekik",
       position: t('operationsDirector'),
       bio: t('amalBio'),
-      image: assets.about?.team?.zineb || "/api/placeholder/300/300"
+      image: assets.about?.team?.amal || "/api/placeholder/300/300"
     },
     {
       name: "Khadija Zouari",
       position: t('customerExperience'),
       bio: t('khadijaBio'),
-      image: assets.about?.team?.mia || "/api/placeholder/300/300"
+      image: assets.about?.team?.khadija || "/api/placeholder/300/300"
     }
   ];
 

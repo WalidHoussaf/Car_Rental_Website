@@ -10,96 +10,99 @@ const Testimonials = ({ testimonials }) => {
   return (
     <section className="relative py-24 px-4 bg-black overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 via-black to-blue-700/10 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-br via-black to-cyan-700"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-600 via-transparent to-transparent"></div>
       
-      {/* Grid Lines Background */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="h-full w-full" style={{
-          backgroundImage: 'linear-gradient(to right, #3B82F6 1px, transparent 1px), linear-gradient(to bottom, #3B82F6 1px, transparent 1px)',
-          backgroundSize: '40px 40px'
-        }}></div>
-      </div>
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+        backgroundSize: '40px 40px'
+      }}></div>
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <h2 className="text-2xl md:text-5xl font-semibold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-[1.2]">
-          {t('customerTestimonials')}
-        </h2>
+        {/* Header */}
+        <div className="text-center mb-20">
+          <div className="inline-block">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] leading-tight">
+              {t('customerTestimonials')}
+            </h2>
+            <div className="h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full"></div>
+          </div>
+          <p className="text-gray-400 mt-6 text-lg font-['Orbitron'] max-w-2xl mx-auto">
+            Discover what our clients say about their transformative experiences
+          </p>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Map Through Testimonials Data */}
           {testimonials.map((testimonial, index) => (
             <div 
-              key={index} 
-              className="group relative bg-black/80 rounded-xl overflow-hidden border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+              key={index}
+              className="group relative"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              {/* Digital Noise Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-b from-blue-900/5 to-blue-700/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-              
-              <div className="p-6">
-                {/* Quote mark */}
-                <div className="absolute top-4 right-4 text-5xl text-white font-serif group-hover:text-gray-400 transition-colors duration-300">"</div>
+              {/* Card Container */}
+              <div className="relative bg-gradient-to-br to-black rounded-xl border border-cyan-500 backdrop-blur-sm transform transition-all duration-300 hover:border-cyan-600 hover:shadow-[0_0_25px_rgba(6,182,212,0.3)] overflow-hidden">
                 
-                <div className="flex items-center mb-6 relative">
-                  <div className="w-16 h-16 rounded-full border-2 border-white group-hover:border-blue-500 transition-colors duration-300 mr-4 overflow-hidden relative">
-                    {/* Image glow effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
-                    <img
-                      src={testimonial.photo}
-                      alt={testimonial.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg text-white group-hover:text-blue-500 transition-colors duration-300 font-['Orbitron']">
-                      {t(`testimonial_${testimonial.name.toLowerCase().replace(/\s+/g, '_')}_name`) || testimonial.name}
-                    </h3>
-                    <p className="text-xs text-gray-400 font-['Orbitron']">
-                      {t(`testimonial_${testimonial.name.toLowerCase().replace(/\s+/g, '_')}_title`) || testimonial.title}
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 via-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <div className="relative p-6">
+                  {/* Quote */}
+                  <div className="mb-6">
+                    <svg className="w-6 h-6 text-cyan-400 mb-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                    </svg>
+                    <p className="text-white font-['Orbitron'] text-sm leading-relaxed text-justify">
+                      "{t(`testimonial_${testimonial.name.toLowerCase().replace(/\s+/g, '_')}_quote`) || testimonial.quote}"
                     </p>
                   </div>
-                </div>
-                
-                <p className="text-gray-300 mb-6 font-['Orbitron'] text-2xs leading-relaxed text-justify">
-                  "{t(`testimonial_${testimonial.name.toLowerCase().replace(/\s+/g, '_')}_quote`) || testimonial.quote}"
-                </p>
-                
-                {/* Star Rating Design */}
-                <div className="flex space-x-2 relative">
-                  {[...Array(testimonial.rating || 5)].map((_, i) => (
-                    <div key={i} className="relative">
-                      {/* Geometric Star Design */}
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400 group-hover:text-yellow-300 transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
-                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        <circle cx="12" cy="12" r="2" fill="rgba(255, 215, 0, 0.5)" className="group-hover:fill-yellow-200 transition-colors duration-300" />
-                      </svg>
-                      <div className="absolute inset-0 bg-yellow-500/40 blur-[1px] rounded-full opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
+                  
+                  {/* User Info */}
+                  <div className="flex items-center">
+                    <div className="relative">
+                      <div className="w-12 h-12 rounded-full border-2 border-cyan-800 transition-all duration-300 overflow-hidden">
+                        <img
+                          src={testimonial.photo}
+                          alt={testimonial.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
-                  ))}
-                </div>
-                
-                {/* Progress Indicator */}
-                <div className="w-full h-0.5 bg-gray-800 mt-6 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-white to-cyan-500 animate-pulse" style={{ width: "100%" }}></div>
+                    
+                    <div className="ml-4 flex-1">
+                      <h3 className="font-semibold text-white transition-colors duration-300 font-['Orbitron'] text-sm">
+                        {t(`testimonial_${testimonial.name.toLowerCase().replace(/\s+/g, '_')}_name`) || testimonial.name}
+                      </h3>
+                      <p className="text-xs text-cyan-400 font-['Orbitron']">
+                        {t(`testimonial_${testimonial.name.toLowerCase().replace(/\s+/g, '_')}_title`) || testimonial.title}
+                      </p>
+                    </div>
+                    
+                    {/* Star Rating */}
+                    <div className="flex items-center space-x-1">
+                      {[...Array(testimonial.rating || 5)].map((_, i) => (
+                        <svg key={i} className="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-        
-        {/* Read More Button */}
-        <div className="mt-12 text-center">
-          <Link 
-            to="/reviews" 
-            className="group relative inline-flex items-center px-6 py-3 overflow-hidden rounded-md bg-black/50 border border-cyan-500/50 hover:border-blue-400/50 transition-all duration-300"
+
+        {/* CTA Button */}
+        <div className="text-center mt-16">
+          <Link
+            to="/reviews"
+            className="inline-flex items-center px-8 py-4 text-lg font-medium text-black bg-gradient-to-r from-white to-cyan-400 border border-cyan-500/50 rounded-lg hover:from-cyan-400 hover:to-white transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.4)] group"
           >
-            {/* Animated Background Effect */}
-            <div className="absolute inset-0 w-3 bg-gradient-to-r from-blue-500/20 to-blue-400/20 transition-all duration-500 group-hover:w-full"></div>
-            
-            <span className="relative z-10 text-white group-hover:text-blue-300 transition-colors duration-300 font-['Orbitron']">
+            <span className="relative z-10 font-['Orbitron'] mr-2">
               {t('readMoreReviews')}
             </span>
-            <svg xmlns="http://www.w3.org/2000/svg" className="relative z-10 h-5 w-5 ml-2 text-white group-hover:text-blue-300 transition-colors duration-300 transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </Link>
         </div>
