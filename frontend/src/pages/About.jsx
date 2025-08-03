@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
-import '../styles/animations.css';
+
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
 import GlowingGrid from '../components/Ui/GlowingGrid';

@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
+import GlowingGrid from './Ui/GlowingGrid';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { language } = useLanguage();
   const t = useTranslations(language);
+  const footerRef = useRef(null);
   
   const footerLinks = [
     {
@@ -66,9 +68,15 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative bg-black text-white overflow-hidden">
+    <footer ref={footerRef} className="relative bg-black text-white overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <GlowingGrid containerRef={footerRef} />
+        <div className="absolute top-1/4 right-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl"></div>
+        <div className="absolute bottom-1/3 left-1/3 w-36 h-36 rounded-full bg-blue-500/5 blur-3xl"></div>
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/90 pointer-events-none"></div>
 
-      
       {/* Top Border Glow */}
       <div className="relative h-px w-full overflow-hidden">
         <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-gray-500 via-white to-blue-500 opacity-70"></div>
@@ -166,7 +174,7 @@ const Footer = () => {
       </div>
       
       {/* Circuit Line Animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes circuitLine {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }

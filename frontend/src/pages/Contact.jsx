@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
 import { assets } from '../assets/assets';
-import '../styles/animations.css';
+
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
 
