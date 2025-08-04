@@ -9,22 +9,19 @@ const CallToAction = () => {
   return (
     <section className="relative py-16 overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-900/5 to-cyan-900/5 pointer-events-none"></div>
       <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none">
         <div className="h-full w-full" style={{
-          backgroundImage: 'linear-gradient(to right, #3B82F6 1px, transparent 1px), linear-gradient(to bottom, #8B5CF6 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(to right, #3B82F6 1px, transparent 1px), linear-gradient(to bottom, #06B6D4 1px, transparent 1px)',
           backgroundSize: '80px 80px'
         }}></div>
       </div>
       
       <div className="max-w-7xl mx-auto px-4 relative">
         {/* Content */}
-        <div className="bg-gradient-to-r from-gray-900/80 via-black/90 to-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-xl p-8 lg:p-12 relative overflow-hidden">
+        <div className="bg-black/90 backdrop-blur-sm border border-gray-800 rounded-xl p-8 lg:p-12 relative overflow-hidden">
           {/* Decorative Elements */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50"></div>
           <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-50"></div>
-          <div className="absolute -left-4 top-0 w-8 h-8 rounded-full bg-cyan-500 blur-xl opacity-20"></div>
-          <div className="absolute -right-4 bottom-0 w-8 h-8 rounded-full bg-white blur-xl opacity-20"></div>
           
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="max-w-2xl">

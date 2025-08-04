@@ -20,6 +20,14 @@ const DestinationPin = () => (
   </svg>
 );
 
+// Map Pin icon
+const MapPin = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+  </svg>
+);
+
 // Location coordinates
 const LOCATIONS_COORDINATES = {
   'casablanca': { lat: 33.5731, lng: -7.5898 },
@@ -97,7 +105,7 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
         attributionControl: false
       });
 
-      // Replace dark theme with a lighter but still elegant theme
+      // Replace dark theme with a lighter one
       window.L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         subdomains: 'abcd'
@@ -182,7 +190,7 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
   }, [mapLoaded, pickup, dropoff, sameLocation]);
 
   return (
-    <div className="relative h-48 bg-black/60 rounded-lg mb-6 overflow-hidden border border-blue-900/20 group-hover:border-blue-900/40 transition-all duration-300">
+    <div className="relative h-64 bg-black/60 rounded-xl mb-8 overflow-hidden border border-blue-900/20 group-hover:border-blue-900/40 transition-all duration-300">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 z-10 pointer-events-none"></div>
       
       {!mapLoaded && (
@@ -235,10 +243,12 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       ...provided,
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
       borderColor: state.isFocused ? '#22d3ee' : 'rgba(59, 130, 246, 0.3)',
-      borderRadius: '0.5rem',
-      padding: '0.25rem',
+      borderRadius: '0.75rem',
+      padding: '0.5rem',
       fontFamily: 'Orbitron, sans-serif',
-      boxShadow: state.isFocused ? '0 0 0 1px #22d3ee' : 'none',
+      fontSize: '1.125rem',
+      minHeight: '3.5rem',
+      boxShadow: state.isFocused ? '0 0 0 2px #22d3ee' : 'none',
       '&:hover': {
         borderColor: '#22d3ee',
       },
@@ -248,7 +258,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       ...provided,
       backgroundColor: 'rgba(0, 0, 0, 0.9)',
       border: '1px solid rgba(59, 130, 246, 0.3)',
-      borderRadius: '0.5rem',
+      borderRadius: '0.75rem',
       padding: '0.5rem',
       zIndex: 50,
       boxShadow: '0 4px 12px rgba(0, 200, 255, 0.15)'
@@ -262,7 +272,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
           : 'transparent',
       color: state.isSelected ? '#22d3ee' : '#ffffff',
       fontFamily: 'Orbitron, sans-serif',
-      fontSize: '0.875rem',
+      fontSize: '1rem',
       cursor: 'pointer',
       transition: 'all 0.2s ease'
     }),
@@ -270,6 +280,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       ...provided,
       color: '#ffffff',
       fontFamily: 'Orbitron, sans-serif',
+      fontSize: '1.125rem',
     }),
     input: (provided) => ({
       ...provided,
@@ -283,46 +294,31 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
   };
   
   return (
-    <div className="relative rounded-xl p-6 md:p-8 overflow-hidden">
+    <div className="relative rounded-xl p-8 md:p-12 overflow-hidden max-w-7xl mx-auto">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/70 to-black z-0"></div>
-      
-      {/* Animated Grid Lines */}
-      <div className="absolute inset-0 opacity-15 z-0 bg-grid-scan"></div>
-      
-      {/* Tech Lines */}
-      <div className="absolute inset-0 opacity-10 z-0 bg-tech-lines"></div>
-      
-      {/* Data Stream */}
-      <div className="absolute inset-0 opacity-8 z-0 bg-data-stream"></div>
-      
-      {/* Glowing Circles */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500 rounded-full opacity-8 blur-xl z-0 floating-light"></div>
-      <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-indigo-500 rounded-full opacity-8 blur-xl z-0 floating-light-slow"></div>
-      
-      {/* Digital Circuit Lines */}
-      <div className="absolute bottom-0 left-0 w-full h-32 opacity-15 bg-circuit-pattern z-0"></div>
-      
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/70 to-black z-0"></div>     
       {/* Border Elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-40 z-10"></div>
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-40 z-10"></div>
       
       <div className="relative z-10">
-        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-6">
+        <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-10 text-center">
           {t('selectPickupDropoff')}
         </h2>
       
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Location Selection Section */}
           <div className="relative">
-            <h3 className="text-lg text-cyan-400 font-['Orbitron'] mb-4 flex items-center">
-              <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-2"></span>
+            <h3 className="text-xl md:text-2xl text-cyan-400 font-['Orbitron'] mb-8 flex items-center justify-center lg:justify-start">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></span>
               {t('chooseYourLocations')}
             </h3>
             
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Pickup Location */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2 font-['Orbitron']">
+              <div className="relative">
+                <label className="text-base font-medium text-gray-300 mb-4 font-['Orbitron'] flex items-center">
+                  <MapPin className="mr-2 text-cyan-400" />
                   {t('pickupLocation')}
                 </label>
                 <div className="relative">
@@ -333,21 +329,24 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                     styles={selectStyles}
                     isSearchable={false}
                   />
-                  <p className="mt-2 text-xs text-gray-500 font-['Orbitron']">
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                   
+                  </div>
+                  <p className="mt-3 text-sm text-gray-500 font-['Orbitron']">
                     {t('vehicleOnlySelectLocations')}
                   </p>
                 </div>
               </div>
               
               {/* Same Location Toggle */}
-              <div className="flex items-center p-3 bg-black/40 rounded-lg border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30">
+              <div className="flex items-center p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30">
                 <div className="relative">
                   <input
                     type="checkbox"
                     id="same-location"
                     checked={sameLocation}
                     onChange={(e) => setSameLocation(e.target.checked)}
-                    className="w-4 h-4 appearance-none bg-black border border-gray-700 rounded checked:bg-cyan-400 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 cursor-pointer"
+                    className="w-5 h-5 appearance-none bg-black border border-gray-700 rounded checked:bg-cyan-400 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 cursor-pointer"
                   />
                   <div className={`absolute inset-0 pointer-events-none flex items-center justify-center transition-opacity duration-300 ${sameLocation ? 'opacity-100' : 'opacity-0'}`}>
                     <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -355,7 +354,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                     </svg>
                   </div>
                 </div>
-                <label htmlFor="same-location" className="ml-2 text-sm text-gray-300 font-['Orbitron']">
+                <label htmlFor="same-location" className="ml-3 text-base text-gray-300 font-['Orbitron'] cursor-pointer">
                   {t('returnSameLocation')}
                 </label>
               </div>
@@ -363,29 +362,32 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
               {/* Dropoff Location (if not same) */}
               {!sameLocation && (
                 <div className="transition-all duration-500 animate-fade-in">
-                  <label className="block text-sm font-medium text-gray-300 mb-2 font-['Orbitron']">
+                  <label className="text-base font-medium text-gray-300 mb-4 font-['Orbitron'] flex items-center">
+                    <MapPin className="mr-2 text-purple-400" />
                     {t('dropoffLocation')}
                   </label>
-                  <Select
-                    options={availableLocations}
-                    value={availableLocations.find(loc => loc.value === dropoff)}
-                    onChange={(selected) => setDropoff(selected.value)}
-                    styles={selectStyles}
-                    isSearchable={false}
-                  />
+                  <div className="relative">
+                    <Select
+                      options={availableLocations}
+                      value={availableLocations.find(loc => loc.value === dropoff)}
+                      onChange={(selected) => setDropoff(selected.value)}
+                      styles={selectStyles}
+                      isSearchable={false}
+                    />
+                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
           </div>
           
           {/* Map Preview */}
-          <div className="backdrop-blur-sm bg-black/50 p-6 rounded-lg border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group">
-            {/* Luminous glow effect on hover */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 pointer-events-none"></div>
-            
+          <div className="backdrop-blur-sm bg-black/50 p-8 rounded-xl border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group h-fit">
+                        
             <div className="relative">
-              <h3 className="text-lg text-cyan-400 font-['Orbitron'] mb-4 flex items-center">
-                <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-2"></span>
+              <h3 className="text-xl md:text-2xl text-cyan-400 font-['Orbitron'] mb-8 flex items-center justify-center lg:justify-start">
+                <span className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></span>
                 {t('locationDetails')}
               </h3>
               
@@ -396,37 +398,37 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                 sameLocation={sameLocation} 
               />
               
-              <div className="space-y-4">
-                <div className="flex items-start p-3 bg-black/40 rounded-lg border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30 group">
-                  <div className="w-8 h-8 flex-shrink-0 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 mt-1 transition-all duration-300 group-hover:bg-cyan-500/30">
+              <div className="space-y-6">
+                <div className="flex items-start p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30 group">
+                  <div className="w-10 h-10 flex-shrink-0 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 mt-1 transition-all duration-300 group-hover:bg-cyan-500/30">
                     <LocationPin />
                   </div>
-                  <div className="ml-3">
-                    <h4 className="text-sm font-medium text-white font-['Orbitron']">
+                  <div className="ml-4">
+                    <h4 className="text-base font-medium text-white font-['Orbitron'] mb-1">
                       {pickup.charAt(0).toUpperCase() + pickup.slice(1)} {language === 'fr' ? 'Agence' : 'Branch'}
                     </h4>
-                    <p className="text-xs text-gray-400 font-['Orbitron']">
+                    <p className="text-sm text-gray-400 font-['Orbitron'] mb-2">
                       {t('branchAddress', { location: pickup.charAt(0).toUpperCase() + pickup.slice(1) })}
                     </p>
-                    <p className="text-xs text-cyan-400 font-['Orbitron'] mt-1">
+                    <p className="text-sm text-cyan-400 font-['Orbitron']">
                       {t('branchOpeningHours')}
                     </p>
                   </div>
                 </div>
                 
                 {!sameLocation && (
-                  <div className="flex items-start p-3 bg-black/40 rounded-lg border border-blue-900/20 transition-all duration-300 hover:border-purple-500/30 group">
-                    <div className="w-8 h-8 flex-shrink-0 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mt-1 transition-all duration-300 group-hover:bg-purple-500/30">
+                  <div className="flex items-start p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-purple-500/30 group">
+                    <div className="w-10 h-10 flex-shrink-0 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mt-1 transition-all duration-300 group-hover:bg-purple-500/30">
                       <DestinationPin />
                     </div>
-                    <div className="ml-3">
-                      <h4 className="text-sm font-medium text-white font-['Orbitron']">
+                    <div className="ml-4">
+                      <h4 className="text-base font-medium text-white font-['Orbitron'] mb-1">
                         {dropoff.charAt(0).toUpperCase() + dropoff.slice(1)} {language === 'fr' ? 'Agence' : 'Branch'}
                       </h4>
-                      <p className="text-xs text-gray-400 font-['Orbitron']">
+                      <p className="text-sm text-gray-400 font-['Orbitron'] mb-2">
                         {t('branchAddress', { location: dropoff.charAt(0).toUpperCase() + dropoff.slice(1) })}
                       </p>
-                      <p className="text-xs text-purple-400 font-['Orbitron'] mt-1">
+                      <p className="text-sm text-purple-400 font-['Orbitron']">
                         {t('branchOpeningHours')}
                       </p>
                     </div>
@@ -438,12 +440,12 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
         </div>
         
         {/* Navigation Buttons */}
-        <div className="mt-8 flex justify-between">
+        <div className="mt-12 flex flex-col sm:flex-row justify-between gap-4">
           <button
             onClick={onPreviousStep}
-            className="px-6 py-3 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] rounded-md transition-all duration-300 flex items-center group cursor-pointer"
+            className="px-8 py-4 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] text-lg rounded-lg transition-all duration-300 flex items-center justify-center group cursor-pointer hover:scale-105 transform"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             {t('backToDates')}
@@ -451,10 +453,10 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
           
           <button
             onClick={handleContinue}
-            className="px-6 py-3 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] rounded-md flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-blue-500/20 cursor-pointer"
+            className="px-8 py-4 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] text-lg rounded-lg flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-cyan-500/20 hover:scale-105 transform cursor-pointer"
           >
             {t('continueToOptions')}
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </button>

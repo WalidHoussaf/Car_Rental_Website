@@ -537,15 +537,8 @@ const CarsPage = () => {
 
       {/* Call To Action */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/80 to-black">
-         
-          <div className="absolute top-10 left-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl animate-float-slow"></div>
-          <div className="absolute bottom-20 right-1/4 w-60 h-60 rounded-full bg-blue-500/5 blur-3xl animate-float-slower"></div>
-          
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black ">
         </div>
-        
         <CallToAction />
       </section>
     </div>

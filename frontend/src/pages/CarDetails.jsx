@@ -83,123 +83,127 @@ const CarDetailPage = () => {
       </div>
 
       {/* Related Vehicles Section */}
-      <section className="py-16 px-4 relative">
+      <section className="py-20 px-4 relative">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-blue-950/50 to-black z-0"></div>
-          
-          {/* Diagonal Lines */}
-          <div className="absolute inset-0 z-10"
-               style={{
-                 backgroundImage: 'linear-gradient(135deg, transparent 0%, transparent 49%, rgba(59, 130, 246, 0.1) 50%, transparent 51%, transparent 100%), linear-gradient(45deg, transparent 0%, transparent 49%, rgba(139, 92, 246, 0.1) 50%, transparent 51%, transparent 100%)',
-                 backgroundSize: '50px 50px, 50px 50px',
-               }}>
-          </div>
-
-          {/* Digital Effect */}
-          <div className="absolute inset-0 z-10"
-               style={{
-                 background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(59, 130, 246, 0.03) 3px, transparent 3px)',
-                 backgroundSize: '100% 4px',
-               }}>
-          </div>
-          
-          {/* Vignette Effect */}
-          <div className="absolute inset-0 bg-radial-gradient z-10"
-               style={{
-                 background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.6) 100%)',
-               }}>
-          </div>
-          
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-blue-950/30 to-black z-0"></div>
         </div>
 
         <div className="max-w-7xl mx-auto relative z-20">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-4">
-              {t('similarVehicles')}
-            </h2> 
-            <div className="w-24 h-1 bg-gradient-to-r from-white to-cyan-400 mx-auto mb-4"></div>
-            <p className="text-gray-300 max-w-2xl mx-auto text-2xs font-['Orbitron']">
+          <div className="text-center mb-16">
+            <div className="inline-block mb-6">
+              <h2 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white font-['Orbitron'] mb-4 tracking-wider">
+                {t('similarVehicles')}
+              </h2>
+            <div className="w-32 h-1 bg-gradient-to-r from-white to-cyan-400 mx-auto rounded-full"></div>
+            </div>
+            <p className="text-gray-300 max-w-3xl mx-auto text-lg font-['Orbitron'] leading-relaxed">
               {t('exploreVehicles')}
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Updated grid with equal height cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {sampleCars
               .filter(relatedCar => relatedCar.category === car.category && relatedCar.id !== car.id)
               .slice(0, 3)
-              .map((relatedCar) => {
+              .map((relatedCar, index) => {
                 const processedRelatedCar = resolveImagePaths([relatedCar], 'image')[0];
                 return (
                   <div
-                  key={relatedCar.id}
-                  className="relative bg-black/60 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-blue-900/20 transition-all duration-300 group hover:border-blue-500/50"
-                  >
-                  {/* Card Corner */}
-                  <div className="absolute top-0 left-0 w-2 h-8 bg-gradient-to-b from-white to-transparent"></div>
-                  <div className="absolute top-0 left-0 w-8 h-2 bg-gradient-to-r from-white to-transparent"></div>
-                  <div className="absolute bottom-0 right-0 w-2 h-8 bg-gradient-to-t from-cyan-400 to-transparent"></div>
-                  <div className="absolute bottom-0 right-0 w-8 h-2 bg-gradient-to-l from-cyan-400  to-transparent"></div>
-                  
-                  {/* Card Header */}
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                    src={processedRelatedCar.image || "/api/placeholder/400/240"}
-                    alt={processedRelatedCar.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
-                    
-                    {/* Badge for Category */}
-                    <div className="absolute top-3 left-3">
-                    <div className="px-3 py-1 rounded-full bg-blue-500/80 backdrop-blur-sm text-xs text-black font-bold bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] uppercase tracking-wider">
-                      {categoryTranslations[processedRelatedCar.category] 
-                        ? categoryTranslations[processedRelatedCar.category][language] 
-                        : processedRelatedCar.category}
-                    </div>
-                    </div>
-                    
-                    {/* Price Badge */}
-                    <div className="absolute bottom-3 right-3">
-                    <div className="px-3 py-1 rounded-md bg-black/80 backdrop-blur-sm text-2xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
-                      ${processedRelatedCar.price}{t('day')}
-                    </div>
-                    </div>
-                  </div>
-                  
-                  {/* Card Content */}
-                  <div className="p-5">
-                    <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-semibold text-gray-300 font-['Orbitron'] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-cyan-400 transition-all duration-300">
-                      {processedRelatedCar.name}
-                    </h3>
-                    <div className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      <span className="text-white text-xl font-['Rationale']">{processedRelatedCar.rating.toFixed(1)}</span>
-                    </div>
-                    </div>
-                    
-                    {/* Button */}
-                    <button
-                    onClick={() => {
-                      navigateWithScroll(`/cars/${processedRelatedCar.id}`);
+                    key={relatedCar.id}
+                    className="relative group h-full" // Added h-full for full height
+                    style={{
+                      animationDelay: `${index * 200}ms`
                     }}
-                    className="w-full px-4 py-2 bg-black text-white border border-cyan-400 font-['Orbitron'] text-sm transition-all duration-300 rounded-sm mt-2 
-                      hover:bg-gradient-to-r hover:from-white hover:to-cyan-500/50 
-                      group relative overflow-hidden cursor-pointer"
-                    >
-                    <span className="relative z-10 transition-colors duration-100  text-white
-                      group-hover:text-black">
-                      {t('viewDetails')}
-                    </span>
-                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-white 
-                      transition-all duration-500 
-                      group-hover:h-1 group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-cyan-400">
-                    </span>
-                    </button>
-                  </div>
+                  >
+                    {/* Glow effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-cyan-400/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    
+                    {/* Updated card structure with flex layout for consistent height */}
+                    <div className="relative h-full bg-black/80 backdrop-blur-xl border border-gray-800/50 rounded-xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-cyan-500/20 transform group-hover:-translate-y-2 flex flex-col">
+                      {/* Card Header - Fixed height */}
+                      <div className="relative h-56 overflow-hidden flex-shrink-0">
+                        <img
+                          src={processedRelatedCar.image || "/api/placeholder/400/240"}
+                          alt={processedRelatedCar.name}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                        
+                        {/* Badge for Category */}
+                        <div className="absolute top-4 left-4">
+                          <div className="px-3 py-1 rounded-full bg-cyan-400 text-black font-bold text-xs font-['Orbitron'] uppercase tracking-wider shadow-lg backdrop-blur-sm border border-white/20">
+                             {categoryTranslations[processedRelatedCar.category] 
+                               ? categoryTranslations[processedRelatedCar.category][language] 
+                               : processedRelatedCar.category}
+                           </div>
+                         </div>
+                        
+                        {/* Price Badge */}
+                        <div className="absolute bottom-4 right-4">
+                          <div className="px-4 py-2 rounded-lg bg-black/80 backdrop-blur-sm border border-cyan-400/30">
+                            <div className="text-cyan-400 text-xs font-['Orbitron'] uppercase tracking-wider">Price</div>
+                            <div className="text-white text-lg font-bold font-['Orbitron']">
+                              ${processedRelatedCar.price}<span className="text-sm text-gray-400">/{t('day')}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-cyan-400/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      </div>
+                      
+                      {/* Card Content - Flexible height with consistent layout */}
+                      <div className="p-6 flex flex-col flex-grow">
+                        {/* Title and Rating - Fixed height area */}
+                        <div className="flex justify-between items-start mb-4 min-h-[3rem]">
+                          <h3 className="text-xl font-bold text-white font-['Orbitron'] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-white transition-all duration-300 flex-1 mr-4 line-clamp-2">
+                            {processedRelatedCar.name}
+                          </h3>
+                          <div className="flex items-center bg-black/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-700/50 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <span className="text-white font-bold font-['Orbitron']">{processedRelatedCar.rating.toFixed(1)}</span>
+                          </div>
+                        </div>
+
+                        {/* Quick specs - Fixed height area */}
+                        <div className="grid grid-cols-2 gap-3 mb-6 min-h-[2.5rem]">
+                          <div className="flex items-center text-gray-300 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-cyan-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <span className="font-['Orbitron'] truncate">{processedRelatedCar.specifications?.power || 'N/A'} HP</span>
+                          </div>
+                          <div className="flex items-center text-gray-300 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-cyan-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="font-['Orbitron'] truncate">{processedRelatedCar.specifications?.acceleration || 'N/A'}s</span>
+                          </div>
+                        </div>
+                        
+                        {/* Button - Always at the bottom */}
+                        <div className="mt-auto">
+                          <button
+                            onClick={() => {
+                              navigateWithScroll(`/cars/${processedRelatedCar.id}`);
+                            }}
+                            className="w-full relative overflow-hidden bg-gradient-to-r from-cyan-400 to-white text-black font-bold font-['Orbitron'] py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 group/btn cursor-pointer"
+                          >
+                            <span className="relative z-10 flex items-center justify-center">
+                              {t('viewDetails')}
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-white to-cyan-400 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 );
               })}

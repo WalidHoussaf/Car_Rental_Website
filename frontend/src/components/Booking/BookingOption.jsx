@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
 
-// Icônes SVG pour les options
+// SVG Icons
 const InsuranceIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
     <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
@@ -156,23 +156,6 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
     <div className="relative rounded-xl p-6 md:p-8 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/70 to-black z-0"></div>
-      
-      {/* Animated Grid Lines */}
-      <div className="absolute inset-0 opacity-15 z-0 bg-grid-scan"></div>
-      
-      {/* Tech Lines */}
-      <div className="absolute inset-0 opacity-10 z-0 bg-tech-lines"></div>
-      
-      {/* Data Stream */}
-      <div className="absolute inset-0 opacity-8 z-0 bg-data-stream"></div>
-      
-      {/* Glowing Circles */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500 rounded-full opacity-8 blur-xl z-0 floating-light"></div>
-      <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-indigo-500 rounded-full opacity-8 blur-xl z-0 floating-light-slow"></div>
-      
-      {/* Digital Circuit Lines */}
-      <div className="absolute bottom-0 left-0 w-full h-32 opacity-15 bg-circuit-pattern z-0"></div>
-      
       {/* Border Elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-40 z-10"></div>
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-40 z-10"></div>
@@ -198,21 +181,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
                   : 'border-blue-900/20 bg-black/40 hover:border-cyan-500/30 hover:bg-black/50'}
                 transform hover:scale-[1.02] hover:-translate-y-0.5
               `}
-            >
-              {/* Ambient background */}
-              <div className="absolute inset-0 -z-10 opacity-70">
-                {selectedOptions.includes(option.id) && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/5 via-transparent to-blue-900/10"></div>
-                )}
-              </div>
-              
-              {/* Inner glow for selected items */}
-              {selectedOptions.includes(option.id) && (
-                <div className="absolute inset-0 -z-10">
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-blue-500/5"></div>
-                </div>
-              )}
-              
+            >              
               <div className="flex items-start relative z-10">
                 <div className={`
                   w-12 h-12 rounded-lg flex items-center justify-center text-2xl mr-4 transition-all duration-300
@@ -263,9 +232,6 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
         
         {/* Price Summary */}
         <div className="mt-10 backdrop-blur-sm bg-black/50 p-6 rounded-lg border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group">
-          {/* Luminous glow effect on hover */}
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 pointer-events-none"></div>
-          
           <div className="relative">
             <h3 className="text-lg text-cyan-400 font-['Orbitron'] mb-4 flex items-center">
               <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-2"></span>

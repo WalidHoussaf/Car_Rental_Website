@@ -156,23 +156,9 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
   if (!car) return null;
   
   return (
-    <div className="relative rounded-xl p-6 overflow-hidden h-auto sticky top-24 mb-12">
+    <div className="rounded-xl p-6 overflow-hidden h-auto sticky top-24 mb-12">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/70 to-black z-0"></div>
-      
-      {/* Animated Grid Lines */}
-      <div className="absolute inset-0 opacity-15 z-0 bg-grid-scan"></div>
-      
-      {/* Tech Lines */}
-      <div className="absolute inset-0 opacity-10 z-0 bg-tech-lines"></div>
-      
-      {/* Data Stream */}
-      <div className="absolute inset-0 opacity-8 z-0 bg-data-stream"></div>
-      
-      {/* Glowing Circles */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500 rounded-full opacity-8 blur-xl z-0 floating-light"></div>
-      <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-indigo-500 rounded-full opacity-8 blur-xl z-0 floating-light-slow"></div>
-      
       {/* Border Elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-40 z-10"></div>
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-40 z-10"></div>
@@ -306,16 +292,11 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
           
           {/* Map Preview */}
           <div className="backdrop-blur-sm bg-black/50 p-6 rounded-lg border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group">
-            {/* Luminous glow effect on hover */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 pointer-events-none"></div>
-            
             <div className="relative">
               <h3 className="text-lg text-cyan-400 font-['Orbitron'] mb-4 flex items-center">
                 <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-2"></span>
                 {t('rentalSummary')}
               </h3>
-              
-              {/* ... existing code ... */}
             </div>
           </div>
         </div>
