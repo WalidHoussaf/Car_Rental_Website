@@ -213,7 +213,7 @@ export const translations = {
     days: "days",
     totalAmount: "Total Amount",
     confirmAndBook: "Confirm & Book Now",
-    
+   
     // Contact
     getInTouch: "Get In Touch",
     fullName: "Full Name",
@@ -378,8 +378,13 @@ export const translations = {
     totalDays: "Total Days",
     dailyRate: "Daily Rate",
     estimatedTotal: "Estimated Total",
-    finalPriceChange: "* Final price may change based on options and additional services",
+    finalPriceChange: "Final price may change based on additional services and taxes",
     continueToLocation: "Continue to Location",
+    weekend: "Weekend",
+    week: "Week",
+    month: "Month",
+    quickSelect: "Quick Select",
+    validationError: "Please select valid dates",
     
     // Booking Location
     selectPickupDropoff: "Select Pickup & Drop-off Locations",
@@ -853,8 +858,13 @@ export const translations = {
     totalDays: "Jours Total",
     dailyRate: "Tarif Journalier",
     estimatedTotal: "Total Estimé",
-    finalPriceChange: "* Le prix final peut changer en fonction des options et des services supplémentaires",
+    finalPriceChange: "Le prix final peut changer en fonction des options et des services supplémentaires",
     continueToLocation: "Continuer à Localisation",
+    weekend: "Weekend",
+    week: "Semaine",
+    month: "Mois",
+    quickSelect: "Sélection Rapide",
+    validationError: "Veuillez sélectionner des dates valides",
     
     // Booking Location
     selectPickupDropoff: "Sélectionner les Lieux de Prise en Charge et de Retour",

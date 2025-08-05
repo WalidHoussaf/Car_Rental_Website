@@ -156,99 +156,119 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
   if (!car) return null;
   
   return (
-    <div className="rounded-xl p-6 overflow-hidden h-auto sticky top-24 mb-12">
+    <div className="relative rounded-xl p-8 md:p-12 overflow-hidden max-w-7xl mx-auto">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/70 to-black z-0"></div>
       {/* Border Elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-40 z-10"></div>
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-40 z-10"></div>
-      
-      <div className="relative z-10 flex flex-col">
-        <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-4 flex items-center">
-          <div className="w-8 h-8 bg-gradient-to-br from-cyan-500/30 to-blue-500/20 rounded-lg flex items-center justify-center text-cyan-400 mr-3">
-            <SummaryIcon />
-          </div>
-          {t('bookingSummary')}
-        </h2>
+      <div className="relative z-10">
+        {/* Header Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-300 to-cyan-400 font-['Orbitron'] flex items-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500/40 to-blue-500/30 rounded-xl flex items-center justify-center text-cyan-400 mr-4 shadow-lg shadow-cyan-500/20">
+              <SummaryIcon />
+            </div>
+            {t('bookingSummary')}
+          </h2>
+        </div>
         
-        {/* Car Info */}
-        <div className="flex items-center mb-4 p-3 bg-black/40 rounded-lg border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30">
-          <div className="w-16 h-16 rounded-lg overflow-hidden mr-4 border border-blue-900/30 bg-black/50 flex items-center justify-center">
-            {carImage ? (
-              <img 
-                src={carImage}
-                alt={car.name} 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  console.log("Image failed to load:", carImage);
-                  e.target.onerror = null;
-                  e.target.src = `https://via.placeholder.com/100x100/0f172a/22d3ee?text=${encodeURIComponent(car.name.split(' ')[0])}`;
-                }}
-              />
-            ) : (
-              <img 
-                src={`https://via.placeholder.com/100x100/0f172a/22d3ee?text=${encodeURIComponent(car.name.split(' ')[0])}`}
-                alt={car.name} 
-                className="w-full h-full object-cover"
-              />
-            )}
-          </div>
-          <div>
-            <h3 className="text-white font-['Orbitron'] font-medium">{car.name}</h3>
-            <div className="flex items-center text-sm">
-              <span className="text-gray-400 uppercase font-['Orbitron']">{car.category}</span>
-              <span className="mx-2 text-gray-600">•</span>
-              <div className="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <span className="text-white font-['Orbitron']">{car.rating}</span>
+        {/* Car Info Section - Enhanced */}
+        <div className="mb-8 p-5 bg-gradient-to-r from-black/60 to-blue-900/30 backdrop-blur-sm rounded-xl border border-blue-900/40 transition-all duration-300 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10">
+          <div className="flex items-center">
+            <div className="w-20 h-20 rounded-xl overflow-hidden mr-5 border-2 border-blue-900/50 bg-black/50 flex items-center justify-center shadow-lg">
+              {carImage ? (
+                <img 
+                  src={carImage}
+                  alt={car.name} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.log("Image failed to load:", carImage);
+                    e.target.onerror = null;
+                    e.target.src = `https://via.placeholder.com/100x100/0f172a/22d3ee?text=${encodeURIComponent(car.name.split(' ')[0])}`;
+                  }}
+                />
+              ) : (
+                <img 
+                  src={`https://via.placeholder.com/100x100/0f172a/22d3ee?text=${encodeURIComponent(car.name.split(' ')[0])}`}
+                  alt={car.name} 
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white font-['Orbitron'] mb-2">{car.name}</h3>
+              <div className="flex items-center text-sm space-x-3">
+                <span className="text-cyan-400 uppercase font-['Orbitron'] font-medium px-2 py-1 bg-cyan-400/10 rounded-md">
+                  {car.category}
+                </span>
+                <div className="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="text-white font-['Orbitron'] font-medium">{car.rating}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
         
-        <div className="flex flex-col space-y-3">
-          {/* Rental Dates */}
-          <div className="p-3 bg-gradient-to-r from-black/50 to-blue-900/20 backdrop-blur-sm rounded-lg border-2 border-cyan-500/70 transition-all duration-300 hover:border-cyan-500/90 shadow-lg shadow-cyan-500/20">
-            <h4 className="text-cyan-400 text-xs font-['Orbitron'] mb-2 flex items-center">
-              <div className="w-1 h-1 bg-cyan-400 rounded-full mr-2"></div>
+        {/* Details Sections */}
+        <div className="space-y-6 mb-8">
+          {/* Rental Dates - Enhanced */}
+          <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
+            <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
               {t('rentalPeriod').toUpperCase()}
             </h4>
             {bookingDetails.startDate ? (
-              <div className="flex justify-between">
-                <div className="text-white font-['Orbitron'] text-sm">
-                  <span className="text-cyan-400 font-bold text-base">{formatDate(bookingDetails.startDate)} - {formatDate(bookingDetails.endDate)}</span>
-                  <div className="text-cyan-400 text-xs mt-1 opacity-100">{bookingDetails.totalDays} {t('days')}</div>
-                </div>
-                <div className="text-white font-['Orbitron'] text-sm">
-                  ${car.price * bookingDetails.totalDays}
+              <div className="space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="text-white font-['Orbitron']">
+                    <div className="text-cyan-300 font-bold text-lg mb-1">
+                      {formatDate(bookingDetails.startDate)} - {formatDate(bookingDetails.endDate)}
+                    </div>
+                    <div className="text-cyan-400/80 text-sm">{bookingDetails.totalDays} {t('days')}</div>
+                  </div>
+                  <div className="text-white font-['Orbitron'] font-bold text-lg">
+                    ${car.price * bookingDetails.totalDays}
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="text-cyan-400 text-sm font-['Orbitron']">{t('notSelectedYet')}</div>
+              <div className="text-cyan-400/70 text-sm font-['Orbitron']">{t('notSelectedYet')}</div>
             )}
           </div>
           
-          {/* Locations */}
-          <div className="p-3 bg-black/30 backdrop-blur-sm rounded-lg border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30">
-            <h4 className="text-cyan-400 text-xs font-['Orbitron'] mb-2 flex items-center">
-              <div className="w-1 h-1 bg-cyan-400 rounded-full mr-2"></div>
+          {/* Locations - Enhanced */}
+          <div className="p-5 bg-black/50 backdrop-blur-sm rounded-xl border border-blue-900/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/60">
+            <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
               {t('pickupReturnTitle')}
             </h4>
             {bookingStep >= 2 && bookingDetails.pickupLocation ? (
-              <div className="text-white font-['Orbitron'] text-sm">
-                <div className="flex items-center mb-2">
-                  <div className="w-6 h-6 flex-shrink-0 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 mr-2">
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-cyan-500/30 to-cyan-600/20 rounded-lg flex items-center justify-center text-cyan-400 mr-3 shadow-md">
                     <LocationPinIcon />
                   </div>
-                  <span>{t('pickupLabel')}: {bookingDetails.pickupLocation?.charAt(0).toUpperCase() + bookingDetails.pickupLocation?.slice(1)}</span>
+                  <div>
+                    <div className="text-xs text-cyan-400/70 font-['Orbitron']">{t('pickupLabel')}</div>
+                    <div className="text-white font-['Orbitron'] font-medium">
+                      {bookingDetails.pickupLocation?.charAt(0).toUpperCase() + bookingDetails.pickupLocation?.slice(1)}
+                    </div>
+                  </div>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-6 h-6 flex-shrink-0 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mr-2">
+                  <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-purple-500/30 to-purple-600/20 rounded-lg flex items-center justify-center text-purple-400 mr-3 shadow-md">
                     <DestinationIcon />
                   </div>
-                  <span>{t('returnLabel')}: {bookingDetails.dropoffLocation?.charAt(0).toUpperCase() + bookingDetails.dropoffLocation?.slice(1)}</span>
+                  <div>
+                    <div className="text-xs text-purple-400/70 font-['Orbitron']">{t('returnLabel')}</div>
+                    <div className="text-white font-['Orbitron'] font-medium">
+                      {bookingDetails.dropoffLocation?.charAt(0).toUpperCase() + bookingDetails.dropoffLocation?.slice(1)}
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -256,31 +276,31 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
             )}
           </div>
           
-          {/* Selected Options */}
-          <div className="p-3 bg-black/30 backdrop-blur-sm rounded-lg border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30">
-            <h4 className="text-cyan-400 text-xs font-['Orbitron'] mb-2 flex items-center">
-              <div className="w-1 h-1 bg-cyan-400 rounded-full mr-2"></div>
+          {/* Selected Options - Enhanced */}
+          <div className="p-5 bg-black/50 backdrop-blur-sm rounded-xl border border-blue-900/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/60">
+            <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
               {t('selectedAddOns')}
             </h4>
             {bookingStep >= 3 && bookingDetails.options && bookingDetails.options.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {bookingDetails.options.map((optionId, index) => {
-                  // Afficher au maximum 3 options
+                  // Show maximum 3 options
                   if (index >= 3) return null;
                   
                   const option = availableOptions.find(opt => opt.id === optionId);
                   return option ? (
-                    <div key={optionId} className="flex justify-between text-sm">
-                      <span className="text-gray-300 font-['Orbitron'] flex items-center">
-                        <span className="w-1 h-1 bg-cyan-400 rounded-full mr-2 opacity-60"></span>
+                    <div key={optionId} className="flex justify-between items-center py-2 px-3 bg-black/30 rounded-lg border border-blue-900/20">
+                      <span className="text-gray-300 font-['Orbitron'] flex items-center text-sm">
+                        <span className="w-1.5 h-1.5 bg-cyan-400/60 rounded-full mr-3"></span>
                         {option.name}
                       </span>
-                      <span className="text-white font-['Orbitron']">${option.price}</span>
+                      <span className="text-white font-['Orbitron'] font-medium">${option.price}</span>
                     </div>
                   ) : null;
                 })}
                 {bookingDetails.options.length > 3 && (
-                  <div className="text-gray-400 text-xs text-right italic">
+                  <div className="text-gray-400 text-xs text-center italic pt-2 border-t border-blue-900/20">
                     +{bookingDetails.options.length - 3} {t('moreOptions')}
                   </div>
                 )}
@@ -289,108 +309,101 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
               <div className="text-gray-500 text-sm font-['Orbitron']">{t('notSelectedYet')}</div>
             )}
           </div>
-          
-          {/* Map Preview */}
-          <div className="backdrop-blur-sm bg-black/50 p-6 rounded-lg border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group">
-            <div className="relative">
-              <h3 className="text-lg text-cyan-400 font-['Orbitron'] mb-4 flex items-center">
-                <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-2"></span>
-                {t('rentalSummary')}
-              </h3>
-            </div>
+        </div>
+        
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent w-full my-8"></div>
+        
+        {/* Total Section - Enhanced */}
+        <div className="mb-8 p-6 bg-gradient-to-r from-black/80 to-blue-900/50 backdrop-blur-sm rounded-xl border-2 border-cyan-500/50 shadow-xl shadow-cyan-500/20">
+          <div className="flex justify-between items-center">
+            <span className="text-cyan-400 font-['Orbitron'] font-semibold text-lg">{t('totalAmount')}</span>
+            <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-500 font-['Orbitron']">
+              ${bookingDetails.totalPrice || (car.price * (bookingDetails.totalDays || 1))}
+            </span>
           </div>
         </div>
         
-        <div className="h-px bg-gradient-to-r from-transparent via-blue-900/50 to-transparent w-full my-3"></div>
-        
-        {/* Total */}
-        <div className="flex justify-between items-center p-3 bg-gradient-to-r from-black/60 to-blue-900/30 backdrop-blur-sm rounded-lg border border-blue-900/50 mb-4">
-          <span className="text-cyan-400 font-['Orbitron'] font-medium">{t('totalAmount')}</span>
-          <span className="text-2xl font-bold text-cyan-400 font-['Orbitron']">
-            ${bookingDetails.totalPrice || (car.price * (bookingDetails.totalDays || 1))}
-          </span>
-        </div>
-        
-        {/* Action Buttons Based on Step */}
-        <div className="mt-4">
-          {bookingStep < 4 ? (
-            <div className="text-center">
-              <div className="px-6 py-3 bg-gradient-to-r from-black/60 to-blue-900/30 backdrop-blur-sm rounded-lg border border-cyan-400/30 text-cyan-400 text-sm font-['Orbitron'] shadow-lg shadow-cyan-500/10">
-                {t('completeStepsToBook')}
-              </div>
+        {/* Action Section */}
+        {bookingStep < 4 ? (
+          <div className="text-center">
+            <div className="px-8 py-4 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border border-cyan-400/30 text-cyan-400 font-['Orbitron'] font-medium shadow-lg shadow-cyan-500/10">
+              {t('completeStepsToBook')}
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Payment Method */}
-              <div className="p-3 bg-black/30 backdrop-blur-sm rounded-lg border border-blue-900/20">
-                <h4 className="text-cyan-400 text-xs font-['Orbitron'] mb-3 flex items-center">
-                  <div className="w-1 h-1 bg-cyan-400 rounded-full mr-2"></div>
-                  {t('paymentMethod')}
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex items-center p-2 rounded-lg border border-blue-900/20 bg-black/30 transition-all duration-300 hover:border-cyan-500/30">
-                    <label htmlFor="creditCard" className="flex items-center cursor-pointer w-full">
-                      <div className="relative flex items-center justify-center w-4 h-4">
-                        <input
-                          type="radio"
-                          id="creditCard"
-                          name="paymentMethod"
-                          value="creditCard"
-                          checked={paymentMethod === 'creditCard'}
-                          onChange={() => setPaymentMethod('creditCard')}
-                          className="w-4 h-4 opacity-0 absolute cursor-pointer"
-                        />
-                        <div className={`w-4 h-4 border border-gray-700 rounded-full ${paymentMethod === 'creditCard' ? 'border-cyan-400' : ''}`}></div>
-                        {paymentMethod === 'creditCard' && (
-                          <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full absolute"></div>
-                        )}
-                      </div>
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-blue-500/20 flex items-center justify-center text-cyan-400 mx-2">
-                        <CreditCardIcon />
-                      </div>
-                      <span className="text-sm text-white font-['Orbitron']">
-                        {t('creditCard')}
-                      </span>
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-center p-2 rounded-lg border border-blue-900/20 bg-black/30 transition-all duration-300 hover:border-cyan-500/30">
-                    <label htmlFor="paypal" className="flex items-center cursor-pointer w-full">
-                      <div className="relative flex items-center justify-center w-4 h-4">
-                        <input
-                          type="radio"
-                          id="paypal"
-                          name="paymentMethod"
-                          value="paypal"
-                          checked={paymentMethod === 'paypal'}
-                          onChange={() => setPaymentMethod('paypal')}
-                          className="w-4 h-4 opacity-0 absolute cursor-pointer"
-                        />
-                        <div className={`w-4 h-4 border border-gray-700 rounded-full ${paymentMethod === 'paypal' ? 'border-cyan-400' : ''}`}></div>
-                        {paymentMethod === 'paypal' && (
-                          <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full absolute"></div>
-                        )}
-                      </div>
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-blue-500/20 flex items-center justify-center text-cyan-400 mx-2">
-                        <PayPalIcon />
-                      </div>
-                      <span className="text-sm text-white font-['Orbitron']">
-                        PayPal
-                      </span>
-                    </label>
-                  </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Payment Method - Enhanced */}
+            <div className="p-5 bg-black/50 backdrop-blur-sm rounded-xl border border-blue-900/40">
+              <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
+                <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
+                {t('paymentMethod')}
+              </h4>
+              <div className="space-y-3">
+                <div className="flex items-center p-4 rounded-xl border border-blue-900/30 bg-black/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/50">
+                  <label htmlFor="creditCard" className="flex items-center cursor-pointer w-full">
+                    <div className="relative flex items-center justify-center w-5 h-5 mr-4">
+                      <input
+                        type="radio"
+                        id="creditCard"
+                        name="paymentMethod"
+                        value="creditCard"
+                        checked={paymentMethod === 'creditCard'}
+                        onChange={() => setPaymentMethod('creditCard')}
+                        className="w-5 h-5 opacity-0 absolute cursor-pointer"
+                      />
+                      <div className={`w-5 h-5 border-2 rounded-full transition-all duration-300 ${paymentMethod === 'creditCard' ? 'border-cyan-400 bg-cyan-400/10' : 'border-gray-600'}`}></div>
+                      {paymentMethod === 'creditCard' && (
+                        <div className="w-2 h-2 bg-cyan-400 rounded-full absolute"></div>
+                      )}
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-500/20 flex items-center justify-center text-cyan-400 mr-4 shadow-lg">
+                      <CreditCardIcon />
+                    </div>
+                    <span className="text-white font-['Orbitron'] font-medium">
+                      {t('creditCard')}
+                    </span>
+                  </label>
+                </div>
+                
+                <div className="flex items-center p-4 rounded-xl border border-blue-900/30 bg-black/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/50">
+                  <label htmlFor="paypal" className="flex items-center cursor-pointer w-full">
+                    <div className="relative flex items-center justify-center w-5 h-5 mr-4">
+                      <input
+                        type="radio"
+                        id="paypal"
+                        name="paymentMethod"
+                        value="paypal"
+                        checked={paymentMethod === 'paypal'}
+                        onChange={() => setPaymentMethod('paypal')}
+                        className="w-5 h-5 opacity-0 absolute cursor-pointer"
+                      />
+                      <div className={`w-5 h-5 border-2 rounded-full transition-all duration-300 ${paymentMethod === 'paypal' ? 'border-cyan-400 bg-cyan-400/10' : 'border-gray-600'}`}></div>
+                      {paymentMethod === 'paypal' && (
+                        <div className="w-2 h-2 bg-cyan-400 rounded-full absolute"></div>
+                      )}
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-500/20 flex items-center justify-center text-cyan-400 mr-4 shadow-lg">
+                      <PayPalIcon />
+                    </div>
+                    <span className="text-white font-['Orbitron'] font-medium">
+                      PayPal
+                    </span>
+                  </label>
                 </div>
               </div>
-              
-              {/* Terms Checkbox */}
-              <div className="flex items-start p-3 bg-black/30 backdrop-blur-sm rounded-lg border border-blue-900/20">
-                <div className="relative mt-1">
+            </div>
+            
+            {/* Terms Checkbox - Enhanced */}
+            <div className="p-5 bg-black/50 backdrop-blur-sm rounded-xl border border-blue-900/40">
+              <div className="flex items-start">
+                <div className="relative mt-1 mr-4">
                   <input
                     type="checkbox"
                     id="terms"
                     checked={termsAccepted}
                     onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="w-4 h-4 appearance-none bg-black border border-gray-700 rounded checked:bg-cyan-400 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 cursor-pointer"
+                    className="w-5 h-5 appearance-none bg-black border-2 border-gray-600 rounded-md checked:bg-cyan-400 checked:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 cursor-pointer"
                   />
                   <div className={`absolute inset-0 pointer-events-none flex items-center justify-center transition-opacity duration-300 ${termsAccepted ? 'opacity-100' : 'opacity-0'}`}>
                     <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -398,57 +411,57 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
                     </svg>
                   </div>
                 </div>
-                <label htmlFor="terms" className="ml-2 text-xs text-gray-400 font-['Orbitron']">
-                  {t('agreeToTerms_booking')} <a href="#" className="text-cyan-400 hover:underline transition-all duration-300">{t('termsConditions')}</a> {t('andPrivacy')} <a href="#" className="text-cyan-400 hover:underline transition-all duration-300">{t('privacyPolicy')}</a>
+                <label htmlFor="terms" className="text-sm text-gray-300 font-['Orbitron'] leading-relaxed">
+                  {t('agreeToTerms_booking')} <a href="#" className="text-cyan-400 hover:text-cyan-300 underline transition-all duration-300">{t('termsConditions')}</a> {t('andPrivacy')} <a href="#" className="text-cyan-400 hover:text-cyan-300 underline transition-all duration-300">{t('privacyPolicy')}</a>
                 </label>
               </div>
+            </div>
+            
+            {/* Navigation Buttons - Enhanced */}
+            <div className="space-y-4 pt-4">
+              <button
+                type="submit"
+                disabled={!termsAccepted || isSubmitting}
+                className={`
+                  w-full px-8 py-4 bg-gradient-to-r from-white to-cyan-400 text-black font-bold font-['Orbitron'] text-lg
+                  rounded-xl transition-all duration-300 backdrop-blur-sm shadow-xl hover:shadow-cyan-500/30
+                  flex items-center justify-center relative overflow-hidden
+                  ${!termsAccepted ? 'opacity-50 cursor-not-allowed' : 'hover:from-cyan-400 hover:to-white cursor-pointer hover:scale-105'}
+                  ${isSubmitting ? 'animate-pulse' : ''}
+                `}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {t('processing')}
+                  </span>
+                ) : (
+                  <>
+                    {t('confirmAndBook_now')}
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-3 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </>
+                )}
+              </button>
               
-              {/* Navigation Buttons */}
-              <div className="flex flex-col space-y-3 mb-8">
-                <button
-                  type="submit"
-                  disabled={!termsAccepted || isSubmitting}
-                  className={`
-                    w-full px-6 py-3 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] 
-                    rounded-md transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-blue-500/20
-                    flex items-center justify-center
-                    ${!termsAccepted ? 'opacity-50 cursor-not-allowed' : 'hover:from-cyan-400 hover:to-white cursor-pointer'}
-                    ${isSubmitting ? 'animate-pulse' : ''}
-                  `}
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {t('processing')}
-                    </span>
-                  ) : (
-                    <>
-                      {t('confirmAndBook_now')}
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </>
-                  )}
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={onPreviousStep}
-                  disabled={isSubmitting}
-                  className="w-full px-6 py-3 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] rounded-md transition-all duration-300 flex items-center justify-center group cursor-pointer"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  {t('backToOptions')}
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
+              <button
+                type="button"
+                onClick={onPreviousStep}
+                disabled={isSubmitting}
+                className="w-full px-8 py-4 bg-black/60 border-2 border-blue-900/50 hover:border-cyan-500/60 text-cyan-400 font-semibold font-['Orbitron'] rounded-xl transition-all duration-300 flex items-center justify-center group cursor-pointer hover:bg-black/70 hover:scale-105 shadow-lg"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                {t('backToOptions')}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

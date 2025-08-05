@@ -163,51 +163,52 @@ const Booking = () => {
   return (
     <div className="min-h-screen bg-black text-white pb-10">
       <BookingHeader car={car} bookingStep={bookingStep} />
-      
       <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Main Content */}
-          <div className="flex-grow">
-            {bookingStep === 1 && (
-              <BookingCalendar 
-                car={car}
-                onDateSelection={handleDateSelection} 
-                onNextStep={goToNextStep}
-              />
-            )}
-            
-            {bookingStep === 2 && (
-              <BookingLocation 
+        {bookingStep !== 4 ? (
+          <div className="flex justify-center">
+            <div className="w-full max-w-screen-xl mx-auto">
+              {bookingStep === 1 && (
+                <BookingCalendar 
+                  car={car}
+                  onDateSelection={handleDateSelection} 
+                  onNextStep={goToNextStep}
+                />
+              )}
+              {bookingStep === 2 && (
+                <BookingLocation 
+                  car={car}
+                  bookingDetails={bookingDetails}
+                  onLocationSelection={handleLocationSelection}
+                  onPreviousStep={goToPreviousStep}
+                  onNextStep={goToNextStep}
+                />
+              )}
+              {bookingStep === 3 && (
+                <BookingOption 
+                  car={car}
+                  bookingDetails={bookingDetails}
+                  onOptionSelection={handleOptionSelection}
+                  onPreviousStep={goToPreviousStep}
+                  onNextStep={goToNextStep}
+                />
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex-grow">
+            </div>
+            <div className="w-full max-w-2xl mx-auto">
+              <BookingSummary 
                 car={car}
                 bookingDetails={bookingDetails}
-                onLocationSelection={handleLocationSelection}
+                bookingStep={bookingStep}
+                onSubmit={handleBookingSubmit}
                 onPreviousStep={goToPreviousStep}
-                onNextStep={goToNextStep}
               />
-            )}
-            
-            {bookingStep === 3 && (
-              <BookingOption 
-                car={car}
-                bookingDetails={bookingDetails}
-                onOptionSelection={handleOptionSelection}
-                onPreviousStep={goToPreviousStep}
-                onNextStep={goToNextStep}
-              />
-            )}
+            </div>
           </div>
-          
-          {/* Booking Summary */}
-          <div className="lg:w-96 lg:min-w-[384px] lg:max-w-[384px] w-full">
-            <BookingSummary 
-              car={car}
-              bookingDetails={bookingDetails}
-              bookingStep={bookingStep}
-              onSubmit={handleBookingSubmit}
-              onPreviousStep={goToPreviousStep}
-            />
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
