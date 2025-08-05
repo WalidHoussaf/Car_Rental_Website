@@ -301,10 +301,13 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-40 z-10"></div>
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-40 z-10"></div>
       
-      <div className="relative z-10">
-        <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-10 text-center">
+      <div className="z-10 w-full space-y-8 md:space-y-10 lg:space-y-12 relative">
+       <div className="text-center space-y-2">
+       <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
           {t('selectPickupDropoff')}
         </h2>
+        <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto opacity-60"></div>
+        </div>
       
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Location Selection Section */}

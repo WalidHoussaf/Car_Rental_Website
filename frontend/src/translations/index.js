@@ -428,6 +428,7 @@ export const translations = {
     option_child_seat_desc: "Safe and comfortable child seat",
     option_additional_driver: "Additional Driver",
     option_additional_driver_desc: "Register an additional driver",
+    availableAddOns: "Available Add-ons",
     
     // Booking additional translations
     enhanceExperience: "Enhance Your Experience",
@@ -908,6 +909,7 @@ export const translations = {
     option_child_seat_desc: "Siège enfant sûr et confortable",
     option_additional_driver: "Conducteur Supplémentaire",
     option_additional_driver_desc: "Enregistrez un conducteur supplémentaire",
+    availableAddOns: "Options Disponibles",
     
     // Booking additional translations
     enhanceExperience: "Améliorez Votre Expérience",

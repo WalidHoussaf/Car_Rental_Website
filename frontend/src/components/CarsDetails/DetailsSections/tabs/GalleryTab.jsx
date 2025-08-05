@@ -7,17 +7,11 @@ const GalleryTab = ({ car }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // State to track the currently displayed main image
   const [selectedImage, setSelectedImage] = useState(0);
-  // State to track if the full-size image modal is open
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // State for image zoom level in modal
   const [zoomLevel, setZoomLevel] = useState(1);
-  // State for image position when zoomed
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
-  // State to track if autoplay is on
   const [isAutoplayOn, setIsAutoplayOn] = useState(true);
-  // State to track favorites
   const [favorites, setFavorites] = useState([]);
   
   // Check if car has gallery property and that it contains valid images
@@ -66,36 +60,6 @@ const GalleryTab = ({ car }) => {
     setImagePosition({ x: 0, y: 0 });
   }, [selectedImage]);
 
-  // Keyboard navigation for modal
-  useEffect(() => {
-    if (!isModalOpen) return;
-
-    const handleKeyDown = (e) => {
-      switch (e.key) {
-        case 'ArrowLeft':
-          goToPrevious();
-          break;
-        case 'ArrowRight':
-          goToNext();
-          break;
-        case 'Escape':
-          closeModal();
-          break;
-        case '+':
-          handleZoomIn();
-          break;
-        case '-':
-          handleZoomOut();
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen, selectedImage]);
-
   // Function to handle thumbnail click
   const handleThumbnailClick = useCallback((index) => {
     setSelectedImage(index);
@@ -142,6 +106,36 @@ const GalleryTab = ({ car }) => {
     setImagePosition({ x: 0, y: 0 });
   }, []);
 
+  // Keyboard navigation for modal
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const handleKeyDown = (e) => {
+      switch (e.key) {
+        case 'ArrowLeft':
+          goToPrevious();
+          break;
+        case 'ArrowRight':
+          goToNext();
+          break;
+        case 'Escape':
+          closeModal();
+          break;
+        case '+':
+          handleZoomIn();
+          break;
+        case '-':
+          handleZoomOut();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen, selectedImage, closeModal, goToNext, goToPrevious, handleZoomIn, handleZoomOut]);
+
   // Handle mouse movement for panning when zoomed
   const handleMouseMove = useCallback((e) => {
     if (zoomLevel <= 1) return;
@@ -162,15 +156,20 @@ const GalleryTab = ({ car }) => {
       e.preventDefault();
       e.stopPropagation();
     }
-    
+
     setFavorites(prev => {
-      if (prev.includes(index)) {
-        return prev.filter(i => i !== index);
+      // Get array of all image indices
+      const allIndices = allImages.map((_, i) => i);
+      const allAreFavorited = allIndices.every(i => prev.includes(i));
+      if (allAreFavorited) {
+        // Unfavorite all
+        return [];
       } else {
-        return [...prev, index];
+        // Favorite all
+        return allIndices;
       }
     });
-  }, []);
+  }, [allImages]);
 
   // Function to handle image sharing - Fixed to properly stop event propagation
   const handleShare = useCallback((e) => {

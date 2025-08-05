@@ -15,19 +15,6 @@ const SpecificationsTab = ({ car }) => {
     <div className="relative overflow-hidden rounded-lg p-8">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-black z-0"></div>
-      
-      {/* Animated Grid Lines */}
-      <div className="absolute inset-0 opacity-20 z-0">
-        <div className="absolute inset-0 bg-grid-pattern"></div>
-      </div>
-      
-      {/* Glowing Circles */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500 rounded-full opacity-10 blur-xl z-0"></div>
-      <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-indigo-500 rounded-full opacity-10 blur-xl z-0"></div>
-      
-      {/* Digital Circuit Lines */}
-      <div className="absolute bottom-0 left-0 w-full h-32 opacity-20 bg-circuit-pattern z-0"></div>
-      
       {/* Content */}
       <div className="relative z-10">
         <div className="mb-12">

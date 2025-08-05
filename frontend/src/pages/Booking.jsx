@@ -195,19 +195,17 @@ const Booking = () => {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="flex-grow">
-            </div>
-            <div className="w-full max-w-2xl mx-auto">
-              <BookingSummary 
-                car={car}
-                bookingDetails={bookingDetails}
-                bookingStep={bookingStep}
-                onSubmit={handleBookingSubmit}
-                onPreviousStep={goToPreviousStep}
-              />
-            </div>
-          </div>
+          <div className="flex justify-center">
+  <div className="w-full max-w-5xl">
+    <BookingSummary 
+      car={car}
+      bookingDetails={bookingDetails}
+      bookingStep={bookingStep}
+      onSubmit={handleBookingSubmit}
+      onPreviousStep={goToPreviousStep}
+    />
+  </div>
+</div>
         )}
       </div>
     </div>

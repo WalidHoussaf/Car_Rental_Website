@@ -1,6 +1,8 @@
 import logo from './logo.png'
 import frenchFlag from './france.png'
 import ukFlag from './united-kingdom.png'
+import paypal from './paypal.png'
+import creditCard from './credit-card.png'
 import bmw from './cars/bmw.png'
 import mercedes from './cars/mercedes.png'
 import tesla from './cars/tesla.png'
@@ -117,6 +119,8 @@ export const assets = {
     logo,
     frenchFlag,
     ukFlag,
+    paypal,
+    creditCard,
     cars: {
         tesla,
         bmw,

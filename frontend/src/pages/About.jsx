@@ -36,10 +36,10 @@ const AboutPage = () => {
 
   // Statistics 
   const stats = [
-    { value: "7+", label: t('locations') },
-    { value: "100+", label: t('premiumVehicles') },
-    { value: "10k+", label: t('happyCustomers') },
-    { value: "6", label: t('yearsExperience') }
+    { value: "7", label: t('locations') },
+    { value: "50+", label: t('premiumVehicles') },
+    { value: "5", label: t('stats_rating') },
+    { value: "24/7", label: t('stats_support') }
   ];
 
   return (
@@ -123,36 +123,40 @@ const AboutPage = () => {
       </section>
       
       {/* Stats Section */}
-      <section className="py-16 px-4 bg-gradient-to-b from-black/80 via-black/60 to-black/80 backdrop-blur-md relative overflow-hidden">
-        {/* Background patterns */}
-        <div className="absolute inset-0 bg-[url('/patterns/grid-pattern.svg')] bg-center opacity-20"></div>
-        
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/30 to-transparent"></div>
-        
-        <div className="container mx-auto relative z-10 max-w-6xl">
-          <div className="text-center mb-12 relative">
-            <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-2xl"></div>
-            <h2 className="text-4xl text-center uppercase font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+      <section className="relative py-16 bg-black border-t border-b border-gray-800/50">
+        {/* Background gradients */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/5 to-cyan-900/5"></div>
+        <div className="absolute inset-0 bg-gradient-radial from-cyan-500/5 via-transparent to-transparent opacity-60"></div>
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="h-full w-full bg-[linear-gradient(rgba(6,182,212,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4">
+          {/* Section title */}
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-cyan-400 font-['Orbitron'] mb-3">
               {t('ourAccomplishments')}
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto"></div>
+            <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto"></div>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, index) => (
-              <div
+              <div 
                 key={index}
-                className="p-8 border border-cyan-900/50 rounded-xl bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm relative group overflow-hidden will-change-transform transform transition-all duration-500 hover:scale-105 hover:shadow-[0_0_25px_rgba(6,182,212,0.2)]"
+                className="group relative text-center p-6 rounded-xl border border-gray-800/30 bg-gradient-to-b from-gray-900/20 to-black/40 backdrop-blur-sm hover:border-cyan-500/30 hover:bg-gradient-to-b hover:from-gray-900/30 hover:to-black/50 transition-all duration-300"
               >
-                {/* Hover effects */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/40 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                <div className="text-4xl md:text-5xl font-bold font-['Orbitron'] mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+                {/* Subtle glow effect on hover */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 to-blue-500/0 group-hover:from-cyan-500/5 group-hover:to-blue-500/5 transition-all duration-300"></div>
+                {/* Value */}
+                <div className="relative text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-3 group-hover:from-cyan-100 group-hover:to-cyan-300 transition-all duration-300">
                   {stat.value}
-                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 group-hover:w-16 h-px bg-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                 </div>
-                <div className="text-white text-lg md:text-xl font-['Rationale'] group-hover:text-cyan-300 transition-colors duration-300">{stat.label}</div>
+                {/* Label */}
+                <div className="text-white text-lg md:text-xl font-['Rationale'] group-hover:text-cyan-300 transition-colors duration-300">
+                  {stat.label}
+                </div>
+                {/* Bottom accent line */}
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 group-hover:w-16 transition-all duration-300"></div>
               </div>
             ))}
           </div>

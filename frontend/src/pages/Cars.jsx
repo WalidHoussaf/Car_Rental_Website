@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { sampleCars, resolveImagePaths, categoryTranslations } from '../assets/assets'; 
 import Select from 'react-select';
 import HeroSection from '../components/Cars/HeroSection';
-import StatsSection from '../components/Cars/StatsSection';
+
 import CallToAction from '../components/Cars/CallToAction';
 import FiltersSidebar from '../components/Cars/Filters/FiltersSidebar';
 import { selectStyles } from '../styles/selectStyles';
@@ -21,13 +21,6 @@ const CarsPage = () => {
   
   // State for Search
   const [searchQuery, setSearchQuery] = useState(searchParam || '');
-  
-  // Scroll to the of the Page
-  useEffect(() => {
-    if (!location.search) {
-      window.scrollTo(0, 0);
-    }
-  }, [location.pathname, location.search]);
   
   // Reference to Store Current Scroll Position
   const scrollPositionRef = useRef(0);
@@ -89,7 +82,7 @@ const CarsPage = () => {
     if (search) {
       setSearchQuery(search);
     }
-  }, []);
+  }, [location.search]);
   
   // Initialize Cars Data
   useEffect(() => {
@@ -257,13 +250,9 @@ const CarsPage = () => {
       {/* Hero Section */}
       <HeroSection onExploreClick={scrollToCarsSection} onLearnMoreClick={navigateToAboutUs} />
       
-      {/* Stats Section */}
-      <StatsSection />
-      
       {/* Main Content */}
       <section ref={carsSectionRef} id="cars-section" className="relative py-16 px-4 bg-gradient-to-b from-black via-black/95 to-black/90 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute inset-0 bg-[url('/patterns/dot-pattern.svg')] bg-repeat opacity-10"></div>
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10">

@@ -159,22 +159,25 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
   };
   
   return (
-    <div className="relative rounded-xl p-8 md:p-12 overflow-hidden max-w-7xl mx-auto">
+    <div className="relative rounded-xl p-4 md:p-6 overflow-hidden max-w-7xl mx-auto">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/70 to-black z-0"></div>
       {/* Border Elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-40 z-10"></div>
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-40 z-10"></div>
       
-      <div className="relative z-10">
-        <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-10 text-center">
-          {t('enhanceExperience')}
-        </h2>
+      <div className="z-10 w-full space-y-8 md:space-y-10 lg:space-y-12 relative">
+        <div className="text-center space-y-2">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
+            {t('enhanceExperience')}
+          </h2>
+          <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto opacity-60"></div>
+        </div>
         
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <OptionsIcon className="text-cyan-400 mr-2" />
-            <span className="text-xl md:text-2xl text-cyan-400 font-['Orbitron'] font-medium">
+            <span className="text-lg md:text-xl text-cyan-400 font-['Orbitron'] font-medium">
               {t('availableAddOns')}
             </span>
           </div>
@@ -189,7 +192,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
               key={option.id}
               onClick={() => toggleOption(option.id)}
               className={`
-                p-6 backdrop-blur-sm border rounded-xl cursor-pointer transition-all duration-300 relative overflow-hidden group
+                p-4 backdrop-blur-sm border rounded-xl cursor-pointer transition-all duration-300 relative overflow-hidden group
                 ${selectedOptions.includes(option.id) 
                   ? 'border-cyan-500/60 bg-gradient-to-br from-cyan-900/20 to-blue-900/20 hover:shadow-lg hover:shadow-cyan-500/20 scale-105' 
                   : 'border-blue-900/20 bg-black/40 hover:border-cyan-500/30 hover:bg-black/50'}
@@ -204,7 +207,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
               <div className="relative z-10">
                 <div className="flex items-start mb-4">
                   <div className={`
-                    w-14 h-14 rounded-xl flex items-center justify-center mr-4 transition-all duration-300 flex-shrink-0
+                    w-10 h-10 rounded-xl flex items-center justify-center mr-3 transition-all duration-300 flex-shrink-0
                     ${selectedOptions.includes(option.id) 
                       ? 'bg-gradient-to-br from-cyan-500/30 to-blue-500/20 text-white shadow-lg border border-cyan-500/30' 
                       : 'bg-black/70 border border-blue-900/30 text-gray-400 group-hover:border-cyan-500/30'}

@@ -19,31 +19,17 @@ const DestinationIcon = () => (
   </svg>
 );
 
-const SummaryIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-    <path d="M8 2h8v4H8z" />
-    <path d="M12 11h4" />
-    <path d="M12 16h4" />
-    <path d="M8 11h.01" />
-    <path d="M8 16h.01" />
-  </svg>
-);
-
 const CreditCardIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h.01M11 15h2" />
-    <rect x="3" y="5" width="18" height="14" rx="2" strokeWidth={1.5} />
-  </svg>
+  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="6" y="10" width="36" height="28" rx="4" fill="#fff" stroke="#22d3ee" stroke-width="2"/>
+  <rect x="6" y="18" width="36" height="4" fill="#22d3ee"/>
+  <rect x="12" y="28" width="8" height="4" rx="2" fill="#22d3ee"/>
+  <rect x="24" y="28" width="8" height="4" rx="2" fill="#22d3ee"/>
+</svg>
 );
 
 const PayPalIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6.5 7h7c1.7 0 3 1.3 3 3s-1.3 3-3 3h-7" />
-    <path d="M9.5 10h7c1.7 0 3 1.3 3 3s-1.3 3-3 3h-7" />
-    <path d="M6.5 7v9" />
-    <path d="M9.5 10v6" />
-  </svg>
+  <img src={assets.paypal} alt="PayPal" className="h-12 w-12 object-contain align-middle" />
 );
 
 // Function to resolve image paths
@@ -140,7 +126,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
     e.preventDefault();
     
     if (!termsAccepted) {
-      return; // Don't proceed if terms aren't accepted
+      return; 
     }
     
     setIsSubmitting(true);
@@ -151,8 +137,6 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
       setIsSubmitting(false);
     }, 1500);
   };
-  
-  // Si pas de voiture, ne rien rendre
   if (!car) return null;
   
   return (
@@ -164,19 +148,19 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-40 z-10"></div>
       <div className="relative z-10">
         {/* Header Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-300 to-cyan-400 font-['Orbitron'] flex items-center">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500/40 to-blue-500/30 rounded-xl flex items-center justify-center text-cyan-400 mr-4 shadow-lg shadow-cyan-500/20">
-              <SummaryIcon />
-            </div>
+        <div className="z-10 w-full space-y-8 md:space-y-10 lg:space-y-12 relative">
+        <div className="text-center space-y-2">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
             {t('bookingSummary')}
           </h2>
+          <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto opacity-60"></div>
+          </div>
         </div>
-        
-        {/* Car Info Section - Enhanced */}
-        <div className="mb-8 p-5 bg-gradient-to-r from-black/60 to-blue-900/30 backdrop-blur-sm rounded-xl border border-blue-900/40 transition-all duration-300 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10">
+        <div className="my-6"></div>
+        {/* Car Info Section */}
+        <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
           <div className="flex items-center">
-            <div className="w-20 h-20 rounded-xl overflow-hidden mr-5 border-2 border-blue-900/50 bg-black/50 flex items-center justify-center shadow-lg">
+            <div className="w-56 h-40 md:w-72 md:h-52 rounded-3xl overflow-hidden mr-10 border-1 border-blue-900/40 bg-black/70 flex items-center justify-center transition-all duration-300 hover:scale-105">
               {carImage ? (
                 <img 
                   src={carImage}
@@ -212,10 +196,10 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
             </div>
           </div>
         </div>
-        
+        <div className="my-8"></div>
         {/* Details Sections */}
         <div className="space-y-6 mb-8">
-          {/* Rental Dates - Enhanced */}
+          {/* Rental Dates */}
           <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
             <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
               <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
@@ -240,8 +224,8 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
             )}
           </div>
           
-          {/* Locations - Enhanced */}
-          <div className="p-5 bg-black/50 backdrop-blur-sm rounded-xl border border-blue-900/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/60">
+          {/* Locations */}
+          <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
             <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
               <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
               {t('pickupReturnTitle')}
@@ -276,8 +260,8 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
             )}
           </div>
           
-          {/* Selected Options - Enhanced */}
-          <div className="p-5 bg-black/50 backdrop-blur-sm rounded-xl border border-blue-900/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/60">
+          {/* Selected Options */}
+          <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
             <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
               <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
               {t('selectedAddOns')}
@@ -314,7 +298,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
         {/* Divider */}
         <div className="h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent w-full my-8"></div>
         
-        {/* Total Section - Enhanced */}
+        {/* Total Section */}
         <div className="mb-8 p-6 bg-gradient-to-r from-black/80 to-blue-900/50 backdrop-blur-sm rounded-xl border-2 border-cyan-500/50 shadow-xl shadow-cyan-500/20">
           <div className="flex justify-between items-center">
             <span className="text-cyan-400 font-['Orbitron'] font-semibold text-lg">{t('totalAmount')}</span>
@@ -333,8 +317,8 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Payment Method - Enhanced */}
-            <div className="p-5 bg-black/50 backdrop-blur-sm rounded-xl border border-blue-900/40">
+            {/* Payment Method */}
+            <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
               <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
                 <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
                 {t('paymentMethod')}
@@ -357,9 +341,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
                         <div className="w-2 h-2 bg-cyan-400 rounded-full absolute"></div>
                       )}
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-500/20 flex items-center justify-center text-cyan-400 mr-4 shadow-lg">
-                      <CreditCardIcon />
-                    </div>
+                    <span className="mr-4"><CreditCardIcon /></span>
                     <span className="text-white font-['Orbitron'] font-medium">
                       {t('creditCard')}
                     </span>
@@ -383,9 +365,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
                         <div className="w-2 h-2 bg-cyan-400 rounded-full absolute"></div>
                       )}
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-500/20 flex items-center justify-center text-cyan-400 mr-4 shadow-lg">
-                      <PayPalIcon />
-                    </div>
+                    <span className="mr-4"><PayPalIcon /></span>
                     <span className="text-white font-['Orbitron'] font-medium">
                       PayPal
                     </span>
@@ -394,8 +374,8 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
               </div>
             </div>
             
-            {/* Terms Checkbox - Enhanced */}
-            <div className="p-5 bg-black/50 backdrop-blur-sm rounded-xl border border-blue-900/40">
+            {/* Terms Checkbox */}
+            <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
               <div className="flex items-start">
                 <div className="relative mt-1 mr-4">
                   <input

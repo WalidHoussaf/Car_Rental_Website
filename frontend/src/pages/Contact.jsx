@@ -349,12 +349,6 @@ const ContactPage = () => {
                     key={index} 
                     className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm p-6 rounded-lg border border-cyan-900/50 shadow-lg relative group overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)]"
                   >
-                    {/* Glow Effect */}
-                    <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/20 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                    
-                    {/* Hover Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm -z-10 group-hover:bg-gradient-to-r group-hover:from-cyan-500/10 group-hover:via-cyan-500/5 group-hover:to-cyan-500/10"></div>
-                    
                     {/* Border Accents */}
                     <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent group-hover:via-cyan-400/60 transition-colors duration-500"></div>
                     <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent group-hover:via-cyan-400/60 transition-colors duration-500"></div>
@@ -400,9 +394,7 @@ const ContactPage = () => {
               
               <div className="mt-12">
                 <div className="bg-gradient-to-b from-gray-900/60 to-black/60 backdrop-blur-sm p-6 rounded-lg border border-cyan-900/50 shadow-lg relative group overflow-hidden">
-                  {/* Glow Effect */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-cyan-600/10 to-transparent rounded-xl blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                  
+             
                   <h3 className="text-xl font-semibold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
                     {language === 'fr' ? 'Heures d\'Ouverture' : 'Opening Hours'}
                   </h3>
