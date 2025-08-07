@@ -2,51 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
-
-// Date icon
-const CalendarIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-    <path className="stroke-current stroke-1" strokeLinecap="round" d="M6 2v4M18 2v4" />
-    <rect x="2" y="4" width="20" height="18" rx="2" className="fill-transparent stroke-current stroke-1" />
-    <path d="M2 10h20" className="stroke-current stroke-1" />
-    <circle cx="8" cy="15" r="1.5" fill="currentColor" />
-    <circle cx="16" cy="15" r="1.5" fill="currentColor" />
-    <circle cx="8" cy="19" r="1.5" fill="currentColor" />
-    <circle cx="16" cy="19" r="1.5" fill="currentColor" />
-    <path d="M10 3L14 3" className="stroke-current stroke-1" />
-  </svg>
-);
-
-// Location Icon
-const LocationIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <circle cx="12" cy="9" r="3" className="fill-current" />
-    <path d="M18 9.5h3M3 9.5h3" className="stroke-current stroke-1" strokeLinecap="round" strokeWidth="1.2" />
-    <path d="M12 16.5v3" className="stroke-current stroke-1" strokeLinecap="round" strokeWidth="1.2" />
-  </svg>
-);
-
-// Option Icon
-const OptionsIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-    <circle cx="12" cy="12" r="10" className="fill-transparent stroke-current stroke-1" />
-    <path d="M12 6.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" className="fill-transparent stroke-current stroke-1" />
-    <path d="M12 2v2.5M12 19.5V22M22 12h-2.5M4.5 12H2M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8M19.1 19.1l-1.8-1.8M6.7 6.7l-1.8-1.8" strokeLinecap="round" className="stroke-current stroke-1" />
-    <circle cx="12" cy="12" r="1.8" className="fill-current" />
-    <circle cx="12" cy="12" r="3" className="fill-transparent stroke-current stroke-1" strokeDasharray="0.5 1" />
-  </svg>
-);
-
-// Summary Icon
-const SummaryIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-    <rect x="3" y="3" width="18" height="18" rx="2" className="fill-transparent stroke-current stroke-1" />
-    <path d="M7 8h10M7 12h10M7 16h6" strokeLinecap="round" className="stroke-current stroke-1" />
-    <path d="M17 17l2 2M21 19l-2-2" strokeLinecap="round" className="stroke-current stroke-1" />
-    <circle cx="17" cy="17" r="1.5" className="fill-current" />
-  </svg>
-);
+import CalendarStepIcon from '../Ui/Icons/CalendarStepIcon';
+import LocationStepIcon from '../Ui/Icons/LocationStepIcon';
+import OptionsStepIcon from '../Ui/Icons/OptionsStepIcon';
+import SummaryStepIcon from '../Ui/Icons/SummaryStepIcon';
+import ArrowLeftIcon from '../Ui/Icons/ArrowLeftIcon';
 
 const BookingHeader = ({ car, bookingStep }) => {
   const { language } = useLanguage();
@@ -54,10 +14,10 @@ const BookingHeader = ({ car, bookingStep }) => {
   
   // Booking process steps 
   const steps = [
-    { id: 1, name: t('dates'), icon: <CalendarIcon />, description: t('selectRentalPeriod') },
-    { id: 2, name: t('location'), icon: <LocationIcon />, description: t('choosePickupReturn') },
-    { id: 3, name: t('selectOptions'), icon: <OptionsIcon />, description: t('customizeExperience') },
-    { id: 4, name: t('summary'), icon: <SummaryIcon />, description: t('reviewAndConfirm') }
+    { id: 1, name: t('dates'), icon: <CalendarStepIcon />, description: t('selectRentalPeriod') },
+    { id: 2, name: t('location'), icon: <LocationStepIcon />, description: t('choosePickupReturn') },
+    { id: 3, name: t('selectOptions'), icon: <OptionsStepIcon />, description: t('customizeExperience') },
+    { id: 4, name: t('summary'), icon: <SummaryStepIcon />, description: t('reviewAndConfirm') }
   ];
 
   return (
@@ -80,9 +40,7 @@ const BookingHeader = ({ car, bookingStep }) => {
                 to={`/cars/${car?.id}`} 
                 className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center font-['Orbitron'] group transition-all duration-300"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+                <ArrowLeftIcon />
                 {t('backToVehicleDetails')}
               </Link>
             </div>

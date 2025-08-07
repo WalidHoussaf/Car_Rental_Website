@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, forwardRef } from 'react';
 import { useTranslations } from '../../translations';
+import CalendarDateIcon from '../Ui/Icons/CalendarDateIcon';
+import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
 
 
 const DatePicker = forwardRef(({ selected, onChange, minDate, className, ...props }, ref) => {
@@ -134,9 +136,7 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
               {/* Start Date */}
               <div className="space-y-4">
                 <label className="text-sm font-medium text-gray-300 font-['Orbitron'] flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-cyan-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                  <CalendarDateIcon />
                   {t('pickupDate')}
                 </label>
                 <div className="relative group">
@@ -162,9 +162,7 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
               {/* End Date */}
               <div className="space-y-4">
                 <label className="text-sm font-medium text-gray-300 font-['Orbitron'] flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-cyan-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                  <CalendarDateIcon />
                   {t('returnDate')}
                 </label>
                 <div className="relative group">
@@ -273,9 +271,7 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
           >
             <span className="flex items-center">
               {t('continueToLocation')}
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <ArrowRightIcon />
             </span>
           </button>
         </div>

@@ -1,14 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 
 const GlowingGrid = ({ containerRef }) => {
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
   const gridPoints = useRef([]);
   const mousePosition = useRef({ x: null, y: null });
-  const hoverEffects = useRef([]);
+
 
   // Initialize the grid
-  const initGrid = (canvas, containerWidth, containerHeight) => {
+  const initGrid = useCallback((canvas, containerWidth, containerHeight) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -25,28 +25,17 @@ const GlowingGrid = ({ containerRef }) => {
           y: y * cellSize,
           baseSize: 1,
           size: 1,
-          alpha: 0.3 + Math.random() * 0.2,
+          alpha: 0.1 + Math.random() * 0.1,
           pulseSpeed: 0.005 + Math.random() * 0.005,
           pulseOffset: Math.random() * Math.PI * 2,
         });
       }
     }
-  };
-  
-  // Create a glow effect on clicks
-  const createHoverEffect = (x, y) => {
-    hoverEffects.current.push({
-      x,
-      y,
-      radius: 5,
-      maxRadius: 100,
-      alpha: 0.8,
-      growing: true
-    });
-  };
+  }, []);
+
 
   // Animation loop
-  const animate = () => {
+  const animate = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -71,7 +60,7 @@ const GlowingGrid = ({ containerRef }) => {
           ctx.moveTo(point.x, point.y);
           ctx.lineTo(otherPoint.x, otherPoint.y);
           
-          const alpha = (1 - distance / 60) * 0.15;
+          const alpha = (1 - distance / 60) * 0.05;
           ctx.strokeStyle = `rgba(100, 255, 255, ${alpha})`;
           ctx.stroke();
         }
@@ -89,7 +78,7 @@ const GlowingGrid = ({ containerRef }) => {
         if (distance < 100) {
           const influence = 1 - distance / 100;
           const size = point.size + influence * 2;
-          const alpha = point.alpha + influence * 0.5;
+          const alpha = point.alpha + influence * 0.2;
           
           ctx.beginPath();
           ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
@@ -109,45 +98,11 @@ const GlowingGrid = ({ containerRef }) => {
       }
     });
     
-    // Animate hover effects
-    for (let i = hoverEffects.current.length - 1; i >= 0; i--) {
-      const effect = hoverEffects.current[i];
-      
-      ctx.beginPath();
-      ctx.arc(effect.x, effect.y, effect.radius, 0, Math.PI * 2);
-      
-      const gradient = ctx.createRadialGradient(
-        effect.x, effect.y, 0,
-        effect.x, effect.y, effect.radius
-      );
-      
-      gradient.addColorStop(0, `rgba(255, 255, 255, ${effect.alpha})`);
-      gradient.addColorStop(0.5, `rgba(100, 255, 255, ${effect.alpha * 0.5})`);
-      gradient.addColorStop(1, `rgba(100, 255, 255, 0)`);
-      
-      ctx.fillStyle = gradient;
-      ctx.fill();
-      
-      if (effect.growing) {
-        effect.radius += 1;
-        effect.alpha -= 0.01;
-        
-        if (effect.radius >= effect.maxRadius) {
-          effect.growing = false;
-        }
-      } else {
-        effect.alpha -= 0.02;
-      }
-      
-      if (effect.alpha <= 0) {
-        hoverEffects.current.splice(i, 1);
-      }
-    }
     
     animationFrameId.current = requestAnimationFrame(animate);
-  };
-  
-  const updateDimensions = () => {
+  }, []);
+
+  const updateDimensions = useCallback(() => {
     if (!containerRef.current || !canvasRef.current) return;
     
     const container = containerRef.current;
@@ -161,9 +116,9 @@ const GlowingGrid = ({ containerRef }) => {
     
     // Reinitialize the grid with new dimensions
     initGrid(canvas, width, height);
-  };
+  }, [containerRef, initGrid]);
   
-  const handleMouseMove = (e) => {
+  const handleMouseMove = useCallback((e) => {
     if (!containerRef.current || !canvasRef.current) return;
     
     const containerRect = containerRef.current.getBoundingClientRect();
@@ -171,17 +126,8 @@ const GlowingGrid = ({ containerRef }) => {
       x: e.clientX - containerRect.left,
       y: e.clientY - containerRect.top
     };
-  };
+  }, [containerRef]);
   
-  const handleClick = (e) => {
-    if (!containerRef.current || !canvasRef.current) return;
-    
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - containerRect.left;
-    const y = e.clientY - containerRect.top;
-    
-    createHoverEffect(x, y);
-  };
   
   // Effects to manage component lifecycle
   useEffect(() => {
@@ -196,7 +142,7 @@ const GlowingGrid = ({ containerRef }) => {
     // Add event listeners
     window.addEventListener('resize', updateDimensions);
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('click', handleClick);
+
     
     // Observe container size changes
     const resizeObserver = new ResizeObserver(updateDimensions);
@@ -206,14 +152,14 @@ const GlowingGrid = ({ containerRef }) => {
     return () => {
       window.removeEventListener('resize', updateDimensions);
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('click', handleClick);
+
       resizeObserver.disconnect();
       
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, []);
+  }, [containerRef, animate, updateDimensions, handleMouseMove]);
   
   return (
     <canvas

@@ -2,31 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import Select from 'react-select';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
-
-// Location icon
-const LocationPin = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <circle cx="12" cy="9" r="3" className="fill-current" />
-  </svg>
-);
-
-// Destination icon
-const DestinationPin = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M12 7L12 11M12 11L14 9M12 11L10 9" className="stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-    <circle cx="12" cy="14" r="1" className="fill-current" />
-  </svg>
-);
-
-// Map Pin icon
-const MapPin = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-);
+import MapMarkerIcon from '../Ui/Icons/MapMarkerIcon';
+import SpinnerIcon from '../Ui/Icons/SpinnerIcon';
+import CheckmarkIcon from '../Ui/Icons/CheckmarkIcon';
+import LocationPinIcon from '../Ui/Icons/LocationPinIcon';
+import DestinationIcon from '../Ui/Icons/DestinationIcon';
+import ArrowLeftIcon from '../Ui/Icons/ArrowLeftIcon';
+import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
 
 // Location coordinates
 const LOCATIONS_COORDINATES = {
@@ -196,10 +178,7 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
       {!mapLoaded && (
         <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-20">
           <div className="text-gray-500 font-['Orbitron'] flex flex-col items-center">
-            <svg className="animate-spin h-8 w-8 text-cyan-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <SpinnerIcon className="mb-2" />
             <span>{t('loadingMap')}</span>
           </div>
         </div>
@@ -321,7 +300,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
               {/* Pickup Location */}
               <div className="relative">
                 <label className="text-base font-medium text-gray-300 mb-4 font-['Orbitron'] flex items-center">
-                  <MapPin className="mr-2 text-cyan-400" />
+                  <MapMarkerIcon className="mr-2 text-cyan-400" />
                   {t('pickupLocation')}
                 </label>
                 <div className="relative">
@@ -352,9 +331,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                     className="w-5 h-5 appearance-none bg-black border border-gray-700 rounded checked:bg-cyan-400 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 cursor-pointer"
                   />
                   <div className={`absolute inset-0 pointer-events-none flex items-center justify-center transition-opacity duration-300 ${sameLocation ? 'opacity-100' : 'opacity-0'}`}>
-                    <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <CheckmarkIcon />
                   </div>
                 </div>
                 <label htmlFor="same-location" className="ml-3 text-base text-gray-300 font-['Orbitron'] cursor-pointer">
@@ -366,7 +343,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
               {!sameLocation && (
                 <div className="transition-all duration-500 animate-fade-in">
                   <label className="text-base font-medium text-gray-300 mb-4 font-['Orbitron'] flex items-center">
-                    <MapPin className="mr-2 text-purple-400" />
+                    <MapMarkerIcon className="mr-2 text-purple-400" />
                     {t('dropoffLocation')}
                   </label>
                   <div className="relative">
@@ -404,7 +381,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
               <div className="space-y-6">
                 <div className="flex items-start p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30 group">
                   <div className="w-10 h-10 flex-shrink-0 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 mt-1 transition-all duration-300 group-hover:bg-cyan-500/30">
-                    <LocationPin />
+                    <LocationPinIcon />
                   </div>
                   <div className="ml-4">
                     <h4 className="text-base font-medium text-white font-['Orbitron'] mb-1">
@@ -422,7 +399,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                 {!sameLocation && (
                   <div className="flex items-start p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-purple-500/30 group">
                     <div className="w-10 h-10 flex-shrink-0 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mt-1 transition-all duration-300 group-hover:bg-purple-500/30">
-                      <DestinationPin />
+                      <DestinationIcon />
                     </div>
                     <div className="ml-4">
                       <h4 className="text-base font-medium text-white font-['Orbitron'] mb-1">
@@ -448,9 +425,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
             onClick={onPreviousStep}
             className="px-8 py-4 bg-black/50 border border-blue-900/30 hover:border-cyan-500/50 text-cyan-400 font-medium font-['Orbitron'] text-lg rounded-lg transition-all duration-300 flex items-center justify-center group cursor-pointer hover:scale-105 transform"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 group-hover:-translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
+            <ArrowLeftIcon className="h-6 w-6 mr-3 group-hover:-translate-x-1 transition-transform duration-300" />
             {t('backToDates')}
           </button>
           
@@ -459,9 +434,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
             className="px-8 py-4 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] text-lg rounded-lg flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-cyan-500/20 hover:scale-105 transform cursor-pointer"
           >
             {t('continueToOptions')}
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
+            <ArrowRightIcon className="h-6 w-6 ml-3" />
           </button>
         </div>
       </div>

@@ -2,34 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { assets } from '../../assets/assets';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
+import LocationPinIcon from '../Ui/Icons/LocationPinIcon';
+import DestinationIcon from '../Ui/Icons/DestinationIcon';
+import CreditCardIcon from '../Ui/Icons/CreditCardIcon';
+import StarIcon from '../Ui/Icons/StarIcon';
+import CheckmarkIcon from '../Ui/Icons/CheckmarkIcon';
 
-// SVG Icons
-const LocationPinIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <circle cx="12" cy="9" r="3" className="fill-current" />
-  </svg>
-);
-
-const DestinationIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M12 7L12 11M12 11L14 9M12 11L10 9" className="stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-    <circle cx="12" cy="14" r="1" className="fill-current" />
-  </svg>
-);
-
-const CreditCardIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="6" y="10" width="36" height="28" rx="4" fill="#fff" stroke="#22d3ee" stroke-width="2"/>
-  <rect x="6" y="18" width="36" height="4" fill="#22d3ee"/>
-  <rect x="12" y="28" width="8" height="4" rx="2" fill="#22d3ee"/>
-  <rect x="24" y="28" width="8" height="4" rx="2" fill="#22d3ee"/>
-</svg>
-);
 
 const PayPalIcon = () => (
   <img src={assets.paypal} alt="PayPal" className="h-12 w-12 object-contain align-middle" />
+);
+
+// Custom Radio Button Component
+const CustomRadio = ({ id, name, value, checked, onChange, children }) => (
+  <label htmlFor={id} className="flex items-center cursor-pointer w-full group">
+    <div className="relative flex items-center justify-center w-5 h-5 mr-4">
+      <input
+        type="radio"
+        id={id}
+        name={name}
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        className="sr-only"
+      />
+      <div className={`
+        w-5 h-5 border-2 rounded-full transition-all duration-300 ease-in-out
+        ${checked 
+          ? 'border-cyan-400 bg-cyan-400/20 shadow-lg shadow-cyan-400/30' 
+          : 'border-gray-500 group-hover:border-cyan-300'
+        }
+      `}>
+        <div className={`
+          w-2.5 h-2.5 bg-cyan-400 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+          transition-all duration-300 ease-in-out
+          ${checked ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}
+        `} />
+      </div>
+    </div>
+    {children}
+  </label>
 );
 
 // Function to resolve image paths
@@ -187,9 +199,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
                   {car.category}
                 </span>
                 <div className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
+                                    <StarIcon />
                   <span className="text-white font-['Orbitron'] font-medium">{car.rating}</span>
                 </div>
               </div>
@@ -317,81 +327,75 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Payment Method */}
+            {/* Payment Method - Fixed */}
             <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
               <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
                 <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
                 {t('paymentMethod')}
               </h4>
               <div className="space-y-3">
-                <div className="flex items-center p-4 rounded-xl border border-blue-900/30 bg-black/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/50">
-                  <label htmlFor="creditCard" className="flex items-center cursor-pointer w-full">
-                    <div className="relative flex items-center justify-center w-5 h-5 mr-4">
-                      <input
-                        type="radio"
-                        id="creditCard"
-                        name="paymentMethod"
-                        value="creditCard"
-                        checked={paymentMethod === 'creditCard'}
-                        onChange={() => setPaymentMethod('creditCard')}
-                        className="w-5 h-5 opacity-0 absolute cursor-pointer"
-                      />
-                      <div className={`w-5 h-5 border-2 rounded-full transition-all duration-300 ${paymentMethod === 'creditCard' ? 'border-cyan-400 bg-cyan-400/10' : 'border-gray-600'}`}></div>
-                      {paymentMethod === 'creditCard' && (
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full absolute"></div>
-                      )}
+                {/* Credit Card Option */}
+                <div className="p-4 rounded-xl border border-blue-900/30 bg-black/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/50">
+                  <CustomRadio
+                    id="creditCard"
+                    name="paymentMethod"
+                    value="creditCard"
+                    checked={paymentMethod === 'creditCard'}
+                    onChange={() => setPaymentMethod('creditCard')}
+                  >
+                    <div className="mr-4">
+                      <CreditCardIcon />
                     </div>
-                    <span className="mr-4"><CreditCardIcon /></span>
                     <span className="text-white font-['Orbitron'] font-medium">
                       {t('creditCard')}
                     </span>
-                  </label>
+                  </CustomRadio>
                 </div>
                 
-                <div className="flex items-center p-4 rounded-xl border border-blue-900/30 bg-black/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/50">
-                  <label htmlFor="paypal" className="flex items-center cursor-pointer w-full">
-                    <div className="relative flex items-center justify-center w-5 h-5 mr-4">
-                      <input
-                        type="radio"
-                        id="paypal"
-                        name="paymentMethod"
-                        value="paypal"
-                        checked={paymentMethod === 'paypal'}
-                        onChange={() => setPaymentMethod('paypal')}
-                        className="w-5 h-5 opacity-0 absolute cursor-pointer"
-                      />
-                      <div className={`w-5 h-5 border-2 rounded-full transition-all duration-300 ${paymentMethod === 'paypal' ? 'border-cyan-400 bg-cyan-400/10' : 'border-gray-600'}`}></div>
-                      {paymentMethod === 'paypal' && (
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full absolute"></div>
-                      )}
+                {/* PayPal Option */}
+                <div className="p-4 rounded-xl border border-blue-900/30 bg-black/40 transition-all duration-300 hover:border-cyan-500/40 hover:bg-black/50">
+                  <CustomRadio
+                    id="paypal"
+                    name="paymentMethod"
+                    value="paypal"
+                    checked={paymentMethod === 'paypal'}
+                    onChange={() => setPaymentMethod('paypal')}
+                  >
+                    <div className="mr-4">
+                      <PayPalIcon />
                     </div>
-                    <span className="mr-4"><PayPalIcon /></span>
                     <span className="text-white font-['Orbitron'] font-medium">
                       PayPal
                     </span>
-                  </label>
+                  </CustomRadio>
                 </div>
               </div>
             </div>
             
-            {/* Terms Checkbox */}
+            {/* Terms Checkbox - Enhanced */}
             <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
               <div className="flex items-start">
-                <div className="relative mt-1 mr-4">
+                <div className="relative mt-1 mr-4 group">
                   <input
                     type="checkbox"
                     id="terms"
                     checked={termsAccepted}
                     onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="w-5 h-5 appearance-none bg-black border-2 border-gray-600 rounded-md checked:bg-cyan-400 checked:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 cursor-pointer"
+                    className="sr-only"
                   />
-                  <div className={`absolute inset-0 pointer-events-none flex items-center justify-center transition-opacity duration-300 ${termsAccepted ? 'opacity-100' : 'opacity-0'}`}>
-                    <svg className="w-3 h-3 text-black" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
+                  <label htmlFor="terms" className="cursor-pointer">
+                    <div className={`
+                      w-5 h-5 border-2 rounded-md transition-all duration-300 ease-in-out flex items-center justify-center
+                      ${termsAccepted 
+                        ? 'bg-cyan-400 border-cyan-400 shadow-lg shadow-cyan-400/30' 
+                        : 'bg-black border-gray-600 group-hover:border-cyan-300'
+                      }
+                    `}>
+                      <CheckmarkIcon className={`transition-all duration-300 ease-in-out ${termsAccepted ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`} />
+                    </div>
+                  </label>
                 </div>
-                <label htmlFor="terms" className="text-sm text-gray-300 font-['Orbitron'] leading-relaxed">
+                <label htmlFor="terms" className="text-sm text-gray-300 font-['Orbitron'] leading-relaxed cursor-pointer">
                   {t('agreeToTerms_booking')} <a href="#" className="text-cyan-400 hover:text-cyan-300 underline transition-all duration-300">{t('termsConditions')}</a> {t('andPrivacy')} <a href="#" className="text-cyan-400 hover:text-cyan-300 underline transition-all duration-300">{t('privacyPolicy')}</a>
                 </label>
               </div>
