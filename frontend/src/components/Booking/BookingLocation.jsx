@@ -34,9 +34,7 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
 
   // Loading Leaflet resources
   useEffect(() => {
-    // Function to load necessary scripts and CSS
     const loadLeafletResources = async () => {
-      // Check if Leaflet is already loaded
       if (window.L) {
         setMapLoaded(true);
         return;
@@ -58,7 +56,6 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
         scriptElement.crossOrigin = '';
         document.body.appendChild(scriptElement);
 
-        // Wait for the script to load
         scriptElement.onload = () => {
           setMapLoaded(true);
         };
@@ -69,7 +66,6 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
 
     loadLeafletResources();
 
-    // Cleanup
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
@@ -81,7 +77,6 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
   // Initialize map after Leaflet loads
   useEffect(() => {
     if (mapLoaded && mapContainerRef.current && !mapRef.current) {
-      // Create map
       const map = window.L.map(mapContainerRef.current, {
         zoomControl: true,
         attributionControl: false

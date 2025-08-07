@@ -56,22 +56,6 @@ const PopularDestinations = ({ destinations }) => {
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/80 opacity-70 z-10"></div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
-              {/* Digital Lines Animation */}
-              <div className="absolute inset-0 opacity-20 z-10 overflow-hidden">
-                <div className="h-full w-full animate-pulse">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div 
-                      key={i} 
-                      className="absolute h-px w-full bg-blue-400/30"
-                      style={{ 
-                        top: `${Math.random() * 100}%`,
-                        animation: 'scanline 3s linear infinite',
-                        animationDelay: `${i * 0.5}s`
-                      }}
-                    ></div>
-                  ))}
-                </div>
-              </div>
               <img
                 src={destination.image}
                 alt={getTranslatedName(destination)}
@@ -100,7 +84,7 @@ const PopularDestinations = ({ destinations }) => {
                   to={`/cars?location=${destination.value || destination.name.toLowerCase()}`}
                   className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-cyan/30 border border-cyan-500/50 rounded-md group-hover:bg-blue-900/30 group-hover:border-blue-500/50 transition-all duration-300 overflow-hidden"
                 >
-                  {/* Animated background glow */}
+                  {/* Background glow */}
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
                   <span className="relative z-10 font-['Orbitron']">{t('discoverRides')}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 relative z-10 transform transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">

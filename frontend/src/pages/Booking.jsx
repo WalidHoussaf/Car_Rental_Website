@@ -196,16 +196,16 @@ const Booking = () => {
           </div>
         ) : (
           <div className="flex justify-center">
-  <div className="w-full max-w-5xl">
-    <BookingSummary 
-      car={car}
-      bookingDetails={bookingDetails}
-      bookingStep={bookingStep}
-      onSubmit={handleBookingSubmit}
-      onPreviousStep={goToPreviousStep}
-    />
-  </div>
-</div>
+            <div className="w-full max-w-5xl">
+              <BookingSummary 
+                car={car}
+                bookingDetails={bookingDetails}
+                bookingStep={bookingStep}
+                onSubmit={handleBookingSubmit}
+                onPreviousStep={goToPreviousStep}
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>

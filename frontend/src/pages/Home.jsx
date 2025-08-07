@@ -46,7 +46,7 @@ const HomePage = () => {
 
   return (
     <div className="bg-black text-white min-h-screen font-['Orbitron'] relative">
-      {/* Enhanced Hero Section */}
+      {/* Hero Section */}
       <div className="relative h-screen w-full overflow-hidden">
         {/* Video Background */}
         <div className="absolute inset-0 z-0">
@@ -76,11 +76,8 @@ const HomePage = () => {
 
           {/* Height Container */}
           <div className="flex flex-col justify-center items-center mb-6 h-36 relative">
-            {/* Background glow for text */}
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-transparent to-cyan-400/20 blur-3xl rounded-full" />
-            
             <div className="h-full flex flex-col justify-center items-center relative z-10">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4 max-w-4xl text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-300 to-cyan-400 font-['Orbitron'] text-center break-words px-4 leading-[1.2] animate-fade-in-up">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 max-w-4xl text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-300 to-cyan-400 font-['Orbitron'] text-center break-words px-4 leading-[1.2] animate-fade-in-up uppercase">
                 {heroMessages[currentSlide].title}
               </h1>
               <p className="text-sm md:text-xl mb-8 max-w-xl text-gray-200 font-['Orbitron'] break-words px-4 animate-fade-in-up animation-delay-300">

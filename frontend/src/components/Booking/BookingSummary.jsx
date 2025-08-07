@@ -8,12 +8,11 @@ import CreditCardIcon from '../Ui/Icons/CreditCardIcon';
 import StarIcon from '../Ui/Icons/StarIcon';
 import CheckmarkIcon from '../Ui/Icons/CheckmarkIcon';
 
-
 const PayPalIcon = () => (
   <img src={assets.paypal} alt="PayPal" className="h-12 w-12 object-contain align-middle" />
 );
 
-// Custom Radio Button Component
+// Radio Button Component
 const CustomRadio = ({ id, name, value, checked, onChange, children }) => (
   <label htmlFor={id} className="flex items-center cursor-pointer w-full group">
     <div className="relative flex items-center justify-center w-5 h-5 mr-4">
@@ -62,7 +61,6 @@ const resolvePath = (path) => {
       return result;
     }
   }
-  
   return path;
 };
 
@@ -327,7 +325,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Payment Method - Fixed */}
+            {/* Payment Method */}
             <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
               <h4 className="text-cyan-400 text-sm font-['Orbitron'] font-semibold mb-4 flex items-center">
                 <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
@@ -372,7 +370,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
               </div>
             </div>
             
-            {/* Terms Checkbox - Enhanced */}
+            {/* Terms Checkbox */}
             <div className="p-5 bg-gradient-to-r from-black/70 to-blue-900/40 backdrop-blur-sm rounded-xl border-2 border-cyan-500/60 transition-all duration-300 hover:border-cyan-400/80 shadow-lg shadow-cyan-500/20">
               <div className="flex items-start">
                 <div className="relative mt-1 mr-4 group">
@@ -401,7 +399,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
               </div>
             </div>
             
-            {/* Navigation Buttons - Enhanced */}
+            {/* Navigation Buttons */}
             <div className="space-y-4 pt-4">
               <button
                 type="submit"

@@ -112,7 +112,7 @@ const CarDetailPage = () => {
                 return (
                   <div
                     key={relatedCar.id}
-                    className="relative group h-full" // Added h-full for full height
+                    className="relative group h-full" 
                     style={{
                       animationDelay: `${index * 200}ms`
                     }}
@@ -154,9 +154,9 @@ const CarDetailPage = () => {
                         <div className="absolute inset-0 bg-gradient-to-t from-cyan-400/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       </div>
                       
-                      {/* Card Content - Flexible height with consistent layout */}
+                      {/* Card Content */}
                       <div className="p-6 flex flex-col flex-grow">
-                        {/* Title and Rating - Fixed height area */}
+                        {/* Title and Rating */}
                         <div className="flex justify-between items-start mb-4 min-h-[3rem]">
                           <h3 className="text-xl font-bold text-white font-['Orbitron'] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-white transition-all duration-300 flex-1 mr-4 line-clamp-2">
                             {processedRelatedCar.name}
@@ -169,7 +169,7 @@ const CarDetailPage = () => {
                           </div>
                         </div>
 
-                        {/* Quick specs - Fixed height area */}
+                        {/* Quick specs */}
                         <div className="grid grid-cols-2 gap-3 mb-6 min-h-[2.5rem]">
                           <div className="flex items-center text-gray-300 text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-cyan-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -185,7 +185,7 @@ const CarDetailPage = () => {
                           </div>
                         </div>
                         
-                        {/* Button - Always at the bottom */}
+                        {/* Button */}
                         <div className="mt-auto">
                           <button
                             onClick={() => {

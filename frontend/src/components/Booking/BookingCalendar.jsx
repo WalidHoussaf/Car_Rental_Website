@@ -19,8 +19,6 @@ const DatePicker = forwardRef(({ selected, onChange, minDate, className, ...prop
   );
 });
 
-
-
 const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, onDateSelection = () => {} }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);

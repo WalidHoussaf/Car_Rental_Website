@@ -4,11 +4,10 @@ import { assets, categoryTranslations } from '../../assets/assets';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
 
-// Fonction pour résoudre les chemins d'image
+// Function to resolve image paths
 const resolvePath = (path) => {
   if (!path || typeof path !== 'string') return null;
   
-  // Si c'est une référence aux assets (format: "cars.tesla")
   if (path.includes('cars.')) {
     const parts = path.split('.');
     if (parts.length === 2 && parts[0] === 'cars') {
@@ -16,8 +15,6 @@ const resolvePath = (path) => {
       return assets.cars[carKey];
     }
   }
-  
-  // Si c'est déjà un chemin complet
   return path;
 };
 
@@ -38,7 +35,7 @@ const HeroSection = ({ car }) => {
   
   return (
     <section className="relative">
-      {/* Main Image with parallax effect */}
+      {/* Main Image */}
       <div className="h-[60vh] overflow-hidden relative">
         <div className="absolute inset-0 transform scale-105 transition-transform duration-15000 hover:scale-100">
           {car.image && car.image.includes('cars.') ? (
@@ -64,12 +61,6 @@ const HeroSection = ({ car }) => {
           )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40"></div>
-        
-        {/* Animated Light Beams */}
-        <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-1 h-full bg-cyan-400 blur-xl transform -skew-x-12 animate-pulse"></div>
-          <div className="absolute top-0 right-1/3 w-1 h-full bg-white blur-xl transform skew-x-12 animate-pulse delay-1000"></div>
-        </div>
         
         {/* Overlay Content */}
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">

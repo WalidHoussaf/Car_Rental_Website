@@ -6,6 +6,8 @@ import creditCard from './credit-card.png'
 import bmw from './cars/bmw.png'
 import mercedes from './cars/mercedes.png'
 import tesla from './cars/tesla.png'
+import privacy from './privacy.png'
+import privacy1 from './privacy1.png'
 import car1 from './cars/car1.png'
 import car2 from './cars/car2.png'
 import car3 from './cars/car3.png'
@@ -121,6 +123,8 @@ export const assets = {
     ukFlag,
     paypal,
     creditCard,
+    privacy,
+    privacy1,
     cars: {
         tesla,
         bmw,

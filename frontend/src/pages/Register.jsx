@@ -159,7 +159,7 @@ const RegisterPage = () => {
           
           {/* Form Header */}
           <div className="text-center mb-8 relative">
-            <h1 className="text-3xl md:text-4xl font-regular mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">
+            <h1 className="text-3xl md:text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 uppercase">
               {t('createYourAccount')}
             </h1>
             <p className="text-sm md:text-base text-gray-300 font-['Orbitron']">

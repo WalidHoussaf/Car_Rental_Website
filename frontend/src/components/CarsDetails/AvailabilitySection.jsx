@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
@@ -23,7 +23,7 @@ const AvailabilitySection = ({ carId }) => {
   const todayString = getTodayString();
 
   // Function to check if a date is valid (not in the past)
-  const isValidDate = (dateString) => {
+  const isValidDate = useCallback((dateString) => {
     const selectedDateObj = new Date(dateString);
     selectedDateObj.setHours(0, 0, 0, 0);
     
@@ -31,10 +31,10 @@ const AvailabilitySection = ({ carId }) => {
     todayDateObj.setHours(0, 0, 0, 0);
     
     return selectedDateObj >= todayDateObj;
-  };
+  }, []);
 
   // Function to check availability
-  const checkAvailability = async (date) => {
+  const checkAvailability = useCallback(async (date) => {
     setLoading(true);
     setDateError(null);
     
@@ -57,7 +57,7 @@ const AvailabilitySection = ({ carId }) => {
       
       setIsAvailable(available);
       
-      if (!available && !dateError) {
+      if (!available) {
         // If not available, set next available date to 3-7 days in the future
         const daysToAdd = Math.floor(Math.random() * 5) + 3;
         const nextDate = new Date(date);
@@ -69,7 +69,7 @@ const AvailabilitySection = ({ carId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t, isValidDate]);
 
   // Handle date selection with validation
   const handleDateChange = (newDate) => {
@@ -80,7 +80,6 @@ const AvailabilitySection = ({ carId }) => {
       setIsAvailable(false);
     } else {
       setDateError(null);
-      checkAvailability(newDate);
     }
     
     setIsCalendarOpen(false);
@@ -113,7 +112,8 @@ const AvailabilitySection = ({ carId }) => {
       setDateError(t('cannotSelectPastDate'));
       setIsAvailable(false);
     }
-  }, [carId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [carId, selectedDate]);
 
   // Generate date buttons for the next 3 days
   const generateDateButtons = () => {

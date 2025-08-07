@@ -416,6 +416,25 @@ export const translations = {
     spec_wheelbase: "Wheelbase",
     spec_driveType: "Drive Type",
     spec_fuelEconomy: "Fuel Economy",
+
+    // Privacy Page
+    privacyPolicy: "Privacy Policy",
+    privacySubtitle: "Your privacy is important to us. Here's how we handle your data.",
+    introduction: "Introduction",
+    introductionText: "Welcome to Rent My Ride's Privacy Policy. This policy explains how we collect, use, disclose, and safeguard your information when you visit our website. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.",
+    informationWeCollect: "Information We Collect",
+    informationWeCollectText: "We may collect information about you in a variety of ways. The information we may collect on the Site includes personal data, such as your name, shipping address, email address, and telephone number, and demographic information, such as your age, gender, hometown, and interests, that you voluntarily give to us when you register with the Site or when you choose to participate in various activities related to the Site.",
+    howWeUseYourInformation: "How We Use Your Information",
+    howWeUseYourInformationText: "Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Site to create and manage your account, email you regarding your account or order, and process payments and refunds.",
+    dataSecurity: "Data Security",
+    dataSecurityText: "We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.",
+    yourRights: "Your Rights",
+    yourRightsText: "You have the right to request access to the personal data we hold about you, to have any inaccuracies corrected, and to request the deletion of your personal data. You can also object to the processing of your personal data in certain circumstances.",
+    privacyContactUsText: "If you have questions or comments about this Privacy Policy, please contact us.",
+    quickNavigation: "Quick Navigation",
+    haveQuestions: "Have Questions?",
+    privacyHelpText: "We are here to help you.",
+    contactPrivacyTeam: "Contact Privacy Team",
     
     // Booking options
     option_insurance: "Premium Insurance",
@@ -455,7 +474,6 @@ export const translations = {
     agreeToTerms_booking: "I agree to the",
     termsConditions: "Terms & Conditions",
     andPrivacy: "and",
-    privacyPolicy: "Privacy Policy",
     processing: "Processing...",
     confirmAndBook_now: "Confirm & Book Now",
     backToOptions: "Back to Options",
@@ -699,7 +717,26 @@ export const translations = {
     totalAmount: "Montant Total",
     confirmAndBook: "Confirmer et Réserver",
     perDay: "par jour",
-    
+
+    // Privacy Page
+    privacyPolicy: "Politique de confidentialité",
+    privacySubtitle: "Votre vie privée est importante pour nous. Voici comment nous gérons vos données.",
+    introduction: "Introduction",
+    introductionText: "Avec plaisir, nous vous présentons notre politique de confidentialité. Cette politique détaille comment nous collectons, utilisons, divulguons et protégeons vos informations lorsque vous visitez notre site web. Veuillez lire cette politique de confidentialité avec soin. Si vous ne vous engagez pas avec les termes de cette politique de confidentialité, veuillez ne pas accéder au site.",
+    informationWeCollect: "Collecte d'informations",
+    informationWeCollectText: "Nous collectons des informations sur vous de différentes manières. Les informations que nous collectons sur le Site comprennent des données personnelles, telles que votre nom, adresse de livraison, adresse e-mail et numéro de téléphone, et des informations démographiques, telles que votre âge, sexe, ville natale et intérêts, que vous nous donnez volontairement lors de votre enregistrement sur le Site ou lors de votre participation à diverses activités liées au Site.",
+    howWeUseYourInformation: "Utilisation des informations",
+    howWeUseYourInformationText: "Nous utilisons des informations collectées sur le Site pour créer et gérer votre compte, vous envoyer des informations sur votre compte ou commande, et traiter les paiements et les remboursements.",
+    dataSecurity: "Sécurité des données",
+    dataSecurityText: "Nous utilisons des mesures administratives, techniques et physiques pour aider à protéger vos informations personnelles. Bien que nous ayons pris des mesures raisonnables pour sécuriser les informations personnelles que vous nous fournissez, veuillez noter que malgré nos efforts, aucune mesure de sécurité n'est parfaite ou impénétrable, et aucun mode de transmission de données ne peut être garantie contre une interception ou un autre type d'abus.",
+    yourRights: "Vos droits",
+    yourRightsText: "Vous avez le droit de demander l'accès aux données personnelles que nous avons sur vous, de corriger les informations inexactes, et de demander la suppression de vos données personnelles. Vous pouvez également objecter au traitement de vos données personnelles dans certaines circonstances.",
+    privacyContactUsText:"Si vous avez des questions ou des commentaires sur cette politique de confidentialité, veuillez nous contacter.",
+    quickNavigation: "Navigation rapide",
+    haveQuestions: "Avez-vous des questions ?",
+    privacyHelpText: "Nous sommes ici pour vous aider.",
+    contactPrivacyTeam: "Contacter l'équipe de confidentialité",
+
     // Contact
     getInTouch: "Nous Contacter",
     fullName: "Nom Complet",
@@ -938,7 +975,6 @@ export const translations = {
     agreeToTerms_booking: "J'accepte les",
     termsConditions: "Conditions d'Utilisation",
     andPrivacy: "et la",
-    privacyPolicy: "Politique de Confidentialité",
     processing: "Traitement en cours...",
 
     confirmAndBook_fr: "Confirmer et Réserver",

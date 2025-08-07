@@ -13,6 +13,7 @@ import FAQ from './pages/FAQ';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
+import Privacy from './pages/Privacy';
 
 function App() {
   return (
@@ -29,7 +30,8 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+                    <Route path="/register" element={<Register />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

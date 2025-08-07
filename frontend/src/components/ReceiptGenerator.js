@@ -249,7 +249,6 @@ class ReceiptGenerator {
       document.head.appendChild(style);
     }
 
-    // Add Orbitron font if not already present
     const existingFont = document.getElementById('orbitron-font');
     if (!existingFont) {
       const orbitronFont = document.createElement('link');

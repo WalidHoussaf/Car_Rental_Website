@@ -62,7 +62,6 @@ const CategoryFilter = ({ filters, handleFilterChange }) => {
     }),
   };
 
-  // Transform categories to include translations
   const localizedCategories = categories.map(cat => ({
     value: cat.value,
     label: cat.label[language]

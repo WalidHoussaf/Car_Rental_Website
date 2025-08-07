@@ -198,7 +198,7 @@ const FAQPage = () => {
           <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
             <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('premiumCarRental')}</span>
           </div>
-          <h1 className="text-2xl md:text-6xl font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative">
+          <h1 className="text-4xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative uppercase">
             {t('frequentlyAskedQuestions')}
             <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
           </h1>
@@ -359,13 +359,7 @@ const FAQPage = () => {
       <section className="py-16 px-4 bg-gradient-to-b from-black/80 via-black/60 to-black/80 backdrop-blur-md relative overflow-hidden">
         {/* Background patterns */}
         <div className="absolute inset-0 bg-[url('/patterns/grid-pattern.svg')] bg-center opacity-30"></div>
-        
-        {/* Floating particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-cyan-500/5 blur-[100px]"></div>
-          <div className="absolute bottom-20 left-20 w-64 h-64 rounded-full bg-blue-500/5 blur-[100px]"></div>
-        </div>
-        
+         
         {/* Decorative Elements */}
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-800/40 to-transparent"></div>
@@ -408,7 +402,6 @@ const FAQPage = () => {
       <section ref={guidesRef} className="py-16 px-4 relative overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <GlowingGrid containerRef={guidesRef} />
           <div className="absolute top-1/4 right-1/4 w-40 h-40 rounded-full bg-cyan-500/5 blur-3xl"></div>
           <div className="absolute bottom-1/3 left-1/3 w-36 h-36 rounded-full bg-blue-500/5 blur-3xl"></div>
         </div>
@@ -531,7 +524,7 @@ const FAQPage = () => {
       
       {/* CTA Section */}
       <section className="py-16 px-4 relative overflow-hidden">
-        {/* Background with Overlay */}
+        {/* Background */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black/90" />
           <img 

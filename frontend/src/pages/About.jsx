@@ -61,7 +61,7 @@ const AboutPage = () => {
           <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
             <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('premiumCarRental')}</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-semibold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative">
+          <h1 className="text-4xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative uppercase">
             {t('aboutUs')}
             <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
           </h1>
@@ -145,7 +145,6 @@ const AboutPage = () => {
                 key={index}
                 className="group relative text-center p-6 rounded-xl border border-gray-800/30 bg-gradient-to-b from-gray-900/20 to-black/40 backdrop-blur-sm hover:border-cyan-500/30 hover:bg-gradient-to-b hover:from-gray-900/30 hover:to-black/50 transition-all duration-300"
               >
-                {/* Subtle glow effect on hover */}
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 to-blue-500/0 group-hover:from-cyan-500/5 group-hover:to-blue-500/5 transition-all duration-300"></div>
                 {/* Value */}
                 <div className="relative text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-3 group-hover:from-cyan-100 group-hover:to-cyan-300 transition-all duration-300">
@@ -220,7 +219,6 @@ const AboutPage = () => {
       <section ref={teamSectionRef} className="relative py-16 px-4 overflow-hidden">
         {/* Background effects */}
         <div className="absolute inset-0 overflow-hidden">
-          <GlowingGrid containerRef={teamSectionRef} />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/85 to-black/90 pointer-events-none"></div>
         

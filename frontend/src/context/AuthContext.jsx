@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is logged in on initial load
   useEffect(() => {
-    // In a real app, you would verify the token with your backend
+    // In a real app, we would verify the token with your backend
     const checkAuthStatus = () => {
       const token = localStorage.getItem('token');
       const userData = localStorage.getItem('user');
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Login function
-  const login = async (email, password) => {
+  const login = async (email) => {
     try {
       // This is where you would make an API call to authenticate
       // For now, we'll simulate a successful login
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Register function
-  const register = async (name, email, password) => {
+  const register = async (name, email) => {
     try {
       // This is where you would make an API call to register the user
       // For now, we'll simulate a successful registration

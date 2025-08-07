@@ -262,8 +262,7 @@ const CarsPage = () => {
             <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
               <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('customizeYourSearch')}</span>
             </div>
-            <br />
-            <br />
+
             <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] mb-4">
               {t('findYourPerfectRide')}
             </h2>

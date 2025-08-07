@@ -8,7 +8,7 @@ const PerformanceStats = ({ specifications }) => {
 
   return (
     <section className="py-12 bg-gradient-to-b from-black via-blue-950/50 to-black border-t border-b border-blue-500/20 backdrop-blur-lg relative overflow-hidden">
-      {/* Animated Background Elements */}
+      {/* Background Elements */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-blue-600 filter blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full bg-indigo-700 filter blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>

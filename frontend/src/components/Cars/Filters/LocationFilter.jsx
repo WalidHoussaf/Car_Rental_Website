@@ -9,7 +9,6 @@ const LocationFilter = ({ filters, handleFilterChange }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Transform locations to include translations
   const localizedLocations = locations.map(loc => ({
     value: loc.value,
     label: loc.label[language]
@@ -35,7 +34,7 @@ const LocationFilter = ({ filters, handleFilterChange }) => {
             fontFamily: 'Orbitron, sans-serif',
             maxHeight: '240px',
             overflowY: 'hidden',
-            zIndex: 9999 // High value to display above other elements
+            zIndex: 9999 
           }),
           menuPortal: (provided) => ({
             ...provided,

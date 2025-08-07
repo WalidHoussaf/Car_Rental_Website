@@ -1,68 +1,13 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslations } from '../../translations';
-
-// SVG Icons
-const InsuranceIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
-    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M12 4L6 7v4c0 3.7 2.56 7.16 6 8 3.44-.84 6-4.3 6-8V7l-6-3z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M9 12l2 2 4-4" className="stroke-current stroke-1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const DriverIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
-    <circle cx="12" cy="7" r="4" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" className="stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M16 11l2-1.5M8 11l-2-1.5" className="stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-    <path d="M12 13v4M12 17l-2 2M12 17l2 2" className="stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const GpsIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
-    <circle cx="12" cy="12" r="9" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <circle cx="12" cy="12" r="3" className="fill-current" />
-    <path d="M12 2v3M12 19v3M2 12h3M19 12h3" className="stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-    <path d="M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" className="stroke-current stroke-1" strokeWidth="1" strokeLinecap="round" />
-  </svg>
-);
-
-const WifiIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
-    <path d="M12 19.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" className="fill-current" />
-    <path d="M12 15c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0-3c-3.87 0-7 3.13-7 7" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-    <path d="M12 12c4.97 0 9 4.03 9 9" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-    <path d="M12 9c-6.07 0-11 4.93-11 11" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-    <path d="M12 9c6.63 0 12 5.37 12 12" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-  </svg>
-);
-
-const ChildSeatIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
-    <path d="M6 9h12v10a2 2 0 01-2 2H8a2 2 0 01-2-2V9z" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M10 2L8 9h8l-2-7" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M8 12h8M8 15h8M8 18h8" className="stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-    <circle cx="12" cy="5" r="1" className="fill-current" />
-  </svg>
-);
-
-const AdditionalDriverIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
-    <circle cx="9" cy="7" r="3" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M4 21v-2a4 4 0 014-4h2a4 4 0 014 4v2" className="stroke-current stroke-1" strokeWidth="1.2" />
-    <circle cx="17" cy="10" r="2.5" className="fill-transparent stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M14 21v-1a3 3 0 013-3h0a3 3 0 013 3v1" className="stroke-current stroke-1" strokeWidth="1.2" />
-    <path d="M15 7h4" className="stroke-current stroke-1" strokeWidth="1.2" strokeLinecap="round" />
-  </svg>
-);
-
-const OptionsIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
-  </svg>
-);
+import InsuranceIcon from '../Ui/Icons/InsuranceIcon';
+import DriverIcon from '../Ui/Icons/DriverIcon';
+import GpsIcon from '../Ui/Icons/GpsIcon';
+import WifiIcon from '../Ui/Icons/WifiIcon';
+import ChildSeatIcon from '../Ui/Icons/ChildSeatIcon';
+import AdditionalDriverIcon from '../Ui/Icons/AdditionalDriverIcon';
+import OptionsIcon from '../Ui/Icons/OptionsIcon';
 
 const getOptionIcon = (iconId) => {
   switch(iconId) {

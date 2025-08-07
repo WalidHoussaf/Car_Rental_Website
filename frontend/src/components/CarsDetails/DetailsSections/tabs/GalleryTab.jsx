@@ -68,7 +68,7 @@ const GalleryTab = ({ car }) => {
   // Function to open modal with full-size image
   const openModal = useCallback(() => {
     setIsModalOpen(true);
-    setIsAutoplayOn(false); // Pause autoplay when modal opens
+    setIsAutoplayOn(false); 
   }, []);
 
   // Function to close modal
@@ -76,7 +76,7 @@ const GalleryTab = ({ car }) => {
     setIsModalOpen(false);
     setZoomLevel(1);
     setImagePosition({ x: 0, y: 0 });
-    setIsAutoplayOn(true); // Resume autoplay when modal closes
+    setIsAutoplayOn(true); 
   }, []);
 
   // Navigation functions
@@ -171,7 +171,7 @@ const GalleryTab = ({ car }) => {
     });
   }, [allImages]);
 
-  // Function to handle image sharing - Fixed to properly stop event propagation
+  // Function to handle image sharing 
   const handleShare = useCallback((e) => {
     if (e) {
       e.preventDefault();
@@ -233,19 +233,10 @@ const GalleryTab = ({ car }) => {
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-black to-gray-900/60 z-0"></div>
       
-      {/* Animated Grid Overlay */}
-      <div className="absolute inset-0 opacity-20 z-0">
-        <div className="absolute inset-0 bg-grid-scan"></div>
-      </div>
-      
       {/* Animated Glow Elements */}
       <div className="absolute -top-32 -right-32 w-64 h-64 bg-blue-500 rounded-full opacity-20 blur-2xl z-0 floating-light"></div>
       <div className="absolute bottom-0 left-32 w-96 h-96 bg-blue-500 rounded-full opacity-10 blur-2xl z-0 floating-light-slow"></div>
-      
-      {/* Tech Circuit Elements */}
-      <div className="absolute bottom-0 left-0 w-full h-32 opacity-20 bg-tech-lines z-0"></div>
-      <div className="absolute top-16 right-0 w-32 h-full opacity-15 bg-data-stream z-0"></div>
-      
+
       {/* Content Container */}
       <div className="relative z-10">
         <div className="mb-4 flex justify-between items-center">
