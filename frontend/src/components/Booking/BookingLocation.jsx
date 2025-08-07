@@ -300,7 +300,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
               {/* Pickup Location */}
               <div className="relative">
                 <label className="text-base font-medium text-gray-300 mb-4 font-['Orbitron'] flex items-center">
-                  <MapMarkerIcon className="mr-2 text-cyan-400" />
+                  <MapMarkerIcon className="w-5 h-5 mr-2 text-cyan-400" />
                   {t('pickupLocation')}
                 </label>
                 <div className="relative">
@@ -343,7 +343,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
               {!sameLocation && (
                 <div className="transition-all duration-500 animate-fade-in">
                   <label className="text-base font-medium text-gray-300 mb-4 font-['Orbitron'] flex items-center">
-                    <MapMarkerIcon className="mr-2 text-purple-400" />
+                    <MapMarkerIcon className="w-5 h-5 mr-2 text-purple-400" />
                     {t('dropoffLocation')}
                   </label>
                   <div className="relative">

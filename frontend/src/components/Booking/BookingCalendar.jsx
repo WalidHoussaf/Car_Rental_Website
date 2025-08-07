@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, forwardRef } from 'react';
 import { useTranslations } from '../../translations';
+import { useLanguage } from '../../context/LanguageContext';
 import CalendarDateIcon from '../Ui/Icons/CalendarDateIcon';
 import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
 
@@ -18,7 +19,7 @@ const DatePicker = forwardRef(({ selected, onChange, minDate, className, ...prop
   );
 });
 
-const useLanguage = () => ({ language: 'en' });
+
 
 const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, onDateSelection = () => {} }) => {
   const { language } = useLanguage();

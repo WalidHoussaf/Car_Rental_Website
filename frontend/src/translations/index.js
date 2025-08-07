@@ -17,6 +17,8 @@ export const translations = {
     searchForCars: "Search for cars...",
     clearSearch: "Clear search",
     closeSearch: "Close search",
+    showLess: "Show Less",
+    showMore: "Show {count} More",
     
     // Home page
     exploreOurFleet: "Explore Our Fleet",
@@ -213,6 +215,7 @@ export const translations = {
     days: "days",
     totalAmount: "Total Amount",
     confirmAndBook: "Confirm & Book Now",
+    perDay: "per day",
    
     // Contact
     getInTouch: "Get In Touch",
@@ -358,7 +361,6 @@ export const translations = {
     exploreDetails: "Explore every detail of this extraordinary vehicle through our comprehensive gallery.",
     autoplayOn: "Autoplay On",
     autoplayOff: "Autoplay Off",
-    showMore: "Show more",
     
     // Booking Header and Calendar
     backToVehicleDetails: "Back to Vehicle Details",
@@ -498,6 +500,8 @@ export const translations = {
     searchForCars: "Rechercher des voitures...",
     clearSearch: "Effacer la recherche",
     closeSearch: "Fermer la recherche",
+    showMore: "Afficher Plus",
+    showLess: "Afficher Moins",
     
     // Home page
     exploreOurFleet: "Explorer Notre Flotte",
@@ -694,6 +698,7 @@ export const translations = {
     days: "jours",
     totalAmount: "Montant Total",
     confirmAndBook: "Confirmer et Réserver",
+    perDay: "par jour",
     
     // Contact
     getInTouch: "Nous Contacter",
@@ -839,7 +844,6 @@ export const translations = {
     exploreDetails: "Explorez chaque détail de ce véhicule extraordinaire à travers notre galerie complète.",
     autoplayOn: "Lecture auto activée",
     autoplayOff: "Lecture auto désactivée",
-    showMore: "Voir plus",
     
     // Booking Header and Calendar
     backToVehicleDetails: "Retour aux Détails de la Voiture",
@@ -936,6 +940,7 @@ export const translations = {
     andPrivacy: "et la",
     privacyPolicy: "Politique de Confidentialité",
     processing: "Traitement en cours...",
+
     confirmAndBook_fr: "Confirmer et Réserver",
     backToOptions: "Retour aux Options",
     
@@ -960,6 +965,7 @@ export const translations = {
     receiptDownloaded: "Reçu téléchargé avec succès !",
     receiptError: "Erreur lors de la génération du reçu. Veuillez réessayer.",
     clickToLearnMore: "Cliquez pour en savoir plus",
+
     confirmAndBook_now: "Confirmer et Réserver",
   }
 };

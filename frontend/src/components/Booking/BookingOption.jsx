@@ -244,7 +244,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
                 
                 {/* Price */}
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500 font-['Orbitron'] text-sm">Per day</span>
+                  <span className="text-gray-500 font-['Orbitron'] text-sm">{t('perDay')}</span>
                   <div className={`
                     font-['Orbitron'] font-bold text-xl transition-all duration-300
                     ${selectedOptions.includes(option.id) 
