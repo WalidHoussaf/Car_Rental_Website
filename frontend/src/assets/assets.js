@@ -8,6 +8,10 @@ import mercedes from './cars/mercedes.png'
 import tesla from './cars/tesla.png'
 import privacy from './privacy.png'
 import privacy1 from './privacy1.png'
+import terms from './terms.png'
+import terms1 from './terms1.png'
+import cookies from './cookies.png'
+import cookies1 from './cookies1.png'
 import car1 from './cars/car1.png'
 import car2 from './cars/car2.png'
 import car3 from './cars/car3.png'
@@ -125,6 +129,10 @@ export const assets = {
     creditCard,
     privacy,
     privacy1,
+    terms,
+    terms1,
+    cookies,
+    cookies1,
     cars: {
         tesla,
         bmw,

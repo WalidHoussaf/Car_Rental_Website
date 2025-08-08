@@ -16,24 +16,22 @@ const Footer = () => {
       links: [
         { name: t('cars'), url: '/cars' },
         { name: t('about'), url: '/about' },
-        { name: 'Careers', url: '/careers' },
         { name: t('contact'), url: '/contact' }
       ]
     },
     {
       title: t('servicesSection'),
       links: [
-        { name: 'Vehicle Rental', url: '/rentals' },
-        { name: 'Luxury Experience', url: '/luxury' },
-        { name: 'Corporate Solutions', url: '/corporate' },
-        { name: 'Long-term Leasing', url: '/leasing' }
+        { name: t('vehicleRental')},
+        { name: t('luxuryExp')},
+        { name: t('corporateSolutions')},
+        
       ]
     },
     {
       title: t('supportSection'),
       links: [
         { name: t('faq'), url: '/faq' },
-        { name: 'Help Center', url: '/help' },
         { name: t('terms'), url: '/terms' },
         { name: t('privacy'), url: '/privacy' }
       ]
@@ -126,13 +124,25 @@ const Footer = () => {
               <ul className="space-y-2">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <Link 
-                      to={link.url}
-                      className="text-gray-400 hover:text-cyan-400 text-sm font-['Orbitron'] transition-colors duration-300 flex items-center group"
-                    >
-                      <div className="w-1 h-1 rounded-full bg-cyan-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      {link.name}
-                    </Link>
+                    {link.external ? (
+                      <a 
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-cyan-400 text-sm font-['Orbitron'] transition-colors duration-300 flex items-center group"
+                      >
+                        <div className="w-1 h-1 rounded-full bg-cyan-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        {link.name}
+                      </a>
+                    ) : (
+                      <Link 
+                        to={link.url}
+                        className="text-gray-400 hover:text-cyan-400 text-sm font-['Orbitron'] transition-colors duration-300 flex items-center group"
+                      >
+                        <div className="w-1 h-1 rounded-full bg-cyan-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        {link.name}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

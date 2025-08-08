@@ -81,6 +81,8 @@ export const translations = {
     terms: "Terms",
     privacy: "Privacy",
     cookies: "Cookies",
+    luxuryExp: "Luxury Experience",
+    corporateSolutions: "Corporate Solutions",
     
     // How It Works section
     howItWorks: "How It Works",
@@ -436,6 +438,40 @@ export const translations = {
     privacyHelpText: "We are here to help you.",
     contactPrivacyTeam: "Contact Privacy Team",
     
+    // Terms of Service Page
+    termsOfService: "Terms of Service",
+    termsSubtitle: "Please read these terms carefully before using our services.",
+    acceptanceOfTerms: "Acceptance of Terms",
+    acceptanceOfTermsText: "By accessing and using Rent My Ride's services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.",
+    useOfService: "Use of Service",
+    useOfServiceText: "You may use our service for lawful purposes only. You agree not to use the service in any way that could damage, disable, overburden, or impair our servers or networks, or interfere with any other party's use and enjoyment of the service.",
+    rentalAgreement: "Rental Agreement",
+    rentalAgreementText: "All vehicle rentals are subject to availability and our standard rental terms. You must be at least 21 years old with a valid driver's license to rent a vehicle. Additional fees may apply for drivers under 25.",
+    paymentTerms: "Payment Terms",
+    paymentTermsText: "Payment is required at the time of booking. We accept major credit cards and other payment methods as specified. All prices are subject to applicable taxes and fees. Cancellation policies apply as outlined in your rental agreement.",
+    liabilityLimitation: "Limitation of Liability",
+    liabilityLimitationText: "In no event shall Rent My Ride be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.",
+    termsContactUsText: "If you have questions about these Terms of Service, please contact us.",
+    termsHelpText: "We're here to clarify any questions about our terms.",
+    contactLegalTeam: "Contact Legal Team",
+
+    // Cookies Page
+    whatAreCookies: "What are Cookies?",
+    whatAreCookiesText: "Cookies are small text files stored on your device that help us improve our website and provide a better user experience.",
+    typesOfCookies: "Types of Cookies",
+    typesOfCookiesText: "There are two types of cookies: session cookies and persistent cookies. Session cookies are temporary and are deleted when you close your browser. Persistent cookies are stored on your device and are deleted when you clear your browser data.",
+    howWeUseCookies: "How We Use Cookies",
+    howWeUseCookiesText: "We use cookies to improve our website and provide a better user experience. We use session cookies to remember your preferences and persistent cookies to remember your login information.",
+    manageCookies: "Manage Cookies",
+    manageCookiesText: "You can manage your cookies by clicking on the 'Manage Cookies' button in the footer.",
+    thirdPartyCookies: "Third Party Cookies",
+    thirdPartyCookiesText: "We use third party cookies to improve our website and provide a better user experience. We use session cookies to remember your preferences and persistent cookies to remember your login information.",
+    cookiesPolicy: "Cookies Policy",
+    cookiesSubtitle: "Your privacy is important to us. Here's how we handle your data.",
+    cookiesContactUsText: "If you have questions about this Cookies Policy, please contact us.",
+    cookiesHelpText: "We're here to help you.",
+    contactSupportTeam: "Contact Support Team",
+
     // Booking options
     option_insurance: "Premium Insurance",
     option_insurance_desc: "Full coverage with zero excess",
@@ -582,7 +618,9 @@ export const translations = {
     terms: "Conditions",
     privacy: "Confidentialité",
     cookies: "Cookies",
-    
+    luxuryExp: "Expérience Luxueuse",
+    corporateSolutions: "Solutions Corporatives",
+  
     // How It Works section
     howItWorks: "Comment ça Marche",
     search: "Rechercher",
@@ -833,6 +871,40 @@ export const translations = {
     alreadyHaveAccount: "Vous avez déjà un compte ?",
     signUp: "S'inscrire",
     signingUp: "Inscription en cours...",
+
+    // Terms of Service Page
+    termsOfService: "Conditions d'Utilisation",
+    termsSubtitle: "Veuillez lire attentivement ces termes avant d'utiliser nos services.",
+    acceptanceOfTerms: "Acceptation des Termes",
+    acceptanceOfTermsText: "En accédant et en utilisant les services de Rent My Ride, vous acceptez et vous engagez à être lié par les termes et les dispositions de ce contrat. Si vous ne souhaitez pas vous conformer aux termes ci-dessus, veuillez ne pas utiliser ce service.",
+    useOfService: "Utilisation des Services",
+    useOfServiceText: "Vous pouvez utiliser nos services pour des fins légales uniquement. Vous acceptez de ne pas utiliser le service de manière qui pourrait endommager, désactiver, surcharger ou endommager nos serveurs ou réseaux, ou interférer avec l'utilisation et l'appréciation d'autres utilisateurs du service.",
+    rentalAgreement: "Contrat de Location",
+    rentalAgreementText: "Toutes les locations de véhicules sont soumises à la disponibilité et nos termes de location standard. Vous devez avoir au moins 21 ans et un permis de conduire valide pour louer un véhicule. Des frais supplémentaires peuvent s'appliquer aux conducteurs de moins de 25 ans.",
+    paymentTerms: "Conditions de Paiement",
+    paymentTermsText: "Le paiement est requis au moment de la réservation. Nous acceptons les cartes de crédit majeures et d'autres méthodes de paiement spécifiées. Tous les prix sont soumis aux taxes et aux frais applicables. Les politiques de remboursement s'appliquent comme décrites dans votre contrat de location.",
+    liabilityLimitation: "Limitation de responsabilité",
+    liabilityLimitationText: "En aucun cas Rent My Ride ne sera tenue responsable de dommages indirects, accessoires, spéciaux, consécutifs ou punitifs, incluant sans limitation les pertes de profits, de données, d'usage, de clientèle, ou autres pertes intangibles.",
+    termsContactUsText: "Si vous avez des questions concernant ces Conditions d'utilisation, veuillez nous contacter.",
+    termsHelpText: "Nous sommes là pour clarifier toute question concernant nos conditions.",
+    contactLegalTeam: "Contacter l'équipe juridique",
+
+    // Cookies Page
+    whatAreCookies: "Quels sont les Cookies ?",
+    whatAreCookiesText: "Les cookies sont des fichiers de texte stockés sur votre appareil qui nous aident à améliorer notre site web et à fournir une meilleure expérience utilisateur.",
+    typesOfCookies: "Quels sont les Types de Cookies ?",
+    typesOfCookiesText: "Il y a deux types de cookies : les cookies de session et les cookies persistants. Les cookies de session sont temporaires et sont supprimés lorsque vous fermez votre navigateur. Les cookies persistants sont stockés sur votre appareil et sont supprimés lorsque vous effacez vos données de navigateur.",
+    howWeUseCookies: "Comment Utilisons-Nous les Cookies ?",
+    howWeUseCookiesText: "Nous utilisons les cookies pour améliorer notre site web et fournir une meilleure expérience utilisateur. Nous utilisons les cookies de session pour vous souvenir de vos préférences et les cookies persistants pour vous souvenir de votre connexion.",
+    manageCookies: "Gestion des Cookies",
+    manageCookiesText: "Vous pouvez gérer vos cookies en cliquant sur le bouton 'Gérer les cookies' dans le pied de page.",
+    thirdPartyCookies: "Cookies tiers",
+    thirdPartyCookiesText: "Nous utilisons des cookies tiers pour améliorer notre site web et fournir une meilleure expérience utilisateur. Nous utilisons les cookies de session pour vous souvenir de vos préférences et les cookies persistants pour vous souvenir de votre connexion.",
+    cookiesPolicy: "Politique des Cookies",
+    cookiesSubtitle: "Votre vie privée est importante pour nous. Voici comment nous gérons vos données.",
+    cookiesContactUsText: "Si vous avez des questions sur cette Politique des Cookies, veuillez nous contacter.",
+    cookiesHelpText: "Nous sommes là pour vous aider.",
+    contactSupportTeam: "Contacter l'équipe support",
     
     // Language switcher
     language: {

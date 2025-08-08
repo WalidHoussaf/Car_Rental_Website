@@ -1,49 +1,49 @@
 import React, { useState } from 'react';
-import { Shield, Lock, Eye, FileText, User, Mail, ChevronRight } from 'lucide-react';
+import { Cookie, Settings, Eye, Database, Shield, Mail, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
 import { assets } from '../assets/assets';
 
-const PrivacyPage = () => {
+const CookiesPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   const [activeSection, setActiveSection] = useState(0);
 
   const sections = [
     { 
-      icon: FileText, 
-      title: t('introduction'), 
-      content: t('introductionText'),
+      icon: Cookie, 
+      title: t('whatAreCookies'), 
+      content: t('whatAreCookiesText'),
+      gradient: "from-gray-900/60 to-black/40"
+    },
+    { 
+      icon: Database, 
+      title: t('typesOfCookies'), 
+      content: t('typesOfCookiesText'),
       gradient: "from-gray-900/60 to-black/40"
     },
     { 
       icon: Eye, 
-      title: t('informationWeCollect'), 
-      content: t('informationWeCollectText'),
+      title: t('howWeUseCookies'), 
+      content: t('howWeUseCookiesText'),
       gradient: "from-gray-900/60 to-black/40"
     },
     { 
-      icon: User, 
-      title: t('howWeUseYourInformation'), 
-      content: t('howWeUseYourInformationText'),
-      gradient: "from-gray-900/60 to-black/40"
-    },
-    { 
-      icon: Lock, 
-      title: t('dataSecurity'), 
-      content: t('dataSecurityText'),
+      icon: Settings, 
+      title: t('manageCookies'), 
+      content: t('manageCookiesText'),
       gradient: "from-gray-900/60 to-black/40"
     },
     { 
       icon: Shield, 
-      title: t('yourRights'), 
-      content: t('yourRightsText'),
+      title: t('thirdPartyCookies'), 
+      content: t('thirdPartyCookiesText'),
       gradient: "from-gray-900/60 to-black/40"
     },
     { 
       icon: Mail, 
       title: t('contactUs'), 
-      content: t('privacyContactUsText'),
+      content: t('cookiesContactUsText'),
       gradient: "from-gray-900/60 to-black/40"
     }
   ];
@@ -70,21 +70,21 @@ const PrivacyPage = () => {
         {/* Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
-          style={{ backgroundImage: `url(${assets.privacy})` }}
+          style={{ backgroundImage: `url(${assets.cookies})` }}
         ></div>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative z-10 container mx-auto px-4 py-16 text-center">
-          {/* Privacy Icon */}
+          {/* Cookies Icon */}
           <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 mb-8 animate-pulse">
-            <Shield className="w-12 h-12 text-cyan-400" />
+            <Cookie className="w-12 h-12 text-cyan-400" />
           </div>
 
           <h1 className="text-4xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-white relative leading-relaxed uppercase">
-            {t('privacyPolicy')}
+            {t('cookiesPolicy')}
           </h1>
           
           <p className="text-xl max-w-3xl mx-auto text-gray-200 mb-10 relative leading-relaxed">
-            {t('privacySubtitle')}
+            {t('cookiesSubtitle')}
           </p>
 
           {/* Scroll indicator */}
@@ -126,7 +126,7 @@ const PrivacyPage = () => {
         </div>
       </section>
 
-      {/* Privacy Content Sections */}
+      {/* Cookies Content Sections */}
       <section className="py-16 px-4 relative">
         <div className="container mx-auto max-w-4xl relative z-10 space-y-16">
           {sections.map((section, index) => {
@@ -170,7 +170,7 @@ const PrivacyPage = () => {
         {/* Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
-          style={{ backgroundImage: `url(${assets.privacy1})` }}
+          style={{ backgroundImage: `url(${assets.cookies1})` }}
         ></div>
         <div className="absolute inset-0 bg-black/60"></div>
         <div className="container mx-auto max-w-4xl text-center relative z-10">
@@ -181,11 +181,11 @@ const PrivacyPage = () => {
             {t('haveQuestions')}
           </h2>
           <p className="text-gray-200 mb-8 text-lg">
-            {t('privacyHelpText')}
+            {t('cookiesHelpText')}
           </p>
           <button className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-400 to-white text-black rounded-xl font-semibold hover:from-white hover:to-cyan-400 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-cyan-500/25 cursor-pointer">
             <Mail className="w-5 h-5 mr-2" />
-            {t('contactPrivacyTeam')}
+            {t('contactSupportTeam')}
             <ChevronRight className="w-4 h-4 ml-2" />
           </button>
         </div>
@@ -194,4 +194,4 @@ const PrivacyPage = () => {
   );
 };
 
-export default PrivacyPage;
+export default CookiesPage;

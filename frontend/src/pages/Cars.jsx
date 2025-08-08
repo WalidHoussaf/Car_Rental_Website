@@ -16,6 +16,7 @@ const CarsPage = () => {
   const queryParams = new URLSearchParams(location.search);
   const locationParam = queryParams.get('location');
   const searchParam = queryParams.get('search');
+  const categoryParam = queryParams.get('category');
   const { language } = useLanguage();
   const t = useTranslations(language);
   
@@ -31,7 +32,7 @@ const CarsPage = () => {
   // State for Filters
   const [filters, setFilters] = useState({
     location: locationParam || 'all',
-    category: 'all',
+    category: categoryParam || 'all',
     priceRange: [0, 1000],
     features: []
   });
