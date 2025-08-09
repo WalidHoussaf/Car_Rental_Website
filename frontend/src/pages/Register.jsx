@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
+import { useAuth } from '../context/AuthContext';
 
 const RegisterPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
+  const { register } = useAuth();
+  const navigate = useNavigate();
   
   // Form State
   const [formData, setFormData] = useState({
@@ -17,6 +20,14 @@ const RegisterPage = () => {
     password: '',
     confirmPassword: '',
     phoneNumber: '',
+    dateOfBirth: '',
+    address: {
+      street: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      country: ''
+    },
     agreeTerms: false
   });
   
@@ -29,10 +40,22 @@ const RegisterPage = () => {
   // Handle Input Changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    
+    if (name.startsWith('address.')) {
+      const addressField = name.split('.')[1];
+      setFormData(prevData => ({
+        ...prevData,
+        address: {
+          ...prevData.address,
+          [addressField]: value
+        }
+      }));
+    } else {
+      setFormData(prevData => ({
+        ...prevData,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
     
     // Clear Error when User Types
     if (errors[name]) {
@@ -63,8 +86,10 @@ const RegisterPage = () => {
     
     if (!formData.password) {
       newErrors.password = language === 'fr' ? 'Le mot de passe est requis' : 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = language === 'fr' ? 'Le mot de passe doit contenir au moins 8 caractères' : 'Password must be at least 8 characters';
+    } else if (formData.password.length < 6) {
+      newErrors.password = language === 'fr' ? 'Le mot de passe doit contenir au moins 6 caractères' : 'Password must be at least 6 characters';
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password = language === 'fr' ? 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre' : 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
     }
     
     if (formData.password !== formData.confirmPassword) {
@@ -73,8 +98,39 @@ const RegisterPage = () => {
     
     if (!formData.phoneNumber.trim()) {
       newErrors.phoneNumber = language === 'fr' ? 'Le numéro de téléphone est requis' : 'Phone number is required';
-    } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ''))) {
-      newErrors.phoneNumber = language === 'fr' ? 'Le numéro de téléphone doit comporter 10 chiffres' : 'Phone number must be 10 digits';
+    } else if (!/^[+]?[\d\s\-()]{7,15}$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = language === 'fr' ? 'Veuillez fournir un numéro de téléphone valide' : 'Please provide a valid phone number';
+    }
+    
+    if (!formData.dateOfBirth) {
+      newErrors.dateOfBirth = language === 'fr' ? 'La date de naissance est requise' : 'Date of birth is required';
+    } else {
+      const birthDate = new Date(formData.dateOfBirth);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      if (age < 18) {
+        newErrors.dateOfBirth = language === 'fr' ? 'Vous devez avoir au moins 18 ans' : 'You must be at least 18 years old';
+      }
+    }
+    
+    if (!formData.address.street.trim()) {
+      newErrors['address.street'] = language === 'fr' ? 'L\'adresse est requise' : 'Street address is required';
+    }
+    
+    if (!formData.address.city.trim()) {
+      newErrors['address.city'] = language === 'fr' ? 'La ville est requise' : 'City is required';
+    }
+    
+    if (!formData.address.state.trim()) {
+      newErrors['address.state'] = language === 'fr' ? 'L\'état/province est requis' : 'State/Province is required';
+    }
+    
+    if (!formData.address.zipCode.trim()) {
+      newErrors['address.zipCode'] = language === 'fr' ? 'Le code postal est requis' : 'Zip code is required';
+    }
+    
+    if (!formData.address.country.trim()) {
+      newErrors['address.country'] = language === 'fr' ? 'Le pays est requis' : 'Country is required';
     }
     
     if (!formData.agreeTerms) {
@@ -85,7 +141,7 @@ const RegisterPage = () => {
   };
 
   // Handle form Submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     const formErrors = validateForm();
@@ -95,24 +151,45 @@ const RegisterPage = () => {
       return;
     }
     
-    // Simulate Form Submission
-    setTimeout(() => {
-      setIsSuccess(true);
+    try {
+      // Prepare user data for backend API
+      const userData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phoneNumber,
+        dateOfBirth: formData.dateOfBirth,
+        address: formData.address
+      };
+
+      // Debug: Log the data being sent
+      console.log('Sending registration data:', userData);
       
-      // Reset Form After Successful Submission
-      setTimeout(() => {
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          phoneNumber: '',
-          agreeTerms: false
+      // Call registration API
+      const result = await register(userData);
+      
+      if (result.success) {
+        setIsSuccess(true);
+        
+        // Navigate to dashboard or home after successful registration
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
+      } else {
+        console.error('Registration failed:', result);
+        setErrors({ 
+          general: result.message || 'Registration failed. Please try again.' 
         });
-        setIsSuccess(false);
-      }, 3000);
-    }, 1000);
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      // Try to get more detailed error information
+      const errorMessage = error.message || 'Registration failed. Please check your connection and try again.';
+      setErrors({ 
+        general: errorMessage
+      });
+    }
   };
 
   // Common Input Styling
@@ -172,6 +249,13 @@ const RegisterPage = () => {
           {isSuccess && (
             <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/10 to-green-500/10 border border-cyan-500/30 rounded-md text-center animate-fade-in">
               <p className="text-cyan-300">{t('registrationSuccessful')}</p>
+            </div>
+          )}
+
+          {/* General Error Message */}
+          {errors.general && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/30 rounded-md text-center animate-fade-in">
+              <p className="text-red-300">{errors.general}</p>
             </div>
           )}
 
@@ -275,6 +359,110 @@ const RegisterPage = () => {
                 />
               </div>
               {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>}
+            </div>
+
+            <div className="mb-6 group">
+              <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">
+                {language === 'fr' ? 'Date de naissance' : 'Date of Birth'}
+              </label>
+              <div className="relative">
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                  className={inputClassName('dateOfBirth')}
+                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+                />
+              </div>
+              {errors.dateOfBirth && <p className="text-red-500 text-xs mt-1">{errors.dateOfBirth}</p>}
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-cyan-300 mb-4">
+                {language === 'fr' ? 'Adresse' : 'Address'}
+              </h3>
+              
+              <div className="grid grid-cols-1 gap-4">
+                <div className="group">
+                  <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">
+                    {language === 'fr' ? 'Adresse' : 'Street Address'}
+                  </label>
+                  <input
+                    type="text"
+                    name="address.street"
+                    value={formData.address.street}
+                    onChange={handleChange}
+                    placeholder={language === 'fr' ? 'Entrez votre adresse' : 'Enter your street address'}
+                    className={inputClassName('address.street')}
+                  />
+                  {errors['address.street'] && <p className="text-red-500 text-xs mt-1">{errors['address.street']}</p>}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="group">
+                    <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">
+                      {language === 'fr' ? 'Ville' : 'City'}
+                    </label>
+                    <input
+                      type="text"
+                      name="address.city"
+                      value={formData.address.city}
+                      onChange={handleChange}
+                      placeholder={language === 'fr' ? 'Ville' : 'City'}
+                      className={inputClassName('address.city')}
+                    />
+                    {errors['address.city'] && <p className="text-red-500 text-xs mt-1">{errors['address.city']}</p>}
+                  </div>
+                  
+                  <div className="group">
+                    <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">
+                      {language === 'fr' ? 'État/Province' : 'State/Province'}
+                    </label>
+                    <input
+                      type="text"
+                      name="address.state"
+                      value={formData.address.state}
+                      onChange={handleChange}
+                      placeholder={language === 'fr' ? 'État/Province' : 'State/Province'}
+                      className={inputClassName('address.state')}
+                    />
+                    {errors['address.state'] && <p className="text-red-500 text-xs mt-1">{errors['address.state']}</p>}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="group">
+                    <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">
+                      {language === 'fr' ? 'Code postal' : 'Zip Code'}
+                    </label>
+                    <input
+                      type="text"
+                      name="address.zipCode"
+                      value={formData.address.zipCode}
+                      onChange={handleChange}
+                      placeholder={language === 'fr' ? 'Code postal' : 'Zip Code'}
+                      className={inputClassName('address.zipCode')}
+                    />
+                    {errors['address.zipCode'] && <p className="text-red-500 text-xs mt-1">{errors['address.zipCode']}</p>}
+                  </div>
+                  
+                  <div className="group">
+                    <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">
+                      {language === 'fr' ? 'Pays' : 'Country'}
+                    </label>
+                    <input
+                      type="text"
+                      name="address.country"
+                      value={formData.address.country}
+                      onChange={handleChange}
+                      placeholder={language === 'fr' ? 'Pays' : 'Country'}
+                      className={inputClassName('address.country')}
+                    />
+                    {errors['address.country'] && <p className="text-red-500 text-xs mt-1">{errors['address.country']}</p>}
+                  </div>
+                </div>
+              </div>
             </div>
             
             <div className="mb-8">

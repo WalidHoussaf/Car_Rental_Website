@@ -1,0 +1,74 @@
+### Health Check
+GET http://localhost:5000/api/health
+
+### Register a new user
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "password": "Password123",
+  "phone": "+1234567890",
+  "dateOfBirth": "1990-05-15",
+  "address": {
+    "street": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "zipCode": "10001",
+    "country": "USA"
+  }
+}
+
+### Login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "Password123"
+}
+
+### Get all cars
+GET http://localhost:5000/api/cars
+
+### Get cars with filters
+GET http://localhost:5000/api/cars?category=luxury&minPrice=50&maxPrice=100
+
+### Get car categories
+GET http://localhost:5000/api/cars/meta/categories
+
+### Get car locations
+GET http://localhost:5000/api/cars/meta/locations
+
+### Create a booking (requires authentication)
+POST http://localhost:5000/api/bookings
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "car": "CAR_ID_HERE",
+  "startDate": "2024-02-15",
+  "endDate": "2024-02-20",
+  "pickupLocation": {
+    "branch": "Downtown",
+    "address": "123 Main St, Downtown"
+  },
+  "dropoffLocation": {
+    "branch": "Downtown",
+    "address": "123 Main St, Downtown"
+  },
+  "paymentMethod": "credit_card",
+  "extras": [
+    {
+      "name": "GPS Navigation",
+      "price": 10,
+      "quantity": 1
+    }
+  ],
+  "insurance": {
+    "type": "premium",
+    "price": 25
+  }
+}

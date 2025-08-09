@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { api } from '../config/api.js';
 
 // Create the context
 const AuthContext = createContext();
@@ -15,14 +16,27 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is logged in on initial load
   useEffect(() => {
-    // In a real app, we would verify the token with your backend
-    const checkAuthStatus = () => {
+    const checkAuthStatus = async () => {
       const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
       
-      if (token && userData) {
-        setIsAuthenticated(true);
-        setUser(JSON.parse(userData));
+      if (token) {
+        try {
+          // Verify token with backend
+          const response = await api.auth.verifyToken();
+          if (response.success) {
+            setUser(response.data.user);
+            setIsAuthenticated(true);
+          } else {
+            // Token is invalid, clear it
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
+        } catch (error) {
+          console.error('Token verification failed:', error);
+          // Clear invalid token
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
       }
       
       setLoading(false);
@@ -32,62 +46,94 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Login function
-  const login = async (email) => {
+  const login = async (email, password) => {
     try {
-      // This is where you would make an API call to authenticate
-      // For now, we'll simulate a successful login
+      setLoading(true);
+      const response = await api.auth.login({ email, password });
       
-      // Sample user data (in a real app, this would come from your API)
-      const userData = {
-        id: '1',
-        name: 'Walid Yugen',
-        email: email,
-      };
-      
-      // Save to localStorage (in a real app, you'd store the JWT token)
-      localStorage.setItem('token', 'sample-jwt-token');
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      // Update state
-      setUser(userData);
-      setIsAuthenticated(true);
-      
-      return { success: true };
+      if (response.success) {
+        // Save token and user data
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Update state
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+        
+        return { success: true };
+      } else {
+        return { 
+          success: false, 
+          message: response.message || 'Login failed' 
+        };
+      }
     } catch (error) {
       return { 
         success: false, 
         message: error.message || 'Failed to login' 
       };
+    } finally {
+      setLoading(false);
     }
   };
 
   // Register function
-  const register = async (name, email) => {
+  const register = async (userData) => {
     try {
-      // This is where you would make an API call to register the user
-      // For now, we'll simulate a successful registration
+      setLoading(true);
+      const response = await api.auth.register(userData);
       
-      // Sample user data (in a real app, this would come from your API)
-      const userData = {
-        id: '1',
-        name: name,
-        email: email,
-      };
-      
-      // Save to localStorage (in a real app, you'd store the JWT token)
-      localStorage.setItem('token', 'sample-jwt-token');
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      // Update state
-      setUser(userData);
-      setIsAuthenticated(true);
-      
-      return { success: true };
+      if (response.success) {
+        // Save token and user data
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Update state
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+        
+        return { success: true };
+      } else {
+        return { 
+          success: false, 
+          message: response.message || 'Registration failed' 
+        };
+      }
     } catch (error) {
       return { 
         success: false, 
         message: error.message || 'Failed to register' 
       };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update profile function
+  const updateProfile = async (profileData) => {
+    try {
+      setLoading(true);
+      const response = await api.auth.updateProfile(profileData);
+      
+      if (response.success) {
+        // Update user data in localStorage and state
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        setUser(response.data.user);
+        
+        return { success: true };
+      } else {
+        return { 
+          success: false, 
+          message: response.message || 'Profile update failed' 
+        };
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        message: error.message || 'Failed to update profile' 
+      };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,6 +155,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    updateProfile,
     logout
   };
 
