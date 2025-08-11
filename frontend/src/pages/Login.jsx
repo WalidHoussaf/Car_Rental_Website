@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
+  const navigate = useNavigate();
+  const { login } = useAuth();
   
   // Form State
   const [formData, setFormData] = useState({
@@ -60,7 +63,7 @@ const LoginPage = () => {
   };
 
   // Handle Form Submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     const formErrors = validateForm();
@@ -70,18 +73,39 @@ const LoginPage = () => {
       return;
     }
     
-    // Simulate Login Process
     setIsLoading(true);
+    setErrors((prev) => ({ ...prev, form: null }));
     
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const result = await login(formData.email.trim(), formData.password);
+      
+      if (!result?.success) {
+        const message = result?.message || (language === 'fr' ? 'Identifiants invalides' : 'Invalid credentials');
+        setErrors((prev) => ({ ...prev, form: message }));
+        return;
+      }
+      
+      // Success
       setIsSuccess(true);
       
-      // Reset Success Message after Delay
+      // Determine role and redirect
+      const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+      const role = storedUser?.role?.toLowerCase?.();
+      
+      // Give a brief moment to show success message
       setTimeout(() => {
-        setIsSuccess(false);
-      }, 2000);
-    }, 1500);
+        if (role === 'admin') {
+          navigate('/dashboard');
+        } else {
+          navigate('/');
+        }
+      }, 800);
+    } catch (err) {
+      const message = err?.message || (language === 'fr' ? 'Échec de la connexion' : 'Failed to login');
+      setErrors((prev) => ({ ...prev, form: message }));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle Social Login Redirects
@@ -132,6 +156,13 @@ const LoginPage = () => {
             </p>
             <div className="w-20 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto mt-4"></div>
           </div>
+
+          {/* Error Message */}
+          {errors.form && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/50 rounded-md text-center">
+              <p className="text-red-400">{errors.form}</p>
+            </div>
+          )}
 
           {/* Success Message */}
           {isSuccess && (

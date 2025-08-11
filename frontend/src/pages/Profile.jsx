@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { assets } from '../assets/assets';
 
 const Profile = () => {
   const { user, updateProfile, logout } = useAuth();
@@ -89,21 +90,33 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="bg-black text-white min-h-screen font-['Orbitron'] relative overflow-hidden">
       {/* Background Effects */}
-      <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black/90" />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-30"
+        >
+          <source src={assets.hero.loginbg} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
       
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="relative z-20 container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 relative">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent mb-4">
               {language === 'fr' ? 'Mon Profil' : 'My Profile'}
             </h1>
             <p className="text-gray-400">
               {language === 'fr' ? 'Gérez vos informations personnelles' : 'Manage your personal information'}
             </p>
+            <div className="w-20 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto mt-4"></div>
           </div>
 
           {/* Profile Card */}
@@ -314,6 +327,11 @@ const Profile = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Bottom Border Glow */}
+      <div className="relative h-px w-full overflow-hidden">
+        <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse"></div>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { useAuth } from '../context/AuthContext';
@@ -9,6 +10,9 @@ import LanguageSwitcher from './Ui/LanguageSwitcher';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const accountRef = useRef(null);
+
   const [searchValue, setSearchValue] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,6 +46,24 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close account menu on outside click or Esc
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (accountRef.current && !accountRef.current.contains(e.target)) {
+        setIsAccountOpen(false);
+      }
+    };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setIsAccountOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
+
   // Toggle search box - only works on cars page
   const toggleSearch = () => {
     if (isOnCarsPage) {
@@ -66,7 +88,7 @@ const Navbar = () => {
         // Navigate to cars page with search parameter
         navigate(`/cars?search=${encodeURIComponent(searchValue.trim())}`);
       }
-      setIsSearchOpen(false); // Close search box after search
+      setIsSearchOpen(false);
     }
   };
 
@@ -119,44 +141,102 @@ const Navbar = () => {
             </div>
 
             {isAuthenticated ? (
-              <div className="relative group">
-                <button className="flex items-center space-x-1 px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors duration-300">
-                  <span>{user?.name || 'Account'}</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="relative" ref={accountRef}>
+                {/* Account Button */}
+                <button
+                  type="button"
+                  aria-haspopup="menu"
+                  aria-expanded={isAccountOpen}
+                  onClick={() => setIsAccountOpen((v) => !v)}
+                  className="group cursor-pointer flex items-center gap-3 pl-2 pr-3 py-1.5 rounded-xl border border-cyan-500/20 bg-gradient-to-r from-black/60 to-black/30 backdrop-blur-sm text-white hover:border-cyan-400/40 transition-all"
+                >
+                  <div className="h-8 w-8 rounded-full bg-cyan-500/15 border border-cyan-400/40 grid place-items-center text-cyan-300">
+                    <span className="text-xs font-['Orbitron']">
+                      {(user?.firstName?.[0] || user?.name?.[0] || 'A').toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="font-['Orbitron'] text-sm bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent">
+                    {user?.firstName || user?.name || 'Account'}
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`h-4 w-4 text-cyan-300 transition-transform ${isAccountOpen ? 'rotate-180' : ''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-black ring-1 ring-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 font-['Rationale']">
-                  <Link
-                    to="/dashboard"
-                    className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
-                    onClick={() => setIsSearchOpen(false)}
-                  >
-                    {t('dashboard')}
-                  </Link>
-                  <Link
-                    to="/my-bookings"
-                    className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
-                    onClick={() => setIsSearchOpen(false)}
-                  >
-                    {t('myBookings')}
-                  </Link>
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
-                    onClick={() => setIsSearchOpen(false)}
-                  >
-                    {t('profileSettings')}
-                  </Link>
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsSearchOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/10"
-                  >
-                    {t('logout')}
-                  </button>
+
+                {/* Dropdown */}
+                <div
+                  role="menu"
+                  aria-hidden={!isAccountOpen}
+                  className={`absolute right-0 mt-3 w-64 rounded-lg overflow-hidden border border-gray-800 bg-black backdrop-blur-xl shadow-lg/5 transition-all duration-200 ${isAccountOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+                >
+                  {/* Header */}
+                  <div className="px-4 py-3 bg-black border-b border-gray-800">
+                    <p className="text-sm text-gray-400 font-['Rationale']">{t('signedInAs')}</p>
+                    <p className="text-sm font-['Orbitron'] bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent">
+                      {user?.email || 'admin@example.com'}
+                    </p>
+                  </div>
+
+                  <div className="py-2 font-['Rationale']">
+                    {user?.role === 'admin' && (
+                      <Link
+                        to="/dashboard"
+                        onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        role="menuitem"
+                      >
+                        <span className="text-cyan-300">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9z"/></svg>
+                        </span>
+                        <span>{t('dashboard')}</span>
+                      </Link>
+                    )}
+
+                    <Link
+                      to="/my-bookings"
+                      onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
+                      className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                      role="menuitem"
+                    >
+                      <span className="text-cyan-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M5 4h14a1 1 0 011 1v14l-4-3-4 3-4-3-4 3V5a1 1 0 011-1z"/></svg>
+                      </span>
+                      <span>{t('myBookings')}</span>
+                    </Link>
+
+                    <Link
+                      to="/profile"
+                      onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
+                      className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                      role="menuitem"
+                    >
+                      <span className="text-cyan-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0H5z"/></svg>
+                      </span>
+                      <span>{t('profileSettings')}</span>
+                    </Link>
+
+                    <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                    <button
+                      onClick={() => { logout(); setIsSearchOpen(false); setIsAccountOpen(false); }}
+                      className="w-full text-left flex items-center gap-3 px-4 py-2.5 text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
+                      role="menuitem"
+                    >
+                      <span className="text-red-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-5 w-5">
+                          <path d="M16 17l5-5-5-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M21 12H9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M13 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </span>
+                      <span className="font-['Orbitron']">{t('logout')}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (

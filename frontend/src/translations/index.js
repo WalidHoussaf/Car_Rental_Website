@@ -19,6 +19,7 @@ export const translations = {
     closeSearch: "Close search",
     showLess: "Show Less",
     showMore: "Show {count} More",
+    signedInAs: "Signed in as",
     
     // Home page
     exploreOurFleet: "Explore Our Fleet",
@@ -556,6 +557,7 @@ export const translations = {
     closeSearch: "Fermer la recherche",
     showMore: "Afficher Plus",
     showLess: "Afficher Moins",
+    signedInAs: "Connecté en tant que",
     
     // Home page
     exploreOurFleet: "Explorer Notre Flotte",
