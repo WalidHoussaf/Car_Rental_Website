@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 const RegisterPage = () => {
   const { language } = useLanguage();
@@ -211,14 +211,15 @@ const RegisterPage = () => {
         // Check if component is still mounted
         if (!mountedRef.current) return;
         
+        // Small post-success delay to let the UI show success/loading
+        await new Promise((resolve) => setTimeout(resolve, 1800));
+
         // Get the most up-to-date user data from AuthContext or localStorage
         const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
 
         if (currentUser && currentUser.role === 'admin') {
-
           navigate('/dashboard', { replace: true });
         } else {
-
           navigate('/profile', { replace: true });
         }
         
@@ -433,7 +434,7 @@ const RegisterPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-cyan-400 transition-colors duration-200 focus:outline-none"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-cyan-400 transition-colors duration-200 focus:outline-none cursor-pointer"
                     disabled={isLoading || isSuccess}
                   >
                     {showPassword ? (
@@ -467,7 +468,7 @@ const RegisterPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-cyan-400 transition-colors duration-200 focus:outline-none"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-cyan-400 transition-colors duration-200 focus:outline-none cursor-pointer"
                     disabled={isLoading || isSuccess}
                   >
                     {showConfirmPassword ? (
@@ -652,7 +653,7 @@ const RegisterPage = () => {
               <span className="px-4 bg-black/60 backdrop-blur-sm relative inline-block">
                 <p className="text-sm text-gray-400">
                   {t('alreadyHaveAccount')} 
-                  <Link to="/login" className="ml-2 text-cyan-400 hover:text-white transition-colors duration-300 relative group">
+                  <Link to="/login" className="ml-2 text-cyan-400 hover:text-white transition-colors duration-300 relative group cursor-pointer">
                     {t('signIn')}
                     <span className="absolute left-0 bottom-0 w-0 h-px bg-cyan-400 group-hover:w-full transition-all duration-300"></span>
                   </Link>

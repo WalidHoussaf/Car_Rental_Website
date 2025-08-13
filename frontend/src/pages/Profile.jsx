@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { assets } from '../assets/assets';
 
 const Profile = () => {
-  const { user, updateProfile, logout } = useAuth();
+  const { user, updateProfile, logout, loading } = useAuth();
+  const navigate = useNavigate();
   const { language } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +39,13 @@ const Profile = () => {
       });
     }
   }, [user]);
+
+  // Redirect to home when not authenticated (after initial auth check)
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/', { replace: true });
+    }
+  }, [loading, user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,10 +85,11 @@ const Profile = () => {
 
   const handleLogout = () => {
     logout();
-    window.location.href = '/';
+    navigate('/');
   };
 
-  if (!user) {
+  // While auth is checking, show loader. If unauthenticated, navigate effect will run; render nothing to avoid flash.
+  if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
@@ -88,6 +98,7 @@ const Profile = () => {
       </div>
     );
   }
+  if (!user) return null;
 
   return (
     <div className="bg-black text-white min-h-screen font-['Orbitron'] relative overflow-hidden">
@@ -99,6 +110,8 @@ const Profile = () => {
           muted
           loop
           playsInline
+          preload="metadata"
+          onError={(e) => { if (e && e.currentTarget && e.currentTarget.style) { e.currentTarget.style.display = 'none'; } }}
           className="w-full h-full object-cover opacity-30"
         >
           <source src={assets.hero.loginbg} type="video/mp4" />
@@ -135,13 +148,13 @@ const Profile = () => {
               <div className="flex space-x-3">
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors"
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors cursor-pointer"
                 >
                   {isEditing ? (language === 'fr' ? 'Annuler' : 'Cancel') : (language === 'fr' ? 'Modifier' : 'Edit')}
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors cursor-pointer"
                 >
                   {language === 'fr' ? 'Déconnexion' : 'Logout'}
                 </button>
@@ -249,7 +262,7 @@ const Profile = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 rounded-lg font-medium transition-all duration-300 disabled:opacity-50"
+                    className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                   >
                     {isLoading ? (language === 'fr' ? 'Mise à jour...' : 'Updating...') : (language === 'fr' ? 'Sauvegarder' : 'Save Changes')}
                   </button>

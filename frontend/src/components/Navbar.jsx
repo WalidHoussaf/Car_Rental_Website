@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
 import LanguageSwitcher from './Ui/LanguageSwitcher';
@@ -223,7 +222,7 @@ const Navbar = () => {
                     <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
                     <button
-                      onClick={() => { logout(); setIsSearchOpen(false); setIsAccountOpen(false); }}
+                      onClick={() => { logout(); setIsSearchOpen(false); setIsAccountOpen(false); navigate('/'); }}
                       className="w-full text-left flex items-center gap-3 px-4 py-2.5 text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
                       role="menuitem"
                     >

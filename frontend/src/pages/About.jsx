@@ -1,10 +1,8 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
-
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
-import GlowingGrid from '../components/Ui/GlowingGrid';
 
 const AboutPage = () => {
   const { language } = useLanguage();
@@ -61,20 +59,24 @@ const AboutPage = () => {
           <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
             <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('premiumCarRental')}</span>
           </div>
-          <h1 className="text-4xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative uppercase">
+          <h1 className="text-4xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative uppercase animate-fade-in-up animation-delay-200">
             {t('aboutUs')}
             <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
           </h1>
-          <p className="text-xl max-w-3xl mx-auto text-gray-200 mb-10 relative">
+          <p className="text-xl max-w-3xl mx-auto text-gray-200 mb-10 relative animate-fade-in-up animation-delay-300">
             {t('companyDescription')}
             <div className="absolute -z-10 inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent blur-xl"></div>
           </p>
           
           <Link
             to="/cars"
-            className="px-10 py-3 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-medium rounded-md transform transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/30 font-['Orbitron']"
+            className="group px-6 py-3 rounded-md bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-cyan-600/20 hover:shadow-cyan-500/30 cursor-pointer transform hover:scale-105 inline-flex items-center justify-center gap-2 text-base font-semibold relative overflow-hidden animate-fade-in-up animation-delay-500"
           >
-            {t('exploreOurFleet')}
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-300/20 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span className="relative z-10">{t('exploreOurFleet')}</span>
           </Link>
         </div>
       </div>
@@ -283,19 +285,23 @@ const AboutPage = () => {
               <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('discoverMore')}</span>
             </div>
           </div>
-          <h2 className="mt-12 text-3xl mb-6 text-transparent bg-clip-text bg-gradient-to-r uppercase from-white to-cyan-400 leading-[1.2] relative inline-block">
+          <h2 className="mt-12 text-3xl mb-6 text-transparent bg-clip-text bg-gradient-to-r uppercase from-white to-cyan-400 leading-[1.2] relative inline-block animate-fade-in-up animation-delay-200">
             {t('readyToExperience')}
             <div className="absolute -bottom-2 left-0 right-0 mx-auto w-24 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
           </h2>
-          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto relative">
+          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto relative animate-fade-in-up animation-delay-300">
             {t('fleetReady')}
             <div className="absolute -z-10 inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent blur-xl"></div>
           </p>
           <Link
             to="/cars"
-            className="px-10 py-3 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-medium rounded-md transform transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/30 font-['Orbitron']"
+            className="group px-6 py-3 rounded-md bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-cyan-600/20 hover:shadow-cyan-500/30 cursor-pointer transform hover:scale-105 inline-flex items-center justify-center gap-2 text-base font-semibold relative overflow-hidden animate-fade-in-up animation-delay-500"
           >
-            {t('exploreOurFleet')}
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-300/20 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span className="relative z-10">{t('exploreOurFleet')}</span>
           </Link>
         </div>
       </section>

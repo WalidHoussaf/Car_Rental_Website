@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { sampleCars, resolveImagePaths, categoryTranslations } from '../assets/assets'; 
 import Select from 'react-select';
 import HeroSection from '../components/Cars/HeroSection';
-
 import CallToAction from '../components/Cars/CallToAction';
 import FiltersSidebar from '../components/Cars/Filters/FiltersSidebar';
 import { selectStyles } from '../styles/selectStyles';

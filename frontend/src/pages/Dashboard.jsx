@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../config/api';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
+  const navigate = useNavigate();
   const { language } = useLanguage();
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -58,9 +60,16 @@ const Dashboard = () => {
     }
   }, [user]);
 
+  // Redirect to home when not authenticated (after initial auth check)
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/', { replace: true });
+    }
+  }, [loading, user, navigate]);
+
   const handleLogout = () => {
     logout();
-    window.location.href = '/';
+    navigate('/');
   };
 
   // Redirect non-admin users
@@ -81,7 +90,8 @@ const Dashboard = () => {
     );
   }
 
-  if (!user) {
+  // While auth is checking, show loader. If unauthenticated, navigate effect will run; render nothing to avoid flash.
+  if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
@@ -90,6 +100,7 @@ const Dashboard = () => {
       </div>
     );
   }
+  if (!user) return null;
 
   return (
     <div className="bg-black text-white min-h-screen font-['Orbitron'] relative overflow-hidden">

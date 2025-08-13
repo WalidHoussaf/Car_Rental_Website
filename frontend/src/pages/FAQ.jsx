@@ -1,10 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets';
-
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../translations';
-import GlowingGrid from '../components/Ui/GlowingGrid';
 
 const FAQPage = () => {
   const { language } = useLanguage();
@@ -198,11 +196,11 @@ const FAQPage = () => {
           <div className="inline-block mb-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-blue-500/20 animate-pulse-slow">
             <span className="text-sm text-cyan-400 font-['Orbitron'] tracking-widest">{t('premiumCarRental')}</span>
           </div>
-          <h1 className="text-4xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative uppercase">
+          <h1 className="text-4xl md:text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative uppercase animate-fade-in-up animation-delay-200">
             {t('frequentlyAskedQuestions')}
             <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
           </h1>
-          <p className="text-xl max-w-3xl mx-auto text-gray-200 mb-10 relative">
+          <p className="text-xl max-w-3xl mx-auto text-gray-200 mb-10 relative animate-fade-in-up animation-delay-300">
             {t('everythingYouNeed')}
             <div className="absolute -z-10 inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent blur-xl"></div>
           </p>
@@ -380,8 +378,17 @@ const FAQPage = () => {
               to="/contact"
               className="px-8 py-3 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-medium rounded-md shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group"
             >
-              <span className="relative z-10">{t('contactUs')}</span>
-              <div className="absolute inset-0 w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-300 -z-5"></div>
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {/* Leading icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                {t('contactUs')}
+                {/* Trailing arrow icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </span>
             </Link>
             <a
               href="tel:+212 57 77 777"
@@ -535,21 +542,24 @@ const FAQPage = () => {
         </div>
         
         <div className="container mx-auto max-w-4xl relative z-10 text-center">
-          <h2 className="text-3xl mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative inline-block">
+          <h2 className="text-3xl mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white relative inline-block animate-fade-in-up animation-delay-200">
             {t('readyToExperienceLuxury')}
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
           </h2>
-          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto animate-fade-in-up animation-delay-300">
             {language === 'fr' 
               ? "Parcourez notre flotte premium et réservez votre prochain voyage extraordinaire à travers le Maroc." 
               : "Browse our premium fleet and book your next extraordinary journey through Morocco."}
           </p>
           <Link
             to="/cars"
-            className="inline-block px-10 py-3 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-medium rounded-md shadow-lg hover:shadow-cyan-500/20 transform transition-all duration-300 hover:scale-105 relative overflow-hidden group"
+            className="group px-6 py-3 rounded-md bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-cyan-600/20 hover:shadow-cyan-500/30 cursor-pointer transform hover:scale-105 inline-flex items-center justify-center gap-2 text-base font-semibold relative overflow-hidden animate-fade-in-up animation-delay-500"
           >
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-300/20 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
             <span className="relative z-10">{t('browseOurFleet')}</span>
-            <div className="absolute inset-0 w-0 bg-gradient-to-r from-cyan-400 to-white group-hover:w-full transition-all duration-300 -z-5"></div>
           </Link>
         </div>
       </section>
