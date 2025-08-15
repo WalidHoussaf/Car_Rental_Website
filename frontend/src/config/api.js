@@ -131,7 +131,15 @@ export const api = {
   // User endpoints
   users: {
     getAll: (params = {}) => {
-      const queryString = new URLSearchParams(params).toString();
+      // Filter out undefined values to prevent them from being sent as 'undefined' strings
+      const cleanParams = {};
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          cleanParams[key] = params[key];
+        }
+      });
+      
+      const queryString = new URLSearchParams(cleanParams).toString();
       return createApiRequest(`/users${queryString ? `?${queryString}` : ''}`);
     },
     

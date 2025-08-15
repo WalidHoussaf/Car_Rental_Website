@@ -49,7 +49,7 @@ const HowItWorks = () => {
 
                 <div className="mt-6 w-14 h-14 rounded-full bg-black/60 flex items-center justify-center border border-gray-700 group-hover:border-cyan-400 transition-all duration-300 overflow-hidden">
                   {/* Animated Search Icon */}
-                  <div className="relative w-6 h-6 group-hover:animate-[search_1.5s_ease-in-out_infinite]">
+                  <div className="relative w-6 h-6 group-hover-animate-search">
                     <svg xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 h-6 w-6 text-cyan-400 group-hover:text-cyan-500 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -92,14 +92,14 @@ const HowItWorks = () => {
 
                 <div className="mt-6 w-14 h-14 rounded-full bg-black/60 flex items-center justify-center border border-gray-700 group-hover:border-cyan-400 transition-all duration-300 overflow-hidden">
                   {/* Calendar Icon */}
-                  <div className="relative w-6 h-6 perspective-500">
+                  <div className="relative w-6 h-6" style={{ perspective: '500px' }}>
                     {/* Back Calendar Page */}
                     <svg xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 h-6 w-6 text-cyan-400 group-hover:text-cyan-500 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     
                     {/* Front Calendar Page */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 origin-left transition-all duration-300 group-hover:animate-[pageFlip_2s_ease-in-out_infinite]">
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 origin-left transition-all duration-300 group-hover-animate-pageFlip">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01M16 17h.01" />
@@ -151,7 +151,7 @@ const HowItWorks = () => {
                     </svg>
                     
                     {/* Happy smiley */}
-                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 h-6 w-6 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:animate-[bounce_1s_ease-in-out_infinite]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 h-6 w-6 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover-animate-smile" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10h.01M15 10h.01" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14s1.5 2 4 2 4-2 4-2" />

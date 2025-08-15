@@ -149,13 +149,26 @@ const Navbar = () => {
                   onClick={() => setIsAccountOpen((v) => !v)}
                   className="group cursor-pointer flex items-center gap-3 pl-2 pr-3 py-1.5 rounded-xl border border-cyan-500/20 bg-gradient-to-r from-black/60 to-black/30 backdrop-blur-sm text-white hover:border-cyan-400/40 transition-all"
                 >
-                  <div className="h-8 w-8 rounded-full bg-cyan-500/15 border border-cyan-400/40 grid place-items-center text-cyan-300">
-                    <span className="text-xs font-['Orbitron']">
-                      {(user?.firstName?.[0] || user?.name?.[0] || 'A').toUpperCase()}
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300 font-['Orbitron'] font-bold">
+                    <span className="text-[10px] leading-none">
+                      {(
+                        user?.firstName?.[0] ||
+                        user?.name?.split(' ')?.[0]?.[0] ||
+                        user?.email?.[0] ||
+                        'A'
+                      ).toUpperCase()}
+                      {(
+                        user?.lastName?.[0] ||
+                        user?.name?.split(' ')?.[1]?.[0] ||
+                        user?.email?.split('@')?.[0]?.[1] ||
+                        ''
+                      ).toUpperCase()}
                     </span>
                   </div>
                   <span className="font-['Orbitron'] text-sm bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent">
-                    {user?.firstName || user?.name || 'Account'}
+                    {user?.firstName && user?.lastName
+                      ? `${user.firstName} ${user.lastName}`
+                      : (user?.name || user?.firstName || 'Account')}
                   </span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -192,6 +205,20 @@ const Navbar = () => {
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9z"/></svg>
                         </span>
                         <span>{t('dashboard')}</span>
+                      </Link>
+                    )}
+
+                    {user?.role === 'admin' && (
+                      <Link
+                        to="/admin/users"
+                        onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        role="menuitem"
+                      >
+                        <span className="text-cyan-300">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V20h14v-3.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V20h6v-3.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        </span>
+                        <span>{t('manageUsers')}</span>
                       </Link>
                     )}
 

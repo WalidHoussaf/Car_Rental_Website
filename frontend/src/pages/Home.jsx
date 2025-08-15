@@ -57,6 +57,11 @@ const HomePage = () => {
             loop
             playsInline
             className="w-full h-full object-cover"
+            disablePictureInPicture
+            controls={false}
+            controlsList="nodownload nofullscreen noplaybackrate noremoteplayback"
+            tabIndex={-1}
+            aria-hidden="true"
           >
             <source src={assets.hero.backgroundVideo} type="video/mp4" />
             Your browser does not support the video tag.

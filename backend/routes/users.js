@@ -1,10 +1,115 @@
 import express from 'express';
 import User from '../models/User.js';
 import Booking from '../models/Booking.js';
+import Car from '../models/Car.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 import { validateObjectId, handleValidationErrors } from '../middleware/validation.js';
 
 const router = express.Router();
+
+// Get admin dashboard stats (Admin only) - Must be before /:id route
+router.get('/dashboard/stats', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    // Get total counts
+    const totalUsers = await User.countDocuments();
+    const totalBookings = await Booking.countDocuments();
+    
+    // Get total revenue
+    const revenueResult = await Booking.aggregate([
+      { $match: { status: { $in: ['completed', 'confirmed'] } } },
+      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+    ]);
+    const revenue = revenueResult[0]?.total || 0;
+    
+    // Get total cars
+    const totalCars = await Car.countDocuments();
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        totalUsers,
+        totalBookings,
+        totalCars,
+        revenue
+      }
+    });
+  } catch (error) {
+    console.error('Get admin dashboard stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch dashboard stats',
+      error: error.message
+    });
+  }
+});
+
+// Get user dashboard stats (for current user) - Must be before /:id route
+router.get('/user/dashboard/stats', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // Get booking statistics
+    const bookingStats = await Booking.aggregate([
+      { $match: { user: userId } },
+      {
+        $group: {
+          _id: null,
+          totalBookings: { $sum: 1 },
+          totalSpent: { $sum: '$totalAmount' },
+          upcomingBookings: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ['$status', 'confirmed'] },
+                    { $gte: ['$startDate', new Date()] }
+                  ]
+                },
+                1,
+                0
+              ]
+            }
+          },
+          activeBookings: {
+            $sum: { $cond: [{ $eq: ['$status', 'active'] }, 1, 0] }
+          },
+          completedBookings: {
+            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+          }
+        }
+      }
+    ]);
+
+    const stats = bookingStats[0] || {
+      totalBookings: 0,
+      totalSpent: 0,
+      upcomingBookings: 0,
+      activeBookings: 0,
+      completedBookings: 0
+    };
+
+    // Get recent bookings
+    const recentBookings = await Booking.find({ user: userId })
+      .populate('car', 'make model year images')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        stats,
+        recentBookings
+      }
+    });
+  } catch (error) {
+    console.error('Get dashboard stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch dashboard stats',
+      error: error.message
+    });
+  }
+});
 
 // Get all users (Admin only)
 router.get('/', authenticateToken, requireAdmin, async (req, res) => {
@@ -224,72 +329,5 @@ router.delete('/:id', authenticateToken, requireAdmin, validateObjectId, handleV
   }
 });
 
-// Get user dashboard stats (for current user)
-router.get('/dashboard/stats', authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user._id;
-
-    // Get booking statistics
-    const bookingStats = await Booking.aggregate([
-      { $match: { user: userId } },
-      {
-        $group: {
-          _id: null,
-          totalBookings: { $sum: 1 },
-          totalSpent: { $sum: '$totalAmount' },
-          upcomingBookings: {
-            $sum: {
-              $cond: [
-                {
-                  $and: [
-                    { $eq: ['$status', 'confirmed'] },
-                    { $gte: ['$startDate', new Date()] }
-                  ]
-                },
-                1,
-                0
-              ]
-            }
-          },
-          activeBookings: {
-            $sum: { $cond: [{ $eq: ['$status', 'active'] }, 1, 0] }
-          },
-          completedBookings: {
-            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
-          }
-        }
-      }
-    ]);
-
-    const stats = bookingStats[0] || {
-      totalBookings: 0,
-      totalSpent: 0,
-      upcomingBookings: 0,
-      activeBookings: 0,
-      completedBookings: 0
-    };
-
-    // Get recent bookings
-    const recentBookings = await Booking.find({ user: userId })
-      .populate('car', 'make model year images')
-      .sort({ createdAt: -1 })
-      .limit(5);
-
-    res.status(200).json({
-      success: true,
-      data: {
-        stats,
-        recentBookings
-      }
-    });
-  } catch (error) {
-    console.error('Get dashboard stats error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch dashboard stats',
-      error: error.message
-    });
-  }
-});
 
 export default router;

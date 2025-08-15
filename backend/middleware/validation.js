@@ -60,8 +60,6 @@ export const validateUserRegistration = [
       return true;
     }),
   
-
-  
   body('address.street')
     .trim()
     .notEmpty()
@@ -80,7 +78,9 @@ export const validateUserRegistration = [
   body('address.zipCode')
     .trim()
     .notEmpty()
-    .withMessage('Zip code is required'),
+    .withMessage('Zip code is required')
+    .matches(/^\d{5}$/)
+    .withMessage('Zip code must be exactly 5 digits'),
   
   body('address.country')
     .trim()

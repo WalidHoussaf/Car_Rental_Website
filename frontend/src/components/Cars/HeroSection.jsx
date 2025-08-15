@@ -19,6 +19,12 @@ const HeroSection = ({ onExploreClick, onLearnMoreClick }) => {
           preload="metadata"
           onError={(e) => { if (e && e.currentTarget && e.currentTarget.style) { e.currentTarget.style.display = 'none'; } }}
           className="w-full h-full object-cover opacity-60"
+          disablePictureInPicture
+          controls={false}
+          controlsList="nodownload nofullscreen noplaybackrate noremoteplayback"
+          tabIndex={-1}
+          aria-hidden="true"
+          onContextMenu={(e) => e.preventDefault()}
         >
           <source src={assets.hero.ourfleetbg} type="video/mp4" />
           Your browser does not support the video tag.

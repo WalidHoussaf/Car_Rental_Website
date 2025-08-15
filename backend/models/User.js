@@ -37,11 +37,15 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Date of birth is required']
   },
   address: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    country: String
+    street: { type: String, trim: true },
+    city: { type: String, trim: true },
+    state: { type: String, trim: true },
+    zipCode: {
+      type: String,
+      trim: true,
+      match: [/^\d{5}$/, 'Zip code must be exactly 5 digits']
+    },
+    country: { type: String, trim: true }
   },
   role: {
     type: String,

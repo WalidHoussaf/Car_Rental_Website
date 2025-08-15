@@ -19,7 +19,7 @@ const seedData = async () => {
     console.log('Cleared existing data');
 
     // Create admin user
-    const adminPassword = await bcrypt.hash('admin123', 12);
+    const adminPassword = await bcrypt.hash('Admin123', 12);
     const adminUser = new User({
       firstName: 'Admin',
       lastName: 'User',
@@ -40,6 +40,81 @@ const seedData = async () => {
 
     await adminUser.save();
     console.log('Created admin user');
+
+    // Create sample customer users
+    const customerUsers = [
+      {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@example.com',
+        password: await bcrypt.hash('password123', 12),
+        phone: '+1234567891',
+        dateOfBirth: new Date('1985-05-15'),
+        address: {
+          street: '456 Customer St',
+          city: 'Customer City',
+          state: 'CC',
+          zipCode: '54321',
+          country: 'USA'
+        },
+        role: 'customer',
+        isVerified: true
+      },
+      {
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'jane.smith@example.com',
+        password: await bcrypt.hash('password123', 12),
+        phone: '+1234567892',
+        dateOfBirth: new Date('1990-08-22'),
+        address: {
+          street: '789 User Ave',
+          city: 'User Town',
+          state: 'UT',
+          zipCode: '67890',
+          country: 'USA'
+        },
+        role: 'customer',
+        isVerified: false
+      },
+      {
+        firstName: 'Mike',
+        lastName: 'Johnson',
+        email: 'mike.johnson@example.com',
+        password: await bcrypt.hash('password123', 12),
+        phone: '+1234567893',
+        dateOfBirth: new Date('1988-12-10'),
+        address: {
+          street: '321 Test Rd',
+          city: 'Test City',
+          state: 'TC',
+          zipCode: '13579',
+          country: 'USA'
+        },
+        role: 'customer',
+        isVerified: true
+      },
+      {
+        firstName: 'Sarah',
+        lastName: 'Wilson',
+        email: 'sarah.wilson@example.com',
+        password: await bcrypt.hash('password123', 12),
+        phone: '+1234567894',
+        dateOfBirth: new Date('1992-03-18'),
+        address: {
+          street: '654 Demo Blvd',
+          city: 'Demo City',
+          state: 'DC',
+          zipCode: '24680',
+          country: 'USA'
+        },
+        role: 'customer',
+        isVerified: false
+      }
+    ];
+
+    await User.insertMany(customerUsers);
+    console.log(`Created ${customerUsers.length} sample customer users`);
 
     // Sample cars data
     const carsData = [

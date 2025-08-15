@@ -69,11 +69,14 @@ const RegisterPage = () => {
     
     if (name.startsWith('address.')) {
       const addressField = name.split('.')[1];
+      const sanitizedValue = (addressField === 'zipCode')
+        ? value.replace(/\D/g, '').slice(0, 5)
+        : value;
       setFormData(prevData => ({
         ...prevData,
         address: {
           ...prevData.address,
-          [addressField]: value
+          [addressField]: sanitizedValue
         }
       }));
     } else {
@@ -153,6 +156,10 @@ const RegisterPage = () => {
     
     if (!formData.address.zipCode.trim()) {
       newErrors['address.zipCode'] = language === 'fr' ? 'Le code postal est requis' : 'Zip code is required';
+    } else if (!/^\d{5}$/.test(formData.address.zipCode)) {
+      newErrors['address.zipCode'] = language === 'fr' 
+        ? 'Le code postal doit comporter exactement 5 chiffres' 
+        : 'Zip code must be exactly 5 digits';
     }
     
     if (!formData.address.country.trim()) {
@@ -324,6 +331,12 @@ const RegisterPage = () => {
           loop
           playsInline
           className="w-full h-full object-cover opacity-20"
+          disablePictureInPicture
+          controls={false}
+          controlsList="nodownload nofullscreen noplaybackrate noremoteplayback"
+          tabIndex={-1}
+          aria-hidden="true"
+          onContextMenu={(e) => e.preventDefault()}
         >
           <source src={assets.hero.loginbg} type="video/mp4" />
           Your browser does not support the video tag.
@@ -363,7 +376,7 @@ const RegisterPage = () => {
           )}
 
           {/* Registration Form */}
-          <form onSubmit={handleSubmit} className="animate-fade-in relative z-10">
+          <form onSubmit={handleSubmit} noValidate className="animate-fade-in relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
               <div className="mb-5 group">
                 <label className="block text-sm font-medium text-cyan-300 mb-1.5 group-hover:text-white transition-colors">{t('firstName')}</label>
@@ -590,6 +603,9 @@ const RegisterPage = () => {
                       onChange={handleChange}
                       placeholder={language === 'fr' ? 'Code postal' : 'Zip Code'}
                       className={inputClassName('address.zipCode')}
+                      maxLength={5}
+                      inputMode="numeric"
+                      title={language === 'fr' ? 'Veuillez saisir exactement 5 chiffres' : 'Please enter exactly 5 digits'}
                       disabled={isLoading || isSuccess}
                     />
                     {errors['address.zipCode'] && <p className="text-red-500 text-xs mt-1">{errors['address.zipCode']}</p>}

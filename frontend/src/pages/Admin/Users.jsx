@@ -1,0 +1,404 @@
+import React, { useEffect, useMemo, useState, useContext, useRef } from 'react';
+import { Navigate } from 'react-router-dom';
+import { api } from '../../config/api';
+import { useNotification } from '../../context/NotificationContext';
+import AuthContext from '../../context/authContext';
+
+const PAGE_SIZE = 10;
+
+const AdminUsers = () => {
+  const { showSuccess, showError } = useNotification();
+  const { user: currentUser, isAuthenticated } = useContext(AuthContext);
+
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const roleDropdownRef = useRef(null);
+
+  const isAdmin = useMemo(() => currentUser?.role === 'admin', [currentUser]);
+
+  // Guard: only admins can view
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin) {
+      setError('Not authorized');
+    }
+  }, [isAuthenticated, isAdmin]);
+
+  // Close role dropdown on outside click or Esc
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (roleDropdownRef.current && !roleDropdownRef.current.contains(e.target)) {
+        setIsRoleDropdownOpen(false);
+      }
+    };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setIsRoleDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
+
+  const fetchUsers = async (opts = {}) => {
+    const { page: p = page, search: s = search, role: r = roleFilter } = opts;
+    setLoading(true);
+    setError('');
+    try {
+      const res = await api.users.getAll({ page: p, limit: PAGE_SIZE, search: s || undefined, role: r || undefined });
+      if (res?.success) {
+        setUsers(res.data.users || []);
+        setPage(res.data.pagination.currentPage || 1);
+        setTotalPages(res.data.pagination.totalPages || 1);
+        setTotalItems(res.data.pagination.totalItems || 0);
+      } else {
+        throw new Error(res?.message || 'Failed to load users');
+      }
+    } catch (e) {
+      setError(e.message || 'Failed to load users');
+      showError(e.message || 'Failed to load users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      fetchUsers({ page: 1 });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, isAdmin]);
+
+  const onSearch = (e) => {
+    e.preventDefault();
+    fetchUsers({ page: 1, search });
+  };
+
+  const onChangeRole = async (id, nextRole) => {
+    if (id === currentUser?._id) {
+      showError('You cannot change your own role');
+      return;
+    }
+    if (!window.confirm(`Change role to ${nextRole}?`)) return;
+    try {
+      setLoading(true);
+      await api.users.updateRole(id, nextRole);
+      showSuccess('User role updated');
+      await fetchUsers();
+    } catch (e) {
+      showError(e.message || 'Failed to update role');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onVerify = async (id) => {
+    try {
+      setLoading(true);
+      await api.users.verify(id);
+      showSuccess('User verified');
+      await fetchUsers();
+    } catch (e) {
+      showError(e.message || 'Failed to verify user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onDelete = async (id) => {
+    if (id === currentUser?._id) {
+      showError('You cannot delete your own account');
+      return;
+    }
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+    try {
+      setLoading(true);
+      await api.users.delete(id);
+      showSuccess('User deleted');
+      const newPage = users.length === 1 && page > 1 ? page - 1 : page;
+      await fetchUsers({ page: newPage });
+    } catch (e) {
+      showError(e.message || 'Failed to delete user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const RoleBadge = ({ role }) => (
+    <span className={`px-2 py-0.5 rounded text-xs ${role === 'admin' ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30' : 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30'}`}>
+      {role}
+    </span>
+  );
+
+  const VerifiedBadge = ({ ok }) => (
+    <span className={`px-2 py-0.5 rounded text-xs ${ok ? 'bg-green-600/20 text-green-300 border border-green-500/30' : 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30'}`}>
+      {ok ? 'Verified' : 'Unverified'}
+    </span>
+  );
+
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (isAuthenticated && !isAdmin) return <Navigate to="/" replace />;
+
+  return (
+    <div className="bg-black text-white min-h-screen font-['Orbitron'] relative overflow-hidden">
+      {/* Background Effects (match Dashboard) */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/95 via-black/80 to-black/95" />
+        <div
+          className="absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+      </div>
+
+      <div className="relative z-20 container mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent mb-2">User Management</h1>
+              <p className="text-gray-400 mb-3">Manage user accounts, roles, and verification status</p>
+              <div className="w-24 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-white">{totalItems}</div>
+              <div className="text-sm text-gray-400">Total Users</div>
+            </div>
+          </div>
+
+          {/* Card: Filters + Table */}
+          <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-black/40 border border-cyan-900/30 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                      <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.75 20.1a8.25 8.25 0 0116.5 0 .9.9 0 01-.9.9H4.65a.9.9 0 01-.9-.9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-white">{users.filter(u => u.role === 'customer').length}</div>
+                    <div className="text-sm text-gray-400">Customers</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-black/40 border border-purple-900/30 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                      <path fillRule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.814 3.903 10.708 9.227 12.21a.75.75 0 00.546 0C17.347 20.458 21.25 15.564 21.25 9.75a12.74 12.74 0 00-.635-4.235.75.75 0 00-.722-.515 11.209 11.209 0 01-7.877-3.08z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-white">{users.filter(u => u.role === 'admin').length}</div>
+                    <div className="text-sm text-gray-400">Admins</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-black/40 border border-green-900/30 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-green-500/15 border border-green-500/30 flex items-center justify-center text-green-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                      <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-white">{users.filter(u => u.isVerified).length}</div>
+                    <div className="text-sm text-gray-400">Verified</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Filters */}
+            <form onSubmit={onSearch} className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by name or email"
+                className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
+              />
+              <div className="relative" ref={roleDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
+                  className="w-full text-left font-['Orbitron'] bg-black/40 border border-cyan-900/30 rounded-md py-2 pl-3 pr-9 focus:ring-2 focus:ring-cyan-500 focus:outline-none text-gray-200 hover:border-cyan-600/40 transition-colors"
+                >
+                  {roleFilter === '' ? 'All roles' : roleFilter === 'customer' ? 'Customer' : 'Admin'}
+                </button>
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-cyan-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`h-4 w-4 transition-transform ${isRoleDropdownOpen ? 'rotate-180' : ''}`}>
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.17l3.71-2.94a.75.75 0 11.94 1.16l-4.18 3.31a.75.75 0 01-.94 0L5.21 8.39a.75.75 0 01.02-1.18z" clipRule="evenodd" />
+                  </svg>
+                </span>
+                
+                {/* Custom Dropdown Menu */}
+                <div
+                  className={`absolute right-0 mt-2 w-full rounded-lg overflow-hidden border border-gray-800 bg-black backdrop-blur-xl shadow-lg transition-all duration-200 z-50 ${isRoleDropdownOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+                >
+                  <div className="py-2 font-['Orbitron']">
+                    <button
+                      onClick={() => { setRoleFilter(''); setPage(1); fetchUsers({ page: 1, role: '' }); setIsRoleDropdownOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                      All roles
+                    </button>
+                    <button
+                      onClick={() => { setRoleFilter('customer'); setPage(1); fetchUsers({ page: 1, role: 'customer' }); setIsRoleDropdownOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                      Customer
+                    </button>
+                    <button
+                      onClick={() => { setRoleFilter('admin'); setPage(1); fetchUsers({ page: 1, role: 'admin' }); setIsRoleDropdownOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                      Admin
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" className="px-4 py-2 text-sm font-['Orbitron'] text-white bg-cyan-600/20 hover:bg-cyan-600/30 border border-cyan-600/40 rounded-md transition-colors cursor-pointer flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Search
+              </button>
+            </form>
+
+            {/* Table */}
+            <div className="overflow-x-auto rounded-lg border border-cyan-900/30">
+              <table className="min-w-full text-left text-sm">
+                <thead className="bg-black/60 text-gray-400 font-['Orbitron']">
+                  <tr>
+                    <th className="py-4 px-4 font-medium">User</th>
+                    <th className="py-4 px-4 font-medium">Contact</th>
+                    <th className="py-4 px-4 font-medium">Role</th>
+                    <th className="py-4 px-4 font-medium">Status</th>
+                    <th className="py-4 px-4 font-medium">Joined</th>
+                    <th className="py-4 px-4 text-right font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-cyan-900/30">
+                  {loading ? (
+                    <tr><td className="py-6 text-center text-gray-400" colSpan={6}>Loading users...</td></tr>
+                  ) : error ? (
+                    <tr><td className="py-6 text-center text-red-300" colSpan={6}>{error}</td></tr>
+                  ) : users.length === 0 ? (
+                    <tr><td className="py-6 text-center text-gray-400" colSpan={6}>No users found.</td></tr>
+                  ) : (
+                    users.map(u => (
+                      <tr key={u._id} className="border-b border-cyan-900/20 hover:bg-white/5 transition-colors">
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300 font-['Orbitron'] font-bold">
+                              {u.firstName?.[0]?.toUpperCase()}{u.lastName?.[0]?.toUpperCase()}
+                            </div>
+                            <div>
+                              <div className="text-white font-medium">{u.firstName} {u.lastName}</div>
+                              <div className="text-gray-400 text-xs font-mono">#{u._id.slice(-8)}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div>
+                            <div className="text-gray-200">{u.email}</div>
+                            <div className="text-gray-400 text-xs">{u.phone || 'No phone'}</div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4"><RoleBadge role={u.role} /></td>
+                        <td className="py-4 px-4"><VerifiedBadge ok={u.isVerified} /></td>
+                        <td className="py-4 px-4">
+                          <div className="text-gray-300">{new Date(u.createdAt).toLocaleDateString()}</div>
+                          <div className="text-gray-500 text-xs">{new Date(u.createdAt).toLocaleTimeString()}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center justify-end gap-2">
+                            {!u.isVerified && (
+                              <button onClick={() => onVerify(u._id)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-green-600/40 text-green-300 hover:bg-green-600/15 transition-colors cursor-pointer flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                                Verify
+                              </button>
+                            )}
+                            <button onClick={() => onChangeRole(u._id, u.role === 'admin' ? 'customer' : 'admin')} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                              </svg>
+                              {u.role === 'admin' ? 'Demote' : 'Promote'}
+                            </button>
+                            <button onClick={() => onDelete(u._id)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-red-600/40 text-red-300 hover:bg-red-600/15 transition-colors cursor-pointer flex items-center gap-1">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd" />
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                              </svg>
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="mt-6 flex items-center justify-between text-sm text-gray-300 bg-black/40 rounded-lg p-4 border border-cyan-900/30">
+              <div className="flex items-center gap-4">
+                <div>Showing <span className="text-white font-medium">{Math.min((page - 1) * PAGE_SIZE + 1, totalItems)}</span> to <span className="text-white font-medium">{Math.min(page * PAGE_SIZE, totalItems)}</span> of <span className="text-white font-medium">{totalItems}</span> users</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  disabled={page <= 1 || loading} 
+                  onClick={() => fetchUsers({ page: page - 1 })} 
+                  className={`px-4 py-2 rounded-md border font-['Orbitron'] transition-colors flex items-center gap-2 ${page <= 1 || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Previous
+                </button>
+                <div className="px-3 py-2 bg-cyan-600/20 border border-cyan-600/40 rounded-md text-cyan-300 font-['Orbitron']">
+                  {page} of {totalPages}
+                </div>
+                <button 
+                  disabled={page >= totalPages || loading} 
+                  onClick={() => fetchUsers({ page: page + 1 })} 
+                  className={`px-4 py-2 rounded-md border font-['Orbitron'] transition-colors flex items-center gap-2 ${page >= totalPages || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
+                >
+                  Next
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Border Glow (match Dashboard) */}
+      <div className="relative h-px w-full overflow-hidden">
+        <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse"></div>
+      </div>
+    </div>
+  );
+}
+export default AdminUsers;
