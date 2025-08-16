@@ -20,6 +20,7 @@ export const translations = {
     showLess: "Show Less",
     showMore: "Show {count} More",
     signedInAs: "Signed in as",
+    manageUsers: "Manage Users",
     
     // Home page
     exploreOurFleet: "Explore Our Fleet",
@@ -558,6 +559,7 @@ export const translations = {
     showMore: "Afficher Plus",
     showLess: "Afficher Moins",
     signedInAs: "Connecté en tant que",
+    manageUsers: "Gestion des utilisateurs",
     
     // Home page
     exploreOurFleet: "Explorer Notre Flotte",

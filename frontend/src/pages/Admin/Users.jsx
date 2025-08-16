@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { api } from '../../config/api';
 import { useNotification } from '../../context/NotificationContext';
 import AuthContext from '../../context/authContext';
+import FuturisticModal from '../../components/Ui/FuturisticModal';
 
 const PAGE_SIZE = 10;
 
@@ -13,6 +14,12 @@ const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Modals and interactions
+  const [modal, setModal] = useState({ type: null, user: null }); // type: 'verify' | 'role' | 'delete' | 'create'
+  const [processing, setProcessing] = useState(false);
+  const [roleChoice, setRoleChoice] = useState('customer');
+  const [createForm, setCreateForm] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '' });
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -89,7 +96,6 @@ const AdminUsers = () => {
       showError('You cannot change your own role');
       return;
     }
-    if (!window.confirm(`Change role to ${nextRole}?`)) return;
     try {
       setLoading(true);
       await api.users.updateRole(id, nextRole);
@@ -120,7 +126,6 @@ const AdminUsers = () => {
       showError('You cannot delete your own account');
       return;
     }
-    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
     try {
       setLoading(true);
       await api.users.delete(id);
@@ -131,6 +136,69 @@ const AdminUsers = () => {
       showError(e.message || 'Failed to delete user');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Open modal helpers
+  const openVerify = (user) => setModal({ type: 'verify', user });
+  const openRole = (user) => {
+    setRoleChoice(user?.role === 'admin' ? 'customer' : 'admin');
+    setModal({ type: 'role', user });
+  };
+  const openDelete = (user) => setModal({ type: 'delete', user });
+  const openCreate = () => setModal({ type: 'create', user: null });
+
+  // Confirm actions for modals
+  const confirmVerify = async () => {
+    if (!modal.user) return;
+    setProcessing(true);
+    try {
+      await onVerify(modal.user._id);
+      setModal({ type: null, user: null });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const confirmRoleChange = async () => {
+    if (!modal.user) return;
+    if (modal.user._id === currentUser?._id) {
+      showError('You cannot change your own role');
+      return;
+    }
+    setProcessing(true);
+    try {
+      await onChangeRole(modal.user._id, roleChoice);
+      setModal({ type: null, user: null });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!modal.user) return;
+    setProcessing(true);
+    try {
+      await onDelete(modal.user._id);
+      setModal({ type: null, user: null });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const submitCreate = async (e) => {
+    e?.preventDefault?.();
+    setProcessing(true);
+    try {
+      await api.auth.register(createForm);
+      showSuccess('User created');
+      setCreateForm({ firstName: '', lastName: '', email: '', phone: '', password: '' });
+      setModal({ type: null, user: null });
+      await fetchUsers({ page: 1 });
+    } catch (e2) {
+      showError(e2.message || 'Failed to create user');
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -150,6 +218,7 @@ const AdminUsers = () => {
   if (isAuthenticated && !isAdmin) return <Navigate to="/" replace />;
 
   return (
+    <>
     <div className="bg-black text-white min-h-screen font-['Orbitron'] relative overflow-hidden">
       {/* Background Effects (match Dashboard) */}
       <div className="absolute inset-0 z-0">
@@ -173,9 +242,22 @@ const AdminUsers = () => {
               <p className="text-gray-400 mb-3">Manage user accounts, roles, and verification status</p>
               <div className="w-24 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-white">{totalItems}</div>
-              <div className="text-sm text-gray-400">Total Users</div>
+            <div className="text-right flex items-end gap-4">
+              <div>
+                <div className="text-2xl font-bold text-white">{totalItems}</div>
+                <div className="text-sm text-gray-400">Total Users</div>
+              </div>
+              <button
+                onClick={openCreate}
+                className="px-4 py-2 rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer font-['Orbitron'] text-sm"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                    <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+                  </svg>
+                  Create User
+                </span>
+              </button>
             </div>
           </div>
 
@@ -237,7 +319,7 @@ const AdminUsers = () => {
                 <button
                   type="button"
                   onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-                  className="w-full text-left font-['Orbitron'] bg-black/40 border border-cyan-900/30 rounded-md py-2 pl-3 pr-9 focus:ring-2 focus:ring-cyan-500 focus:outline-none text-gray-200 hover:border-cyan-600/40 transition-colors"
+                  className="w-full text-left font-['Orbitron'] bg-black/40 border border-cyan-900/30 rounded-md py-2 pl-3 pr-9 focus:ring-2 focus:ring-cyan-500 focus:outline-none text-gray-200 hover:border-cyan-600/40 transition-colors cursor-pointer"
                 >
                   {roleFilter === '' ? 'All roles' : roleFilter === 'customer' ? 'Customer' : 'Admin'}
                 </button>
@@ -330,20 +412,30 @@ const AdminUsers = () => {
                         <td className="py-4 px-4">
                           <div className="flex items-center justify-end gap-2">
                             {!u.isVerified && (
-                              <button onClick={() => onVerify(u._id)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-green-600/40 text-green-300 hover:bg-green-600/15 transition-colors cursor-pointer flex items-center gap-1">
+                              <button onClick={() => openVerify(u)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-green-600/40 text-green-300 hover:bg-green-600/15 transition-colors cursor-pointer flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                                 Verify
                               </button>
                             )}
-                            <button onClick={() => onChangeRole(u._id, u.role === 'admin' ? 'customer' : 'admin')} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer flex items-center gap-1">
+                            <button onClick={() => openRole(u)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer flex items-center gap-1">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                               </svg>
-                              {u.role === 'admin' ? 'Demote' : 'Promote'}
+                              Change Role
                             </button>
-                            <button onClick={() => onDelete(u._id)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-red-600/40 text-red-300 hover:bg-red-600/15 transition-colors cursor-pointer flex items-center gap-1">
+                            <button
+                              onClick={() => openDelete(u)}
+                              disabled={u.role === 'admin'}
+                              aria-disabled={u.role === 'admin'}
+                              title={u.role === 'admin' ? 'Admins cannot be deleted' : 'Delete user'}
+                              className={`px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border transition-colors flex items-center gap-1 ${
+                                u.role === 'admin'
+                                  ? 'border-red-900/30 text-red-700/60 cursor-not-allowed opacity-60'
+                                  : 'border-red-600/40 text-red-300 hover:bg-red-600/15 cursor-pointer'
+                              }`}
+                            >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd" />
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -399,6 +491,167 @@ const AdminUsers = () => {
         <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse"></div>
       </div>
     </div>
-  );
+    
+    {/* Modals */}
+    {/* View modal removed */}
+
+    {modal.type === 'verify' && (
+      <FuturisticModal
+        open
+        onClose={() => setModal({ type: null, user: null })}
+        title="Verify User"
+        actions={[
+          { label: 'Cancel', onClick: () => setModal({ type: null, user: null }) },
+          { label: processing ? 'Verifying...' : 'Verify', onClick: confirmVerify, variant: 'primary', disabled: processing }
+        ]}
+      >
+        <p className="text-sm text-gray-300">
+          Are you sure you want to verify
+          <span className="text-white"> {modal.user.firstName} {modal.user.lastName}</span>?
+        </p>
+      </FuturisticModal>
+    )}
+
+    {modal.type === 'role' && (
+      <FuturisticModal
+        open
+        onClose={() => setModal({ type: null, user: null })}
+        title="Change User Role"
+        actions={[
+          { 
+            label: 'Cancel', 
+            onClick: () => setModal({ type: null, user: null }),
+            icon: (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            )
+          },
+          { 
+            label: processing ? 'Updating...' : `Set ${roleChoice}`,
+            onClick: confirmRoleChange,
+            variant: 'primary',
+            disabled: processing,
+            icon: (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+              </svg>
+            )
+          }
+        ]}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-300 font-['Orbitron']">Select a new role for <span className="text-white">{modal.user.firstName} {modal.user.lastName}</span>.</p>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setRoleChoice('customer')}
+              className={`px-4 py-3 rounded-md border text-sm font-['Orbitron'] cursor-pointer transition-colors ${roleChoice === 'customer' ? 'border-cyan-400 text-cyan-300 bg-cyan-600/10' : 'border-cyan-900/40 text-gray-300 hover:bg-white/5'}`}
+            >Customer</button>
+            <button
+              onClick={() => setRoleChoice('admin')}
+              className={`px-4 py-3 rounded-md border text-sm font-['Orbitron'] cursor-pointer transition-colors ${roleChoice === 'admin' ? 'border-purple-400 text-purple-300 bg-purple-600/10' : 'border-purple-900/40 text-gray-300 hover:bg-white/5'}`}
+            >Admin</button>
+          </div>
+        </div>
+      </FuturisticModal>
+    )}
+
+    {modal.type === 'delete' && (
+      <FuturisticModal
+        open
+        onClose={() => setModal({ type: null, user: null })}
+        title="Delete User"
+        actions={[
+          { 
+            label: 'Cancel', 
+            onClick: () => setModal({ type: null, user: null }),
+            icon: (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            )
+          },
+          { 
+            label: processing ? 'Deleting...' : 'Delete', 
+            onClick: confirmDelete, 
+            variant: 'danger', 
+            disabled: processing,
+            icon: (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 -0.5 21 21"
+                className="h-4 w-4"
+              >
+                <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                  <g transform="translate(-179.000000, -360.000000)" fill="currentColor">
+                    <g transform="translate(56.000000, 160.000000)">
+                      <path d="M130.35,216 L132.45,216 L132.45,208 L130.35,208 L130.35,216 Z M134.55,216 L136.65,216 L136.65,208 L134.55,208 L134.55,216 Z M128.25,218 L138.75,218 L138.75,206 L128.25,206 L128.25,218 Z M130.35,204 L136.65,204 L136.65,202 L130.35,202 L130.35,204 Z M138.75,204 L138.75,200 L128.25,200 L128.25,204 L123,204 L123,206 L126.15,206 L126.15,220 L140.85,220 L140.85,206 L144,206 L144,204 L138.75,204 Z" />
+                    </g>
+                  </g>
+                </g>
+              </svg>
+            )
+          }
+        ]}
+      >
+        <p className="text-sm text-gray-300 font-['Orbitron']">
+          This action cannot be undone. Delete
+          <span className="text-white"> {modal.user.firstName} {modal.user.lastName}</span> permanently?
+        </p>
+      </FuturisticModal>
+    )}
+
+    {modal.type === 'create' && (
+      <FuturisticModal
+        open
+        onClose={() => setModal({ type: null, user: null })}
+        title="Create New User"
+        actions={[
+          { label: 'Cancel', onClick: () => setModal({ type: null, user: null }) },
+          { label: processing ? 'Creating...' : 'Create', onClick: submitCreate, variant: 'primary', disabled: processing }
+        ]}
+      >
+        <form onSubmit={submitCreate} className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input
+            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
+            placeholder="First name"
+            value={createForm.firstName}
+            onChange={(e) => setCreateForm(f => ({ ...f, firstName: e.target.value }))}
+            required
+          />
+          <input
+            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
+            placeholder="Last name"
+            value={createForm.lastName}
+            onChange={(e) => setCreateForm(f => ({ ...f, lastName: e.target.value }))}
+            required
+          />
+          <input
+            type="email"
+            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200 md:col-span-2"
+            placeholder="Email"
+            value={createForm.email}
+            onChange={(e) => setCreateForm(f => ({ ...f, email: e.target.value }))}
+            required
+          />
+          <input
+            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
+            placeholder="Phone (optional)"
+            value={createForm.phone}
+            onChange={(e) => setCreateForm(f => ({ ...f, phone: e.target.value }))}
+          />
+          <input
+            type="password"
+            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
+            placeholder="Temporary password"
+            value={createForm.password}
+            onChange={(e) => setCreateForm(f => ({ ...f, password: e.target.value }))}
+            required
+          />
+        </form>
+      </FuturisticModal>
+    )}
+  </>
+);
 }
 export default AdminUsers;
