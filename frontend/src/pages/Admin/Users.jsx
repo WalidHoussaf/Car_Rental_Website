@@ -9,7 +9,7 @@ const PAGE_SIZE = 10;
 
 const AdminUsers = () => {
   const { showSuccess, showError } = useNotification();
-  const { user: currentUser, isAuthenticated } = useContext(AuthContext);
+  const { user: currentUser, isAuthenticated, loading: authLoading } = useContext(AuthContext);
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +19,19 @@ const AdminUsers = () => {
   const [modal, setModal] = useState({ type: null, user: null }); // type: 'verify' | 'role' | 'delete' | 'create'
   const [processing, setProcessing] = useState(false);
   const [roleChoice, setRoleChoice] = useState('customer');
-  const [createForm, setCreateForm] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '' });
+  const [createForm, setCreateForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    dateOfBirth: '',
+    street: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: ''
+  });
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -190,9 +202,49 @@ const AdminUsers = () => {
     e?.preventDefault?.();
     setProcessing(true);
     try {
-      await api.auth.register(createForm);
+      // Minimal client-side validation to match backend requirements
+      const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'password', 'dateOfBirth', 'street', 'city', 'state', 'zipCode', 'country'];
+      for (const f of requiredFields) {
+        if (!String(createForm[f] || '').trim()) {
+          setProcessing(false);
+          showError('Please fill all required fields, including Date of Birth and full address.');
+          return;
+        }
+      }
+      if (!/^\d{5}$/.test(createForm.zipCode.trim())) {
+        setProcessing(false);
+        showError('Zip code must be exactly 5 digits.');
+        return;
+      }
+      // Optional hint for password complexity
+      if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}/.test(createForm.password)) {
+        setProcessing(false);
+        showError('Password must be 6+ chars and include upper, lower, and a number.');
+        return;
+      }
+
+      const payload = {
+        firstName: createForm.firstName.trim(),
+        lastName: createForm.lastName.trim(),
+        email: createForm.email.trim().toLowerCase(),
+        password: createForm.password,
+        phone: createForm.phone.trim(),
+        dateOfBirth: createForm.dateOfBirth, // yyyy-mm-dd from input[type=date] satisfies ISO8601
+        address: {
+          street: createForm.street.trim(),
+          city: createForm.city.trim(),
+          state: createForm.state.trim(),
+          zipCode: createForm.zipCode.trim(),
+          country: createForm.country.trim(),
+        },
+      };
+
+      await api.auth.register(payload);
       showSuccess('User created');
-      setCreateForm({ firstName: '', lastName: '', email: '', phone: '', password: '' });
+      setCreateForm({
+        firstName: '', lastName: '', email: '', phone: '', password: '',
+        dateOfBirth: '', street: '', city: '', state: '', zipCode: '', country: ''
+      });
       setModal({ type: null, user: null });
       await fetchUsers({ page: 1 });
     } catch (e2) {
@@ -214,13 +266,28 @@ const AdminUsers = () => {
     </span>
   );
 
+  // Wait for auth to resolve before deciding navigation
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="flex items-center gap-3 text-cyan-300 font-['Orbitron']">
+          <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+          <span>Checking authentication…</span>
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (isAuthenticated && !isAdmin) return <Navigate to="/" replace />;
 
   return (
     <>
     <div className="bg-black text-white min-h-screen font-['Orbitron'] relative overflow-hidden">
-      {/* Background Effects (match Dashboard) */}
+      {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-black/95 via-black/80 to-black/95" />
         <div
@@ -329,7 +396,7 @@ const AdminUsers = () => {
                   </svg>
                 </span>
                 
-                {/* Custom Dropdown Menu */}
+                {/* Dropdown Menu */}
                 <div
                   className={`absolute right-0 mt-2 w-full rounded-lg overflow-hidden border border-gray-800 bg-black backdrop-blur-xl shadow-lg transition-all duration-200 z-50 ${isRoleDropdownOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
                 >
@@ -486,26 +553,42 @@ const AdminUsers = () => {
         </div>
       </div>
 
-      {/* Bottom Border Glow (match Dashboard) */}
+      {/* Bottom Border Glow */}
       <div className="relative h-px w-full overflow-hidden">
         <div className="absolute inset-0 h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse"></div>
       </div>
     </div>
     
     {/* Modals */}
-    {/* View modal removed */}
-
     {modal.type === 'verify' && (
       <FuturisticModal
         open
         onClose={() => setModal({ type: null, user: null })}
         title="Verify User"
         actions={[
-          { label: 'Cancel', onClick: () => setModal({ type: null, user: null }) },
-          { label: processing ? 'Verifying...' : 'Verify', onClick: confirmVerify, variant: 'primary', disabled: processing }
+          { 
+            label: 'Cancel', 
+            onClick: () => setModal({ type: null, user: null }),
+            icon: (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            )
+          },
+          { 
+            label: processing ? 'Verifying...' : 'Verify', 
+            onClick: confirmVerify, 
+            variant: 'success', 
+            disabled: processing,
+            icon: (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            )
+          }
         ]}
       >
-        <p className="text-sm text-gray-300">
+        <p className="text-sm text-gray-300 font-['Orbitron']">
           Are you sure you want to verify
           <span className="text-white"> {modal.user.firstName} {modal.user.lastName}</span>?
         </p>
@@ -607,47 +690,144 @@ const AdminUsers = () => {
         onClose={() => setModal({ type: null, user: null })}
         title="Create New User"
         actions={[
-          { label: 'Cancel', onClick: () => setModal({ type: null, user: null }) },
-          { label: processing ? 'Creating...' : 'Create', onClick: submitCreate, variant: 'primary', disabled: processing }
+          { 
+            label: 'Cancel', 
+            onClick: () => setModal({ type: null, user: null }),
+            icon: (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            )
+          },
+          { 
+            label: processing ? 'Creating...' : 'Create', 
+            onClick: submitCreate, 
+            variant: 'primary', 
+            disabled: processing,
+            icon: (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+              </svg>
+            )
+          }
         ]}
       >
-        <form onSubmit={submitCreate} className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input
-            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
-            placeholder="First name"
-            value={createForm.firstName}
-            onChange={(e) => setCreateForm(f => ({ ...f, firstName: e.target.value }))}
-            required
-          />
-          <input
-            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
-            placeholder="Last name"
-            value={createForm.lastName}
-            onChange={(e) => setCreateForm(f => ({ ...f, lastName: e.target.value }))}
-            required
-          />
-          <input
-            type="email"
-            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200 md:col-span-2"
-            placeholder="Email"
-            value={createForm.email}
-            onChange={(e) => setCreateForm(f => ({ ...f, email: e.target.value }))}
-            required
-          />
-          <input
-            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
-            placeholder="Phone (optional)"
-            value={createForm.phone}
-            onChange={(e) => setCreateForm(f => ({ ...f, phone: e.target.value }))}
-          />
-          <input
-            type="password"
-            className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
-            placeholder="Temporary password"
-            value={createForm.password}
-            onChange={(e) => setCreateForm(f => ({ ...f, password: e.target.value }))}
-            required
-          />
+        <form onSubmit={submitCreate} className="space-y-3">
+          {/* Personal Information */}
+          <div className="space-y-2">
+            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">Personal Information</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+                placeholder="First name"
+                value={createForm.firstName}
+                onChange={(e) => setCreateForm(f => ({ ...f, firstName: e.target.value }))}
+                autoComplete="given-name"
+                autoFocus
+                required
+              />
+              <input
+                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+                placeholder="Last name"
+                value={createForm.lastName}
+                onChange={(e) => setCreateForm(f => ({ ...f, lastName: e.target.value }))}
+                autoComplete="family-name"
+                required
+              />
+            </div>
+            <input
+              type="email"
+              className="w-full bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+              placeholder="Email address"
+              value={createForm.email}
+              onChange={(e) => setCreateForm(f => ({ ...f, email: e.target.value }))}
+              autoComplete="email"
+              required
+            />
+            <input
+              type="date"
+              className="w-full bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+              value={createForm.dateOfBirth}
+              onChange={(e) => setCreateForm(f => ({ ...f, dateOfBirth: e.target.value }))}
+              required
+            />
+          </div>
+
+          {/* Contact & Security */}
+          <div className="space-y-2">
+            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">Contact & Security</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="tel"
+                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+                placeholder="Phone"
+                value={createForm.phone}
+                onChange={(e) => setCreateForm(f => ({ ...f, phone: e.target.value }))}
+                autoComplete="tel"
+                required
+              />
+              <input
+                type="password"
+                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+                placeholder="Password"
+                value={createForm.password}
+                onChange={(e) => setCreateForm(f => ({ ...f, password: e.target.value }))}
+                autoComplete="new-password"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className="space-y-2">
+            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">Address Information</h3>
+            <input
+              className="w-full bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+              placeholder="Street address"
+              value={createForm.street}
+              onChange={(e) => setCreateForm(f => ({ ...f, street: e.target.value }))}
+              autoComplete="street-address"
+              required
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+                placeholder="City"
+                value={createForm.city}
+                onChange={(e) => setCreateForm(f => ({ ...f, city: e.target.value }))}
+                autoComplete="address-level2"
+                required
+              />
+              <input
+                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+                placeholder="State/Province"
+                value={createForm.state}
+                onChange={(e) => setCreateForm(f => ({ ...f, state: e.target.value }))}
+                autoComplete="address-level1"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+                placeholder="Zip Code"
+                value={createForm.zipCode}
+                onChange={(e) => setCreateForm(f => ({ ...f, zipCode: e.target.value }))}
+                pattern="[0-9]{5}"
+                inputMode="numeric"
+                autoComplete="postal-code"
+                required
+              />
+              <input
+                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
+                placeholder="Country"
+                value={createForm.country}
+                onChange={(e) => setCreateForm(f => ({ ...f, country: e.target.value }))}
+                autoComplete="country-name"
+                required
+              />
+            </div>
+          </div>
         </form>
       </FuturisticModal>
     )}
