@@ -4,12 +4,16 @@ import { api } from '../../config/api';
 import { useNotification } from '../../context/NotificationContext';
 import AuthContext from '../../context/authContext';
 import FuturisticModal from '../../components/Ui/FuturisticModal';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTranslations } from '../../translations';
 
 const PAGE_SIZE = 10;
 
 const AdminUsers = () => {
   const { showSuccess, showError } = useNotification();
   const { user: currentUser, isAuthenticated, loading: authLoading } = useContext(AuthContext);
+  const { language } = useLanguage();
+  const t = useTranslations(language);
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,9 +51,9 @@ const AdminUsers = () => {
   // Guard: only admins can view
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
-      setError('Not authorized');
+      setError(t('notAuthorized'));
     }
-  }, [isAuthenticated, isAdmin]);
+  }, [isAuthenticated, isAdmin, t]);
 
   // Close role dropdown on outside click or Esc
   useEffect(() => {
@@ -81,11 +85,11 @@ const AdminUsers = () => {
         setTotalPages(res.data.pagination.totalPages || 1);
         setTotalItems(res.data.pagination.totalItems || 0);
       } else {
-        throw new Error(res?.message || 'Failed to load users');
+        throw new Error(res?.message || t('failedToLoadUsers'));
       }
-    } catch (e) {
-      setError(e.message || 'Failed to load users');
-      showError(e.message || 'Failed to load users');
+    } catch {
+      setError(t('failedToLoadUsers'));
+      showError(t('failedToLoadUsers'));
     } finally {
       setLoading(false);
     }
@@ -105,16 +109,16 @@ const AdminUsers = () => {
 
   const onChangeRole = async (id, nextRole) => {
     if (id === currentUser?._id) {
-      showError('You cannot change your own role');
+      showError(t('cannotChangeOwnRole'));
       return;
     }
     try {
       setLoading(true);
       await api.users.updateRole(id, nextRole);
-      showSuccess('User role updated');
+      showSuccess(t('roleUpdated'));
       await fetchUsers();
-    } catch (e) {
-      showError(e.message || 'Failed to update role');
+    } catch {
+      showError(t('failedToUpdateRole'));
     } finally {
       setLoading(false);
     }
@@ -124,10 +128,10 @@ const AdminUsers = () => {
     try {
       setLoading(true);
       await api.users.verify(id);
-      showSuccess('User verified');
+      showSuccess(t('userVerified'));
       await fetchUsers();
-    } catch (e) {
-      showError(e.message || 'Failed to verify user');
+    } catch {
+      showError(t('failedToVerifyUser'));
     } finally {
       setLoading(false);
     }
@@ -135,17 +139,17 @@ const AdminUsers = () => {
 
   const onDelete = async (id) => {
     if (id === currentUser?._id) {
-      showError('You cannot delete your own account');
+      showError(t('cannotDeleteOwnAccount'));
       return;
     }
     try {
       setLoading(true);
       await api.users.delete(id);
-      showSuccess('User deleted');
+      showSuccess(t('userDeleted'));
       const newPage = users.length === 1 && page > 1 ? page - 1 : page;
       await fetchUsers({ page: newPage });
-    } catch (e) {
-      showError(e.message || 'Failed to delete user');
+    } catch {
+      showError(t('failedToDeleteUser'));
     } finally {
       setLoading(false);
     }
@@ -175,7 +179,7 @@ const AdminUsers = () => {
   const confirmRoleChange = async () => {
     if (!modal.user) return;
     if (modal.user._id === currentUser?._id) {
-      showError('You cannot change your own role');
+      showError(t('cannotChangeOwnRole'));
       return;
     }
     setProcessing(true);
@@ -207,19 +211,19 @@ const AdminUsers = () => {
       for (const f of requiredFields) {
         if (!String(createForm[f] || '').trim()) {
           setProcessing(false);
-          showError('Please fill all required fields, including Date of Birth and full address.');
+          showError(t('fillRequiredFields'));
           return;
         }
       }
       if (!/^\d{5}$/.test(createForm.zipCode.trim())) {
         setProcessing(false);
-        showError('Zip code must be exactly 5 digits.');
+        showError(t('invalidZipCode'));
         return;
       }
       // Optional hint for password complexity
       if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}/.test(createForm.password)) {
         setProcessing(false);
-        showError('Password must be 6+ chars and include upper, lower, and a number.');
+        showError(t('passwordRequirements'));
         return;
       }
 
@@ -229,7 +233,7 @@ const AdminUsers = () => {
         email: createForm.email.trim().toLowerCase(),
         password: createForm.password,
         phone: createForm.phone.trim(),
-        dateOfBirth: createForm.dateOfBirth, // yyyy-mm-dd from input[type=date] satisfies ISO8601
+        dateOfBirth: createForm.dateOfBirth, 
         address: {
           street: createForm.street.trim(),
           city: createForm.city.trim(),
@@ -240,15 +244,15 @@ const AdminUsers = () => {
       };
 
       await api.auth.register(payload);
-      showSuccess('User created');
+      showSuccess(t('userCreated'));
       setCreateForm({
         firstName: '', lastName: '', email: '', phone: '', password: '',
         dateOfBirth: '', street: '', city: '', state: '', zipCode: '', country: ''
       });
       setModal({ type: null, user: null });
       await fetchUsers({ page: 1 });
-    } catch (e2) {
-      showError(e2.message || 'Failed to create user');
+    } catch {
+      showError(t('failedToCreateUser'));
     } finally {
       setProcessing(false);
     }
@@ -256,13 +260,13 @@ const AdminUsers = () => {
 
   const RoleBadge = ({ role }) => (
     <span className={`px-2 py-0.5 rounded text-xs ${role === 'admin' ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30' : 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30'}`}>
-      {role}
+      {role === 'admin' ? t('admin') : t('customer')}
     </span>
   );
 
   const VerifiedBadge = ({ ok }) => (
     <span className={`px-2 py-0.5 rounded text-xs ${ok ? 'bg-green-600/20 text-green-300 border border-green-500/30' : 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30'}`}>
-      {ok ? 'Verified' : 'Unverified'}
+      {ok ? t('verified') : t('unverified')}
     </span>
   );
 
@@ -275,7 +279,7 @@ const AdminUsers = () => {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
           </svg>
-          <span>Checking authentication…</span>
+          <span>{t('checkingAuthentication')}</span>
         </div>
       </div>
     );
@@ -305,14 +309,14 @@ const AdminUsers = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent mb-2">User Management</h1>
-              <p className="text-gray-400 mb-3">Manage user accounts, roles, and verification status</p>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent mb-2">{t('userManagement')}</h1>
+              <p className="text-gray-400 mb-3">{t('userdescription')}</p>
               <div className="w-24 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
             </div>
             <div className="text-right flex items-end gap-4">
               <div>
                 <div className="text-2xl font-bold text-white">{totalItems}</div>
-                <div className="text-sm text-gray-400">Total Users</div>
+                <div className="text-sm text-gray-400">{t('totalUsers')}</div>
               </div>
               <button
                 onClick={openCreate}
@@ -322,7 +326,7 @@ const AdminUsers = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
                     <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
                   </svg>
-                  Create User
+                  {t('createUser')}
                 </span>
               </button>
             </div>
@@ -341,7 +345,7 @@ const AdminUsers = () => {
                   </div>
                   <div>
                     <div className="text-xl font-bold text-white">{users.filter(u => u.role === 'customer').length}</div>
-                    <div className="text-sm text-gray-400">Customers</div>
+                    <div className="text-sm text-gray-400">{t('customers')}</div>
                   </div>
                 </div>
               </div>
@@ -354,7 +358,7 @@ const AdminUsers = () => {
                   </div>
                   <div>
                     <div className="text-xl font-bold text-white">{users.filter(u => u.role === 'admin').length}</div>
-                    <div className="text-sm text-gray-400">Admins</div>
+                    <div className="text-sm text-gray-400">{t('admins')}</div>
                   </div>
                 </div>
               </div>
@@ -367,7 +371,7 @@ const AdminUsers = () => {
                   </div>
                   <div>
                     <div className="text-xl font-bold text-white">{users.filter(u => u.isVerified).length}</div>
-                    <div className="text-sm text-gray-400">Verified</div>
+                    <div className="text-sm text-gray-400">{t('verified')}</div>
                   </div>
                 </div>
               </div>
@@ -379,7 +383,7 @@ const AdminUsers = () => {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name or email"
+                placeholder={t('searchfield')}
                 className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-gray-200"
               />
               <div className="relative" ref={roleDropdownRef}>
@@ -388,7 +392,7 @@ const AdminUsers = () => {
                   onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
                   className="w-full text-left font-['Orbitron'] bg-black/40 border border-cyan-900/30 rounded-md py-2 pl-3 pr-9 focus:ring-2 focus:ring-cyan-500 focus:outline-none text-gray-200 hover:border-cyan-600/40 transition-colors cursor-pointer"
                 >
-                  {roleFilter === '' ? 'All roles' : roleFilter === 'customer' ? 'Customer' : 'Admin'}
+                  {roleFilter === '' ? t('allRoles') : roleFilter === 'customer' ? t('customers') : t('admins')}
                 </button>
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-cyan-300">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`h-4 w-4 transition-transform ${isRoleDropdownOpen ? 'rotate-180' : ''}`}>
@@ -405,19 +409,19 @@ const AdminUsers = () => {
                       onClick={() => { setRoleFilter(''); setPage(1); fetchUsers({ page: 1, role: '' }); setIsRoleDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
-                      All roles
+                      {t('allRoles')}
                     </button>
                     <button
                       onClick={() => { setRoleFilter('customer'); setPage(1); fetchUsers({ page: 1, role: 'customer' }); setIsRoleDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
-                      Customer
+                      {t('customers')}
                     </button>
                     <button
                       onClick={() => { setRoleFilter('admin'); setPage(1); fetchUsers({ page: 1, role: 'admin' }); setIsRoleDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
-                      Admin
+                      {t('admins')}
                     </button>
                   </div>
                 </div>
@@ -426,7 +430,7 @@ const AdminUsers = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                Search
+                {t('search')}
               </button>
             </form>
 
@@ -435,21 +439,21 @@ const AdminUsers = () => {
               <table className="min-w-full text-left text-sm">
                 <thead className="bg-black/60 text-gray-400 font-['Orbitron']">
                   <tr>
-                    <th className="py-4 px-4 font-medium">User</th>
-                    <th className="py-4 px-4 font-medium">Contact</th>
-                    <th className="py-4 px-4 font-medium">Role</th>
-                    <th className="py-4 px-4 font-medium">Status</th>
-                    <th className="py-4 px-4 font-medium">Joined</th>
-                    <th className="py-4 px-4 text-right font-medium">Actions</th>
+                    <th className="py-4 px-4 font-medium">{t('user')}</th>
+                    <th className="py-4 px-4 font-medium">{t('contact')}</th>
+                    <th className="py-4 px-4 font-medium">{t('role')}</th>
+                    <th className="py-4 px-4 font-medium">{t('status')}</th>
+                    <th className="py-4 px-4 font-medium">{t('joined')}</th>
+                    <th className="py-4 px-4 text-right font-medium">{t('actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-cyan-900/30">
                   {loading ? (
-                    <tr><td className="py-6 text-center text-gray-400" colSpan={6}>Loading users...</td></tr>
+                    <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('loadingUsers')}</td></tr>
                   ) : error ? (
-                    <tr><td className="py-6 text-center text-red-300" colSpan={6}>{error}</td></tr>
+                    <tr><td className="py-6 text-center text-red-300" colSpan={6}>{t('errorLoadingUsers')}</td></tr>
                   ) : users.length === 0 ? (
-                    <tr><td className="py-6 text-center text-gray-400" colSpan={6}>No users found.</td></tr>
+                    <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('noUsers')}</td></tr>
                   ) : (
                     users.map(u => (
                       <tr key={u._id} className="border-b border-cyan-900/20 hover:bg-white/5 transition-colors">
@@ -470,8 +474,8 @@ const AdminUsers = () => {
                             <div className="text-gray-400 text-xs">{u.phone || 'No phone'}</div>
                           </div>
                         </td>
-                        <td className="py-4 px-4"><RoleBadge role={u.role} /></td>
-                        <td className="py-4 px-4"><VerifiedBadge ok={u.isVerified} /></td>
+                        <td className="py-4 px-4 uppercase"><RoleBadge role={u.role} /></td>
+                        <td className="py-4 px-4 uppercase"><VerifiedBadge ok={u.isVerified} /></td>
                         <td className="py-4 px-4">
                           <div className="text-gray-300">{new Date(u.createdAt).toLocaleDateString()}</div>
                           <div className="text-gray-500 text-xs">{new Date(u.createdAt).toLocaleTimeString()}</div>
@@ -479,25 +483,25 @@ const AdminUsers = () => {
                         <td className="py-4 px-4">
                           <div className="flex items-center justify-end gap-2">
                             {!u.isVerified && (
-                              <button onClick={() => openVerify(u)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-green-600/40 text-green-300 hover:bg-green-600/15 transition-colors cursor-pointer flex items-center gap-1">
+                              <button onClick={() => openVerify(u)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-green-600/40 text-green-300 hover:bg-green-600/15 transition-colors cursor-pointer flex items-center gap-1 uppercase">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
-                                Verify
+                                {t('verify')}
                               </button>
                             )}
-                            <button onClick={() => openRole(u)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer flex items-center gap-1">
+                            <button onClick={() => openRole(u)} className="px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer flex items-center gap-1 uppercase">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                               </svg>
-                              Change Role
+                              {t('changeRole')}
                             </button>
                             <button
                               onClick={() => openDelete(u)}
                               disabled={u.role === 'admin'}
                               aria-disabled={u.role === 'admin'}
-                              title={u.role === 'admin' ? 'Admins cannot be deleted' : 'Delete user'}
-                              className={`px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border transition-colors flex items-center gap-1 ${
+                              title={u.role === 'admin' ? t('adminsCannotBeDeleted') : t('deleteUser')}
+                              className={`px-3 py-1.5 text-xs font-['Orbitron'] rounded-md border transition-colors flex items-center gap-1 uppercase ${
                                 u.role === 'admin'
                                   ? 'border-red-900/30 text-red-700/60 cursor-not-allowed opacity-60'
                                   : 'border-red-600/40 text-red-300 hover:bg-red-600/15 cursor-pointer'
@@ -507,7 +511,7 @@ const AdminUsers = () => {
                                 <path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd" />
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                               </svg>
-                              Delete
+                              {t('delete')}
                             </button>
                           </div>
                         </td>
@@ -521,7 +525,7 @@ const AdminUsers = () => {
             {/* Pagination */}
             <div className="mt-6 flex items-center justify-between text-sm text-gray-300 bg-black/40 rounded-lg p-4 border border-cyan-900/30">
               <div className="flex items-center gap-4">
-                <div>Showing <span className="text-white font-medium">{Math.min((page - 1) * PAGE_SIZE + 1, totalItems)}</span> to <span className="text-white font-medium">{Math.min(page * PAGE_SIZE, totalItems)}</span> of <span className="text-white font-medium">{totalItems}</span> users</div>
+                <div>{t('showing')} <span className="text-white font-medium">{Math.min((page - 1) * PAGE_SIZE + 1, totalItems)}</span> {t('to')} <span className="text-white font-medium">{Math.min(page * PAGE_SIZE, totalItems)}</span> {t('of')} <span className="text-white font-medium">{totalItems}</span> {t('users')} </div>
               </div>
               <div className="flex items-center gap-2">
                 <button 
@@ -532,17 +536,17 @@ const AdminUsers = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  Previous
+                  {t('previous')}
                 </button>
                 <div className="px-3 py-2 bg-cyan-600/20 border border-cyan-600/40 rounded-md text-cyan-300 font-['Orbitron']">
-                  {page} of {totalPages}
+                  {page} {t('of')} {totalPages}
                 </div>
                 <button 
                   disabled={page >= totalPages || loading} 
                   onClick={() => fetchUsers({ page: page + 1 })} 
                   className={`px-4 py-2 rounded-md border font-['Orbitron'] transition-colors flex items-center gap-2 ${page >= totalPages || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
                 >
-                  Next
+                  {t('next')}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -564,10 +568,10 @@ const AdminUsers = () => {
       <FuturisticModal
         open
         onClose={() => setModal({ type: null, user: null })}
-        title="Verify User"
+        title={t('verifyUser')}
         actions={[
           { 
-            label: 'Cancel', 
+            label: t('cancel'), 
             onClick: () => setModal({ type: null, user: null }),
             icon: (
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
@@ -576,7 +580,7 @@ const AdminUsers = () => {
             )
           },
           { 
-            label: processing ? 'Verifying...' : 'Verify', 
+            label: processing ? t('verifying') : t('verify'), 
             onClick: confirmVerify, 
             variant: 'success', 
             disabled: processing,
@@ -589,7 +593,7 @@ const AdminUsers = () => {
         ]}
       >
         <p className="text-sm text-gray-300 font-['Orbitron']">
-          Are you sure you want to verify
+          {t('verifyUserText')}
           <span className="text-white"> {modal.user.firstName} {modal.user.lastName}</span>?
         </p>
       </FuturisticModal>
@@ -599,10 +603,10 @@ const AdminUsers = () => {
       <FuturisticModal
         open
         onClose={() => setModal({ type: null, user: null })}
-        title="Change User Role"
+        title={t('changeUserRole')}
         actions={[
           { 
-            label: 'Cancel', 
+            label: t('cancel'), 
             onClick: () => setModal({ type: null, user: null }),
             icon: (
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
@@ -611,7 +615,7 @@ const AdminUsers = () => {
             )
           },
           { 
-            label: processing ? 'Updating...' : `Set ${roleChoice}`,
+            label: processing ? t('updating') : t('setRoleTo', { role: t(roleChoice) }),
             onClick: confirmRoleChange,
             variant: 'primary',
             disabled: processing,
@@ -624,16 +628,16 @@ const AdminUsers = () => {
         ]}
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-300 font-['Orbitron']">Select a new role for <span className="text-white">{modal.user.firstName} {modal.user.lastName}</span>.</p>
+          <p className="text-sm text-gray-300 font-['Orbitron']">{t('changeUserRoleText')} <span className="text-white">{modal.user.firstName} {modal.user.lastName}</span>.</p>
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setRoleChoice('customer')}
               className={`px-4 py-3 rounded-md border text-sm font-['Orbitron'] cursor-pointer transition-colors ${roleChoice === 'customer' ? 'border-cyan-400 text-cyan-300 bg-cyan-600/10' : 'border-cyan-900/40 text-gray-300 hover:bg-white/5'}`}
-            >Customer</button>
+            >{t('customer')}</button>
             <button
               onClick={() => setRoleChoice('admin')}
               className={`px-4 py-3 rounded-md border text-sm font-['Orbitron'] cursor-pointer transition-colors ${roleChoice === 'admin' ? 'border-purple-400 text-purple-300 bg-purple-600/10' : 'border-purple-900/40 text-gray-300 hover:bg-white/5'}`}
-            >Admin</button>
+            >{t('admin')}</button>
           </div>
         </div>
       </FuturisticModal>
@@ -643,10 +647,10 @@ const AdminUsers = () => {
       <FuturisticModal
         open
         onClose={() => setModal({ type: null, user: null })}
-        title="Delete User"
+        title={t('deleteUser')}
         actions={[
           { 
-            label: 'Cancel', 
+            label: t('cancel'), 
             onClick: () => setModal({ type: null, user: null }),
             icon: (
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
@@ -655,7 +659,7 @@ const AdminUsers = () => {
             )
           },
           { 
-            label: processing ? 'Deleting...' : 'Delete', 
+            label: processing ? t('deleting') : t('delete'), 
             onClick: confirmDelete, 
             variant: 'danger', 
             disabled: processing,
@@ -678,8 +682,8 @@ const AdminUsers = () => {
         ]}
       >
         <p className="text-sm text-gray-300 font-['Orbitron']">
-          This action cannot be undone. Delete
-          <span className="text-white"> {modal.user.firstName} {modal.user.lastName}</span> permanently?
+          {t('deleteUserText')}
+          <span className="text-red-600 uppercase"> {modal.user.firstName} {modal.user.lastName}</span> ?
         </p>
       </FuturisticModal>
     )}
@@ -688,10 +692,10 @@ const AdminUsers = () => {
       <FuturisticModal
         open
         onClose={() => setModal({ type: null, user: null })}
-        title="Create New User"
+        title={t('createNewUser')}
         actions={[
           { 
-            label: 'Cancel', 
+            label: t('cancel'), 
             onClick: () => setModal({ type: null, user: null }),
             icon: (
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
@@ -700,7 +704,7 @@ const AdminUsers = () => {
             )
           },
           { 
-            label: processing ? 'Creating...' : 'Create', 
+            label: processing ? t('creating') : t('create'), 
             onClick: submitCreate, 
             variant: 'primary', 
             disabled: processing,
@@ -715,11 +719,11 @@ const AdminUsers = () => {
         <form onSubmit={submitCreate} className="space-y-3">
           {/* Personal Information */}
           <div className="space-y-2">
-            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">Personal Information</h3>
+            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">{t('personalInformation')}</h3>
             <div className="grid grid-cols-2 gap-2">
               <input
                 className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder="First name"
+                placeholder={t('firstName')}
                 value={createForm.firstName}
                 onChange={(e) => setCreateForm(f => ({ ...f, firstName: e.target.value }))}
                 autoComplete="given-name"
@@ -728,7 +732,7 @@ const AdminUsers = () => {
               />
               <input
                 className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder="Last name"
+                placeholder={t('lastName')}
                 value={createForm.lastName}
                 onChange={(e) => setCreateForm(f => ({ ...f, lastName: e.target.value }))}
                 autoComplete="family-name"
@@ -738,7 +742,7 @@ const AdminUsers = () => {
             <input
               type="email"
               className="w-full bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-              placeholder="Email address"
+              placeholder={t('emailAddress')}
               value={createForm.email}
               onChange={(e) => setCreateForm(f => ({ ...f, email: e.target.value }))}
               autoComplete="email"
@@ -755,12 +759,12 @@ const AdminUsers = () => {
 
           {/* Contact & Security */}
           <div className="space-y-2">
-            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">Contact & Security</h3>
+            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">{t('contactSecurity')}</h3>
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="tel"
                 className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder="Phone"
+                placeholder={t('phone')}
                 value={createForm.phone}
                 onChange={(e) => setCreateForm(f => ({ ...f, phone: e.target.value }))}
                 autoComplete="tel"
@@ -769,7 +773,7 @@ const AdminUsers = () => {
               <input
                 type="password"
                 className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder="Password"
+                placeholder={t('password')}
                 value={createForm.password}
                 onChange={(e) => setCreateForm(f => ({ ...f, password: e.target.value }))}
                 autoComplete="new-password"
@@ -780,10 +784,10 @@ const AdminUsers = () => {
 
           {/* Address */}
           <div className="space-y-2">
-            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">Address Information</h3>
+            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">{t('addressInformation')}</h3>
             <input
               className="w-full bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-              placeholder="Street address"
+              placeholder={t('streetAddress')}
               value={createForm.street}
               onChange={(e) => setCreateForm(f => ({ ...f, street: e.target.value }))}
               autoComplete="street-address"
@@ -792,7 +796,7 @@ const AdminUsers = () => {
             <div className="grid grid-cols-2 gap-2">
               <input
                 className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder="City"
+                placeholder={t('city')}
                 value={createForm.city}
                 onChange={(e) => setCreateForm(f => ({ ...f, city: e.target.value }))}
                 autoComplete="address-level2"
@@ -800,7 +804,7 @@ const AdminUsers = () => {
               />
               <input
                 className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder="State/Province"
+                placeholder={t('stateProvince')}
                 value={createForm.state}
                 onChange={(e) => setCreateForm(f => ({ ...f, state: e.target.value }))}
                 autoComplete="address-level1"
@@ -810,7 +814,7 @@ const AdminUsers = () => {
             <div className="grid grid-cols-2 gap-2">
               <input
                 className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder="Zip Code"
+                placeholder={t('zipCode')}
                 value={createForm.zipCode}
                 onChange={(e) => setCreateForm(f => ({ ...f, zipCode: e.target.value }))}
                 pattern="[0-9]{5}"
@@ -820,7 +824,7 @@ const AdminUsers = () => {
               />
               <input
                 className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder="Country"
+                placeholder={t('country')}
                 value={createForm.country}
                 onChange={(e) => setCreateForm(f => ({ ...f, country: e.target.value }))}
                 autoComplete="country-name"
