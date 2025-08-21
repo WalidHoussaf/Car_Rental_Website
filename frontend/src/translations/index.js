@@ -262,6 +262,24 @@ export const translations = {
     verifyUser: "Verify user",
     setRoleTo: "Set role to",
     roleChoice: "Select role",
+
+    // Booking Management Section
+    bookingManagement: "Booking Management",
+    manageAllBookings: "Manage all bookings",
+    totalBookings: "Total bookings",
+    pending: "Pending",
+    confirmed: "Confirmed",
+    active: "Active",
+    completed: "Completed",
+    cancelled: "Cancelled",
+    allStatuses: "All statuses",
+    bookingId: "Booking ID",
+    car: "Car",
+    bookings: "Bookings",
+    loadingGeneric: "Loading...",
+    noBookingsFound: "No bookings found",
+    failedToLoadBookings: "Failed to load bookings",
+    currencySymbol: "MAD ",
     
     // Availability Section
     availability: "Availability",
@@ -875,6 +893,24 @@ export const translations = {
     verifyUser: "Vérifier l'utilisateur",
     setRoleTo: "Modifier le rôle",
     roleChoice: "Selectionnez un rôle",
+
+     // Booking Management Section
+     bookingManagement: "Gestion des réservations",
+     manageAllBookings: "Gérer toutes les réservations",
+     totalBookings: "Nombre total de réservations",
+     pending: "En attente",
+     confirmed: "Confirmé",
+     active: "Actif",
+     completed: "Completé",
+     cancelled: "Annulé",
+     allStatuses: "Tous les statuts",
+     bookingId: " ID de la réservation",
+     car: "Véhicule",
+     bookings: "Réservations",
+     loadingGeneric: "Chargement...",
+     noBookingsFound: "Aucune réservation trouvée",
+     failedToLoadBookings: "Échec du chargement des réservations",
+     currencySymbol: "MAD ",
 
     // Availability Section
     availability: "Disponibilité",

@@ -120,7 +120,7 @@ const BookingConfirmation = () => {
     const receiptGenerator = new ReceiptGenerator(language, t);
     
     const onSuccess = () => {
-      console.log("Receipt generated successfully.");
+      // Receipt generated successfully
     };
 
     const onError = (error) => {

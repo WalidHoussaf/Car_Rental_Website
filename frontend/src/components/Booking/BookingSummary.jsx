@@ -47,17 +47,13 @@ const CustomRadio = ({ id, name, value, checked, onChange, children }) => (
 const resolvePath = (path) => {
   if (!path || typeof path !== 'string') return null;
   
-  console.log('Resolving path:', path);
-  
   // If it's a reference to assets (format: "cars.tesla")
   if (path.includes('.')) {
     const parts = path.split('.');
     if (parts.length === 2) {
       const category = parts[0];
       const key = parts[1];
-      console.log('Trying to resolve from assets:', category, key);
       const result = assets[category] && assets[category][key];
-      console.log('Result:', result);
       return result;
     }
   }
@@ -77,26 +73,21 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
   useEffect(() => {
     if (!car) return;
     
-    console.log('Car data:', car);
-    
     let image = null;
     
     // Attempt 1: Use car.image if it's an asset reference
     if (car.image && typeof car.image === 'string' && car.image.includes('.')) {
-      console.log('Trying to resolve from car.image:', car.image);
       image = resolvePath(car.image);
     }
     
     // Attempt 2: Look up by ID (car1, car2, etc.)
     if (!image && car.id && assets.cars[`car${car.id}`]) {
-      console.log('Resolving from car ID:', car.id);
       image = assets.cars[`car${car.id}`];
     }
     
     // Attempt 3: Look up by brand name
     if (!image && car.name) {
       const carBrand = car.name.toLowerCase().split(' ')[0];
-      console.log('Trying to resolve by car brand:', carBrand);
       
       if (carBrand === 'tesla' && assets.cars.tesla) {
         image = assets.cars.tesla;
@@ -107,7 +98,6 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
       }
     }
     
-    console.log('Final resolved image:', image);
     setCarImage(image);
   }, [car]);
   
@@ -177,7 +167,6 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
                   alt={car.name} 
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    console.log("Image failed to load:", carImage);
                     e.target.onerror = null;
                     e.target.src = `https://via.placeholder.com/100x100/0f172a/22d3ee?text=${encodeURIComponent(car.name.split(' ')[0])}`;
                   }}

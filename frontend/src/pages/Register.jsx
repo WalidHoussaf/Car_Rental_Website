@@ -54,7 +54,6 @@ const RegisterPage = () => {
   // Redirect if already authenticated 
   React.useEffect(() => {
     if (isAuthenticated && user && !isLoading && !isSuccess) {
-      console.log('🔀 User already authenticated, redirecting...');
       if (user.role === 'admin') {
         navigate('/dashboard', { replace: true });
       } else {

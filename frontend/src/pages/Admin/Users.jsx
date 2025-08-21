@@ -309,7 +309,7 @@ const AdminUsers = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent mb-2">{t('userManagement')}</h1>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent mb-2 leading-tight">{t('userManagement')}</h1>
               <p className="text-gray-400 mb-3">{t('userdescription')}</p>
               <div className="w-24 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
             </div>
@@ -594,7 +594,7 @@ const AdminUsers = () => {
       >
         <p className="text-sm text-gray-300 font-['Orbitron']">
           {t('verifyUserText')}
-          <span className="text-white"> {modal.user.firstName} {modal.user.lastName}</span>?
+          <span className="text-green-600"> {modal.user.firstName} {modal.user.lastName}</span>?
         </p>
       </FuturisticModal>
     )}
@@ -628,7 +628,7 @@ const AdminUsers = () => {
         ]}
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-300 font-['Orbitron']">{t('changeUserRoleText')} <span className="text-white">{modal.user.firstName} {modal.user.lastName}</span>.</p>
+          <p className="text-sm text-gray-300 font-['Orbitron']">{t('changeUserRoleText')} <span className="text-yellow-500">{modal.user.firstName} {modal.user.lastName}</span>.</p>
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setRoleChoice('customer')}
@@ -683,7 +683,7 @@ const AdminUsers = () => {
       >
         <p className="text-sm text-gray-300 font-['Orbitron']">
           {t('deleteUserText')}
-          <span className="text-red-600 uppercase"> {modal.user.firstName} {modal.user.lastName}</span> ?
+          <span className="text-red-600"> {modal.user.firstName} {modal.user.lastName}</span> ?
         </p>
       </FuturisticModal>
     )}

@@ -9,7 +9,6 @@ const NewsletterSection = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Email submitted:', email);
     setEmail('');
   };
 
@@ -17,7 +16,6 @@ const NewsletterSection = () => {
     <section className="relative py-16 px-4 bg-black overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 via-black to-purple-900/10 pointer-events-none"></div>
-     
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-6">
           <div className="inline-block">
@@ -35,7 +33,6 @@ const NewsletterSection = () => {
         <div className="relative max-w-2xl mx-auto">
           {/* Tech Border */}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-white rounded-lg opacity-50 blur-sm group-hover:opacity-75 transition duration-300"></div>
-         
           <form onSubmit={handleSubmit} className="relative flex flex-col sm:flex-row gap-4 justify-center bg-black/50 p-2 rounded-lg backdrop-blur-sm border border-gray-800">
             <input
               type="email"
@@ -49,9 +46,7 @@ const NewsletterSection = () => {
               type="submit"
               className="group relative px-6 py-3 bg-gradient-to-r from-cyan-400 to-white text-black font-medium rounded-md transition-all duration-300 transform hover:scale-105 overflow-hidden font-['Orbitron'] cursor-pointer"
             >
-             
               <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 via-cyan-400/30 to-purple-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
-             
               <span className="relative z-10 flex items-center justify-center pl-2">
                 {t('subscribe')}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 transform transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">

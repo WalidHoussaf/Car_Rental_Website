@@ -101,12 +101,26 @@ export const api = {
   // Booking endpoints
   bookings: {
     getMyBookings: (params = {}) => {
-      const queryString = new URLSearchParams(params).toString();
+      // Clean params to avoid sending undefined/null/empty values
+      const cleanParams = {};
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          cleanParams[key] = params[key];
+        }
+      });
+      const queryString = new URLSearchParams(cleanParams).toString();
       return createApiRequest(`/bookings/my-bookings${queryString ? `?${queryString}` : ''}`);
     },
     
     getAll: (params = {}) => {
-      const queryString = new URLSearchParams(params).toString();
+      // Clean params to avoid sending undefined/null/empty values (e.g., status=undefined)
+      const cleanParams = {};
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+          cleanParams[key] = params[key];
+        }
+      });
+      const queryString = new URLSearchParams(cleanParams).toString();
       return createApiRequest(`/bookings/all${queryString ? `?${queryString}` : ''}`);
     },
     

@@ -252,8 +252,7 @@ const Dashboard = () => {
               {language === 'fr' ? 'Actions rapides' : 'Quick Actions'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
-            <button className="p-4 bg-cyan-600/15 hover:bg-cyan-600/25 border border-cyan-600/30 rounded-lg transition-colors text-left group cursor-pointer">
+            <button onClick={() => navigate('/admin/users')} className="p-4 bg-cyan-600/15 hover:bg-cyan-600/25 border border-cyan-600/30 rounded-lg transition-colors text-left group cursor-pointer">
                 <div className="flex items-center gap-3 mb-1">
                   <div className="h-9 w-9 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
                     {/* Users icon */}
@@ -264,7 +263,7 @@ const Dashboard = () => {
                 <p className="text-sm text-gray-400">{language === 'fr' ? 'Gérer les utilisateurs' : 'Manage users'}</p>
               </button>
               
-              <button className="p-4 bg-blue-600/15 hover:bg-blue-600/25 border border-blue-600/30 rounded-lg transition-colors text-left group cursor-pointer">
+              <button onClick={() => navigate('/admin/bookings')} className="p-4 bg-blue-600/15 hover:bg-blue-600/25 border border-blue-600/30 rounded-lg transition-colors text-left group cursor-pointer">
                 <div className="flex items-center gap-3 mb-1">
                   <div className="h-9 w-9 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-300">
                     {/* Clipboard list icon */}
