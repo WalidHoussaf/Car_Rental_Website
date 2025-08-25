@@ -61,8 +61,15 @@ const MyBookings = () => {
         setIsStatusDropdownOpen(false);
       }
     };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setIsStatusDropdownOpen(false);
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
   }, []);
 
   const StatusBadge = ({ status }) => {
@@ -183,14 +190,14 @@ const MyBookings = () => {
             </div>
 
             {/* Filters */}
-            <div className="mb-6">
+            <div className="mb-6 flex justify-end">
               <div className="relative" ref={statusDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                   className="w-full sm:w-64 text-left font-['Orbitron'] bg-black/40 border border-cyan-900/30 rounded-md py-2 pl-3 pr-9 focus:ring-2 focus:ring-cyan-500 focus:outline-none text-gray-200 hover:border-cyan-600/40 transition-colors cursor-pointer"
                 >
-                  {status === '' ? (t('allStatuses') || 'All Statuses') : (t(status) || status)}
+                  {status === '' ? t('allStatuses') : (t(status) || status)}
                 </button>
                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-cyan-300">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`h-4 w-4 transition-transform ${isStatusDropdownOpen ? 'rotate-180' : ''}`}>
@@ -269,7 +276,7 @@ const MyBookings = () => {
                         <td className="py-4 px-4">
                           <div>
                             <div className="text-white font-medium">#{booking._id.slice(-8)}</div>
-                            <div className="text-gray-400 text-xs font-mono">{new Date(booking.createdAt).toLocaleDateString()}</div>
+                            <div className="text-gray-400 text-xs font-['Orbitron']">{new Date(booking.createdAt).toLocaleDateString()}</div>
                           </div>
                         </td>
                         <td className="py-4 px-4">

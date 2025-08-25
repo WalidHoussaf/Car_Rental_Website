@@ -20,7 +20,7 @@ export const translations = {
     showLess: "Show Less",
     showMore: "Show {count} More",
     signedInAs: "Signed in as",
-    manageUsers: "Manage Users",
+    manageUsers: "Users Management",
     
     // Home page
     exploreOurFleet: "Explore Our Fleet",
@@ -280,6 +280,8 @@ export const translations = {
     noBookingsFound: "No bookings found",
     failedToLoadBookings: "Failed to load bookings",
     currencySymbol: "MAD ",
+    myBookingsDesc: "Review and manage your reservations.",
+    booking: "Booking",
     
     // Availability Section
     availability: "Availability",
@@ -911,6 +913,8 @@ export const translations = {
      noBookingsFound: "Aucune réservation trouvée",
      failedToLoadBookings: "Échec du chargement des réservations",
      currencySymbol: "MAD ",
+     booking: "Réservation",
+     myBookingsDesc: "Revue et gestion de vos réservations.",
 
     // Availability Section
     availability: "Disponibilité",

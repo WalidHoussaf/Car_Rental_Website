@@ -222,6 +222,20 @@ const Navbar = () => {
                       </Link>
                     )}
 
+                    {user?.role === 'admin' && (
+                      <Link
+                        to="/admin/bookings"
+                        onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        role="menuitem"
+                      >
+                        <span className="text-cyan-300">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M5 4h14a1 1 0 011 1v14l-4-3-4 3-4-3-4 3V5a1 1 0 011-1z"/></svg>
+                        </span>
+                        <span>{t('bookingManagement')}</span>
+                      </Link>
+                    )}
+
                     <Link
                       to="/my-bookings"
                       onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
