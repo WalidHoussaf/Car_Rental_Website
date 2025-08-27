@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Select from 'react-select';
 import { assets } from '../assets/assets';
 
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
 
 import GlowingGrid from '../components/Ui/GlowingGrid';

@@ -5,7 +5,7 @@ import HeroSection from '../components/CarsDetails/HeroSection';
 import PerformanceStats from '../components/CarsDetails/PerformanceStats';
 import AvailabilitySection from '../components/CarsDetails/AvailabilitySection';
 import DetailsTabSection from '../components/CarsDetails/DetailsTabSection';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
 
 const CarDetailPage = () => {

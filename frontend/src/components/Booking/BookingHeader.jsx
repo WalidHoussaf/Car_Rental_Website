@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 import CalendarStepIcon from '../Ui/Icons/CalendarStepIcon';
 import LocationStepIcon from '../Ui/Icons/LocationStepIcon';

@@ -1,6 +1,6 @@
 import React from 'react';
 import SpecsSection from '../SpecsSection';
-import { useLanguage } from '../../../../context/LanguageContext';
+import { useLanguage } from '../../../../hooks/useLanguage';
 import { useTranslations } from '../../../../translations';
 
 const SpecificationsTab = ({ car }) => {

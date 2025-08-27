@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, forwardRef } from 'react';
 import { useTranslations } from '../../translations';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import CalendarDateIcon from '../Ui/Icons/CalendarDateIcon';
 import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
 

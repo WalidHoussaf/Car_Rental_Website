@@ -7,7 +7,7 @@ import PopularDestinations from '../components/Home/PopularDestinations';
 import Testimonials from '../components/Home/Testimonials';
 import NewsletterSection from '../components/Home/NewsletterSection';
  
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
 
 const HomePage = () => {

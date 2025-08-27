@@ -4,7 +4,7 @@ import CategoryFilter from './CategoryFilter';
 import PriceRangeFilter from './PriceRangeFilter';
 import FeaturesFilter from './FeaturesFilter';
 import ResetButton from './ResetButton';
-import { useLanguage } from '../../../context/LanguageContext';
+import { useLanguage } from '../../../hooks/useLanguage';
 import { useTranslations } from '../../../translations';
 
 const FiltersSidebar = ({ filters, handleFilterChange, toggleFeature, resetFilters, navigate }) => {

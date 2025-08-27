@@ -4,8 +4,6 @@ import { api } from '../config/api.js';
 // Create the context
 import AuthContext from './authContext';
 
-// Note: Fast Refresh requires this file to only export components
-
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);

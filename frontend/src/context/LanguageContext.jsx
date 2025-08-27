@@ -1,12 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-
-// Create the context
-const LanguageContext = createContext();
-
-// Custom hook to use the language context
-export const useLanguage = () => {
-  return useContext(LanguageContext);
-};
+import React, { useState, useEffect } from 'react';
+import { LanguageContext } from './languageContext';
 
 export const LanguageProvider = ({ children }) => {
   // Get stored language or use 'en' as default
@@ -45,4 +38,4 @@ export const LanguageProvider = ({ children }) => {
   );
 };
 
-export default LanguageContext; 
+ 

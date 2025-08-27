@@ -1,7 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 import { categories } from '../../../assets/assets';
-import { useLanguage } from '../../../context/LanguageContext';
+import { useLanguage } from '../../../hooks/useLanguage';
 import { useTranslations } from '../../../translations';
 
 const CategoryFilter = ({ filters, handleFilterChange }) => {

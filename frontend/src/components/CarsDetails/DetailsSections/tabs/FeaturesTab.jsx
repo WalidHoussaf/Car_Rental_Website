@@ -1,6 +1,6 @@
 import React from 'react';
 import FeatureCard from '../FeatureCard';
-import { useLanguage } from '../../../../context/LanguageContext';
+import { useLanguage } from '../../../../hooks/useLanguage';
 import { useTranslations } from '../../../../translations';
 
 // Helper function to determine iconType based on feature name

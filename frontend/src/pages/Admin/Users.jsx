@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState, useContext, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { api } from '../../config/api';
-import { useNotification } from '../../context/NotificationContext';
+import { useNotification } from '../../context/notificationUtils';
 import AuthContext from '../../context/authContext';
 import FuturisticModal from '../../components/Ui/FuturisticModal';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 
 const PAGE_SIZE = 10;

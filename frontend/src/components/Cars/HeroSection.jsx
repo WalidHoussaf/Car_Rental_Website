@@ -1,6 +1,6 @@
 import React from 'react';
 import { assets } from '../../assets/assets';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 
 const HeroSection = ({ onExploreClick, onLearnMoreClick }) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import CarHighlights from '../CarHighlights';
-import { useLanguage } from '../../../../context/LanguageContext';
+import { useLanguage } from '../../../../hooks/useLanguage';
 import { useTranslations } from '../../../../translations';
 
 const OverviewTab = ({ car }) => {

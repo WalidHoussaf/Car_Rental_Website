@@ -6,7 +6,7 @@ import BookingCalendar from '../components/Booking/BookingCalendar';
 import BookingLocation from '../components/Booking/BookingLocation';
 import BookingOption from '../components/Booking/BookingOption';
 import BookingSummary from '../components/Booking/BookingSummary';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
 
 const Booking = () => {

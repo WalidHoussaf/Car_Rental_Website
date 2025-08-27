@@ -1,13 +1,8 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useState } from 'react';
 import { api } from '../config/api.js';
 
 // Create the context
 const BookingContext = createContext();
-
-// Custom hook to use the booking context
-export const useBooking = () => {
-  return useContext(BookingContext);
-};
 
 export const BookingProvider = ({ children }) => {
   const [bookings, setBookings] = useState([]);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Scale, Users, CreditCard, Shield, Mail, ChevronRight } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
 import { assets } from '../assets/assets';
 

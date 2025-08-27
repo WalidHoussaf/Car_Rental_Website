@@ -6,7 +6,7 @@ import HeroSection from '../components/Cars/HeroSection';
 import CallToAction from '../components/Cars/CallToAction';
 import FiltersSidebar from '../components/Cars/Filters/FiltersSidebar';
 import { selectStyles } from '../styles/selectStyles';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
 
 const CarsPage = () => {

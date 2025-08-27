@@ -1,13 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { api } from '../config/api.js';
 
 // Create the context
 const CarContext = createContext();
 
-// Custom hook to use the car context
-export const useCar = () => {
-  return useContext(CarContext);
-};
 
 export const CarProvider = ({ children }) => {
   const [cars, setCars] = useState([]);

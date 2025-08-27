@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Select from 'react-select';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 import MapMarkerIcon from '../Ui/Icons/MapMarkerIcon';
 import SpinnerIcon from '../Ui/Icons/SpinnerIcon';

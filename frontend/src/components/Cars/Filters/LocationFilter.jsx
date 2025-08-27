@@ -2,7 +2,7 @@ import React from 'react';
 import Select from 'react-select';
 import { locations } from '../../../assets/assets';
 import { selectStyles } from '../../../styles/selectStyles';
-import { useLanguage } from '../../../context/LanguageContext';
+import { useLanguage } from '../../../hooks/useLanguage';
 import { useTranslations } from '../../../translations';
 
 const LocationFilter = ({ filters, handleFilterChange }) => {

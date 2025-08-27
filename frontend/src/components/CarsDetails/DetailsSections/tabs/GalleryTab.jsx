@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, X, Maximize, ZoomIn, ZoomOut, Download, Heart, Share2 } from 'lucide-react';
-import { useLanguage } from '../../../../context/LanguageContext';
+import { useLanguage } from '../../../../hooks/useLanguage';
 import { useTranslations } from '../../../../translations';
 
 const GalleryTab = ({ car }) => {
