@@ -1,6 +1,18 @@
 import React, { useEffect } from 'react';
 
-const FuturisticModal = ({ open, onClose, title, children, actions = [] }) => {
+const FuturisticModal = ({
+  open,
+  onClose,
+  title,
+  children,
+  actions = [],
+  // Optional styling controls
+  maxWidthClass = 'max-w-xl',
+  containerPaddingTopClass = 'pt-10 md:pt-16',
+  containerPaddingBottomClass = 'pb-10 md:pb-16',
+  bodyClassName = '',
+  cardClassName = '',
+}) => {
   const [show, setShow] = React.useState(false);
   useEffect(() => {
     const onKey = (e) => {
@@ -21,7 +33,7 @@ const FuturisticModal = ({ open, onClose, title, children, actions = [] }) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center pt-10 md:pt-16">
+    <div className={`fixed inset-0 z-[100] flex items-start justify-center ${containerPaddingTopClass} ${containerPaddingBottomClass}`}>
       {/* Backdrop */}
       <div
         className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${show ? 'opacity-100' : 'opacity-0'}`}
@@ -30,7 +42,7 @@ const FuturisticModal = ({ open, onClose, title, children, actions = [] }) => {
 
       {/* Modal Card */}
       <div
-        className={`relative z-[110] w-[95%] max-w-xl rounded-xl overflow-hidden border border-cyan-800/40 bg-gray-900/70 shadow-2xl transform transition-all duration-300 ease-out ${show ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}`}
+        className={`relative z-[110] w-[95%] ${maxWidthClass} rounded-xl overflow-hidden border border-cyan-800/40 bg-gray-900/70 shadow-2xl transform transition-all duration-300 ease-out ${show ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'} flex flex-col ${cardClassName}`}
       >
         <div
           className="absolute inset-0 opacity-[0.06] pointer-events-none"
@@ -58,7 +70,7 @@ const FuturisticModal = ({ open, onClose, title, children, actions = [] }) => {
         </div>
 
         {/* Body */}
-        <div className="relative p-5 text-gray-200">
+        <div className={`relative p-5 text-gray-200 ${bodyClassName}`}>
           {children}
         </div>
 

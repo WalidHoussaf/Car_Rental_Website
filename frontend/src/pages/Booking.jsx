@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { sampleCars } from '../assets/assets';
+import { assets } from '../assets/assets';
 import BookingHeader from '../components/Booking/BookingHeader';
 import BookingCalendar from '../components/Booking/BookingCalendar';
 import BookingLocation from '../components/Booking/BookingLocation';
@@ -8,6 +8,7 @@ import BookingOption from '../components/Booking/BookingOption';
 import BookingSummary from '../components/Booking/BookingSummary';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
+import CarContext from '../context/CarContext';
 
 const Booking = () => {
   const { id } = useParams();
@@ -17,6 +18,36 @@ const Booking = () => {
   const [bookingStep, setBookingStep] = useState(1); 
   const { language } = useLanguage();
   const t = useTranslations(language);
+  
+  // Use CarContext for data management
+  const { cars } = useContext(CarContext);
+  
+  // Helper function to resolve image paths from backend
+  const resolveImagePath = (imagePath) => {
+    if (!imagePath) return "/api/placeholder/400/240";
+    
+    // If it's already a full URL or starts with /, return as is
+    if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
+      return imagePath;
+    }
+    
+    // If it's a dot notation path like "cars.car1", resolve from assets
+    if (imagePath.includes('.')) {
+      const path = imagePath.split('.');
+      let resolved = assets;
+      
+      try {
+        path.forEach(key => {
+          resolved = resolved[key];
+        });
+        return resolved || "/api/placeholder/400/240";
+      } catch {
+        return "/api/placeholder/400/240";
+      }
+    }
+    
+    return imagePath;
+  };
   
   // Booking details state
   const [bookingDetails, setBookingDetails] = useState({
@@ -39,24 +70,14 @@ const Booking = () => {
         return;
       }
       
-      const parsedId = parseInt(id);
-      const foundCar = sampleCars.find(c => c.id === parsedId);
+      const foundCar = cars.find(c => (c._id || c.id) === id);
       
       if (foundCar) {
         // Clone the object to avoid reference issues
         const carWithResolvedImage = {...foundCar};
         
-        // Process images that are references
-        if (foundCar.image && typeof foundCar.image === 'string' && foundCar.image.includes('cars.')) {
-          // Build a default image path
-          const carNumber = foundCar.image.split('cars.car')[1];
-          if (carNumber) {
-            carWithResolvedImage.image = `/cars/car${carNumber}.png`;
-          } else {
-            // Fallback for unexpected format
-            carWithResolvedImage.image = `/api/placeholder/500/300?text=${encodeURIComponent(foundCar.name)}`;
-          }
-        }
+        // Process images using resolveImagePath
+        carWithResolvedImage.image = resolveImagePath(foundCar.image);
         
         setCar(carWithResolvedImage);
         
@@ -73,7 +94,7 @@ const Booking = () => {
       }
       setLoading(false);
     }, 800);
-  }, [id]);
+  }, [id, cars]);
   
   const handleDateSelection = (startDate, endDate) => {
     // Calculate total days

@@ -26,7 +26,7 @@ export const CarProvider = ({ children }) => {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 10
+    itemsPerPage: 50
   });
 
   // Fetch cars with filters
@@ -37,7 +37,7 @@ export const CarProvider = ({ children }) => {
     try {
       const params = {
         page,
-        limit: 10,
+        limit: 50, 
         ...searchFilters
       };
 

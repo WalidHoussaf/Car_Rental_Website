@@ -88,6 +88,30 @@ export const validateUserRegistration = [
     .withMessage('Country is required')
 ];
 
+// Car update validation rules (all fields optional to support partial updates)
+export const validateCarUpdate = [
+  body('make').optional().trim().notEmpty(),
+  body('model').optional().trim().notEmpty(),
+  body('year').optional().isInt({ min: 1900, max: new Date().getFullYear() + 1 }),
+  body('category').optional().isIn(['economy', 'compact', 'midsize', 'fullsize', 'luxury', 'suv', 'sport', 'convertible', 'van']),
+  body('transmission').optional().isIn(['manual', 'automatic', '8-Speed Automatic', '9-Speed Automatic', '10-Speed Automatic', '8-Speed Dual-Clutch', '7-Speed Dual-Clutch', 'Single-Speed']),
+  body('fuelType').optional().isIn(['gasoline', 'diesel', 'hybrid', 'electric']),
+  body('seats').optional().isInt({ min: 2, max: 9 }),
+  body('doors').optional().isInt({ min: 2, max: 5 }),
+  body('pricePerDay').optional().isFloat({ min: 0 }),
+  body('licensePlate').optional().trim().notEmpty(),
+  body('mileage').optional().isFloat({ min: 0 }),
+  body('location').optional().isString().trim(),
+  // Images
+  body('image').optional().isString().trim(),
+  body('images').optional().isArray(),
+  body('images.*').optional().isString(),
+  body('description').optional().isString(),
+  body('features').optional().isArray(),
+  body('features.*').optional().isString(),
+  body('availability').optional().isBoolean(),
+];
+
 export const validateUserLogin = [
   body('email')
     .isEmail()
@@ -116,7 +140,7 @@ export const validateCar = [
     .withMessage('Please provide a valid year'),
   
   body('category')
-    .isIn(['economy', 'compact', 'midsize', 'fullsize', 'luxury', 'suv', 'convertible', 'van'])
+    .isIn(['economy', 'compact', 'midsize', 'fullsize', 'luxury', 'suv', 'sport', 'convertible', 'van'])
     .withMessage('Please select a valid category'),
   
   body('transmission')
@@ -147,16 +171,10 @@ export const validateCar = [
   body('mileage')
     .isFloat({ min: 0 })
     .withMessage('Mileage must be a positive number'),
-  
-  body('location.branch')
+  body('location')
     .trim()
     .notEmpty()
-    .withMessage('Branch location is required'),
-  
-  body('location.address')
-    .trim()
-    .notEmpty()
-    .withMessage('Address is required')
+    .withMessage('Location (city) is required')
 ];
 
 // Booking validation rules
@@ -224,8 +242,13 @@ export const validateCarSearch = [
   
   query('category')
     .optional()
-    .isIn(['economy', 'compact', 'midsize', 'fullsize', 'luxury', 'suv', 'convertible', 'van'])
-    .withMessage('Please select a valid category')
+    .isIn(['economy', 'compact', 'midsize', 'fullsize', 'luxury', 'suv', 'sport', 'convertible', 'van'])
+    .withMessage('Please select a valid category'),
+
+  query('availability')
+    .optional()
+    .isIn(['true', 'false', 'all'])
+    .withMessage('Availability must be true, false, or all')
 ];
 
 // Parameter validation

@@ -26,6 +26,11 @@ const createApiRequest = async (endpoint, options = {}) => {
     },
   };
 
+  // If body is FormData, let the browser set the Content-Type with boundary
+  if (config.body instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
+
   try {
     const response = await fetch(url, config);
     const data = await response.json();
@@ -96,6 +101,16 @@ export const api = {
     getCategories: () => createApiRequest('/cars/meta/categories'),
     
     getLocations: () => createApiRequest('/cars/meta/locations'),
+    
+    // Upload images (admin only)
+    upload: (files) => {
+      const fd = new FormData();
+      [...files].forEach(f => fd.append('images', f));
+      return createApiRequest('/cars/upload', {
+        method: 'POST',
+        body: fd,
+      });
+    },
   },
 
   // Booking endpoints

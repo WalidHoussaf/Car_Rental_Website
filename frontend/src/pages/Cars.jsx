@@ -1,23 +1,59 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { sampleCars, resolveImagePaths, categoryTranslations } from '../assets/assets'; 
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useLanguage } from '../hooks/useLanguage';
+import { useTranslations } from '../translations';
+import CarContext from '../context/CarContext';
+import { categoryTranslations, assets } from '../assets/assets'; 
 import Select from 'react-select';
 import HeroSection from '../components/Cars/HeroSection';
 import CallToAction from '../components/Cars/CallToAction';
 import FiltersSidebar from '../components/Cars/Filters/FiltersSidebar';
 import { selectStyles } from '../styles/selectStyles';
-import { useLanguage } from '../hooks/useLanguage';
-import { useTranslations } from '../translations';
 
 const CarsPage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const locationParam = queryParams.get('location');
   const searchParam = queryParams.get('search');
   const categoryParam = queryParams.get('category');
   const { language } = useLanguage();
   const t = useTranslations(language);
+  
+  // Helper function to resolve image paths from backend
+  const resolveImagePath = (imagePath) => {
+    if (!imagePath) return "/api/placeholder/400/240";
+    
+    // If it's already a full URL or starts with /, return as is
+    if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
+      return imagePath;
+    }
+    
+    // If it's a dot notation path like "cars.car1", resolve from assets
+    if (imagePath.includes('.')) {
+      const path = imagePath.split('.');
+      let resolved = assets;
+      
+      try {
+        path.forEach(key => {
+          resolved = resolved[key];
+        });
+        return resolved || "/api/placeholder/400/240";
+      } catch {
+        return "/api/placeholder/400/240";
+      }
+    }
+    
+    return imagePath;
+  };
+  
+  // Use CarContext for data management
+  const {
+    cars,
+    loading,
+    updateFilters,
+    clearFilters: contextClearFilters
+  } = useContext(CarContext);
   
   // State for Search
   const [searchQuery, setSearchQuery] = useState(searchParam || '');
@@ -28,17 +64,14 @@ const CarsPage = () => {
   // Reference for the Cars Section
   const carsSectionRef = useRef(null);
   
-  // State for Filters
-  const [filters, setFilters] = useState({
+  // Local state for UI-specific filters
+  const [localFilters, setLocalFilters] = useState({
     location: locationParam || 'all',
     category: categoryParam || 'all',
     priceRange: [0, 1000],
     features: []
   });
   
-  // State for Cars Data
-  const [carsData, setCarsData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('recommended');
   
   // Update Search when the URL Changes
@@ -75,23 +108,9 @@ const CarsPage = () => {
     };
   }, [handleSearchUpdate]);
   
-  // Initialize the Search from the URL on Page Load
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const search = queryParams.get('search');
-    if (search) {
-      setSearchQuery(search);
-    }
-  }, [location.search]);
   
-  // Initialize Cars Data
+  // Initialize Cars Data - now handled by CarContext
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      const processedCars = resolveImagePaths(sampleCars, 'image');
-      setCarsData(processedCars);
-      setLoading(false);
-    }, 800);
   }, []);
   
   // Handle Scroll to Cars Section
@@ -117,8 +136,11 @@ const CarsPage = () => {
     // Save Current Scroll Position before Navigation
     scrollPositionRef.current = window.pageYOffset;
     
-    const newFilters = { ...filters, [filterType]: value };
-    setFilters(newFilters);
+    const newFilters = { ...localFilters, [filterType]: value };
+    setLocalFilters(newFilters);
+    
+    // Update context filters for API calls
+    updateFilters({ [filterType]: value });
     
     // Update URL if Location Filter Changes
     if (filterType === 'location' && value !== 'all') {
@@ -133,9 +155,9 @@ const CarsPage = () => {
     // Save Current Scroll Position before Navigation
     scrollPositionRef.current = window.pageYOffset;
     
-    const newFeatures = filters.features.includes(feature)
-      ? filters.features.filter(f => f !== feature)
-      : [...filters.features, feature];
+    const newFeatures = localFilters.features.includes(feature)
+      ? localFilters.features.filter(f => f !== feature)
+      : [...localFilters.features, feature];
     
     handleFilterChange('features', newFeatures);
   };
@@ -145,42 +167,43 @@ const CarsPage = () => {
     // Save Current Scroll Position before Navigation
     scrollPositionRef.current = window.pageYOffset;
     
-    setFilters({
+    setLocalFilters({
       location: 'all',
       category: 'all',
       priceRange: [0, 1000],
       features: []
     });
+    contextClearFilters();
     navigate('/cars', { replace: true });
   };
   
   // Filter Cars Based on Current Filters
-  const filteredCars = carsData.filter(car => {
+  const filteredCars = cars.filter(car => {
     // Filter by Location
-    if (filters.location !== 'all') {
+    if (localFilters.location !== 'all') {
       // Handle Both String and Array Locations
       if (Array.isArray(car.location)) {
-        if (!car.location.includes(filters.location)) {
+        if (!car.location.includes(localFilters.location)) {
           return false;
         }
-      } else if (car.location !== filters.location) {
+      } else if (car.location !== localFilters.location) {
         return false;
       }
     }
     
     // Filter by Category
-    if (filters.category !== 'all' && car.category !== filters.category) {
+    if (localFilters.category !== 'all' && car.category !== localFilters.category) {
       return false;
     }
     
     // Filter by Price Range
-    if (car.price < filters.priceRange[0] || car.price > filters.priceRange[1]) {
+    if (car.price < localFilters.priceRange[0] || car.price > localFilters.priceRange[1]) {
       return false;
     }
     
     // Filter by Features
-    if (filters.features.length > 0 && !filters.features.some(feature => 
-      car.features.some(carFeature => carFeature.toLowerCase().includes(feature.toLowerCase()))
+    if (localFilters.features.length > 0 && !localFilters.features.some(feature => 
+      car.features && car.features.some(carFeature => carFeature.toLowerCase().includes(feature.toLowerCase()))
     )) {
       return false;
     }
@@ -275,7 +298,7 @@ const CarsPage = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <FiltersSidebar 
-              filters={filters}
+              filters={localFilters}
               handleFilterChange={handleFilterChange}
               toggleFeature={toggleFeature}
               resetFilters={resetFilters}
@@ -404,15 +427,15 @@ const CarsPage = () => {
               {/* Cars Grid */}
               {!loading && sortedCars.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 relative">                  
-                  {sortedCars.map((car) => (
+                  {sortedCars.map((car, index) => (
                     <div
-                      key={car.id}
+                      key={car._id || car.id || `car-${index}`}
                       className="bg-gradient-to-b from-gray-900/40 to-black/20 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 group hover:border-cyan-500/30 flex flex-col h-full relative"
                     >                      
                       {/* Card Header */}
                       <div className="relative h-48 overflow-hidden">
                         <img
-                          src={car.image || "/api/placeholder/400/240"}
+                          src={resolveImagePath(car.image)}
                           alt={car.name}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
@@ -467,15 +490,15 @@ const CarsPage = () => {
                           
                           {/* Features */}
                           <div className="flex flex-wrap gap-2 mb-5">
-                            {car.features.slice(0, 3).map((feature, index) => (
+                            {car.features && car.features.slice(0, 3).map((feature, featureIndex) => (
                               <span
-                                key={index}
+                                key={`${car._id || car.id}-feature-${featureIndex}`}
                                 className="px-2 py-1 bg-gray-800/50 border border-gray-700/30 rounded text-xs text-gray-300 font-['Orbitron'] transition-colors duration-300 hover:text-cyan-300 hover:border-cyan-700/30"
                               >
                                 {language === 'fr' ? t(feature) : feature}
                               </span>
                             ))}
-                            {car.features.length > 3 && (
+                            {car.features && car.features.length > 3 && (
                               <span className="px-2 py-1 bg-cyan-900/20 border border-cyan-900/30 rounded text-xs text-cyan-300 font-['Orbitron']">
                                 +{car.features.length - 3} {t('moreFeatures')}
                               </span>
@@ -487,7 +510,7 @@ const CarsPage = () => {
                         <div className="flex space-x-2 mt-auto">
                           <button
                             onClick={() => {
-                              navigateWithScroll(`/booking/${car.id}`);
+                              navigateWithScroll(`/booking/${car._id || car.id}`);
                             }}
                             className="flex-1 px-4 py-2 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] text-sm transition-all duration-500 rounded-md cursor-pointer shadow-lg shadow-cyan-800/10 hover:shadow-cyan-800/30"
                           >
@@ -495,7 +518,7 @@ const CarsPage = () => {
                           </button>
                           <button 
                             onClick={() => {
-                              navigateWithScroll(`/cars/${car.id}`);
+                              navigateWithScroll(`/cars/${car._id || car.id}`);
                             }}
                             className="px-4 py-2 bg-transparent border border-gray-700 hover:border-cyan-500 text-cyan-300 hover:text-cyan-400 font-['Orbitron'] text-sm transition-all duration-300 rounded-md cursor-pointer"
                           >

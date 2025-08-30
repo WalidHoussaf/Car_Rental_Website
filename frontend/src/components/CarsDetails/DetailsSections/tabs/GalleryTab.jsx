@@ -16,13 +16,53 @@ const GalleryTab = ({ car }) => {
   
   // Check if car has gallery property and that it contains valid images
   const hasGallery = car && car.gallery && Array.isArray(car.gallery) && car.gallery.length > 0;
+  const hasImages = car && car.images && Array.isArray(car.images) && car.images.length > 0;
   
-  // Create a combined array of images starting with the main car image
+  // Create a combined array of images from multiple sources
   const allImages = useMemo(() => {
-    return hasGallery 
-      ? [{ path: car.image, alt: `${car.name} main view` }, ...car.gallery]
-      : car?.image ? [{ path: car.image, alt: `${car.name} main view` }] : [];
-  }, [hasGallery, car?.image, car?.gallery, car?.name]);
+    const imageArray = [];
+    
+    // Always add main image first if it exists
+    if (car?.image) {
+      imageArray.push({ path: car.image, alt: `${car.name} main view` });
+    }
+    
+    // Add gallery images if they exist
+    if (hasGallery) {
+      car.gallery.forEach((img, index) => {
+        imageArray.push({
+          path: img.path || img,
+          alt: img.alt || `${car.name} gallery image ${index + 1}`
+        });
+      });
+    }
+    
+    // Add images array if it exists and we don't have enough images yet
+    if (hasImages && imageArray.length < 6) {
+      car.images.forEach((img, index) => {
+        // Avoid duplicates
+        if (!imageArray.some(existing => existing.path === img)) {
+          imageArray.push({
+            path: img,
+            alt: `${car.name} image ${index + 1}`
+          });
+        }
+      });
+    }
+    
+    // If we still don't have enough images, create some variations of the main image
+    if (imageArray.length < 3 && car?.image) {
+      const mainImage = car.image;
+      for (let i = imageArray.length; i < 3; i++) {
+        imageArray.push({
+          path: mainImage,
+          alt: `${car.name} view ${i + 1}`
+        });
+      }
+    }
+    
+    return imageArray;
+  }, [hasGallery, hasImages, car?.image, car?.gallery, car?.images, car?.name]);
 
   // Load favorites from localStorage on component mount
   useEffect(() => {

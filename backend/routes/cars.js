@@ -1,10 +1,62 @@
 import express from 'express';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
 import Car from '../models/Car.js';
 import Booking from '../models/Booking.js';
 import { authenticateToken, requireAdmin, optionalAuth } from '../middleware/auth.js';
-import { validateCar, validateCarSearch, validateObjectId, handleValidationErrors } from '../middleware/validation.js';
+import { validateCar, validateCarUpdate, validateCarSearch, validateObjectId, handleValidationErrors } from '../middleware/validation.js';
 
 const router = express.Router();
+
+// Ensure uploads directory exists
+const uploadsDir = path.resolve('uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Multer storage config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, '_');
+    cb(null, `${unique}-${base}${ext}`);
+  }
+});
+
+// Upload car images (Admin only)
+router.post('/upload', authenticateToken, requireAdmin, (req, res, next) => {
+  const handler = upload.array('images', 10);
+  handler(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+    try {
+      const files = req.files || [];
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const urls = files.map(f => ({
+        filename: f.filename,
+        url: `${baseUrl}/uploads/${f.filename}`,
+        mimetype: f.mimetype,
+        size: f.size,
+      }));
+      return res.status(201).json({ success: true, data: { files: urls } });
+    } catch (e) {
+      return res.status(500).json({ success: false, message: 'Upload failed', error: e.message });
+    }
+  });
+});
+
+const fileFilter = (req, file, cb) => {
+  if (/^image\//.test(file.mimetype)) cb(null, true);
+  else cb(new Error('Only image files are allowed'));
+};
+
+const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024, files: 10 } });
 
 // Get all cars with filtering and pagination
 router.get('/', validateCarSearch, handleValidationErrors, optionalAuth, async (req, res) => {
@@ -27,16 +79,32 @@ router.get('/', validateCarSearch, handleValidationErrors, optionalAuth, async (
     } = req.query;
 
     // Build filter object
-    const filter = {
-      availability: true,
-      maintenanceStatus: 'available'
-    };
+    const filter = {};
+
+    // Handle availability filtering
+    if (req.query.availability === 'true') {
+      filter.availability = true;
+    } else if (req.query.availability === 'false') {
+      filter.availability = false;
+    } else if (req.query.availability === 'all') {
+      // Don't add availability filter - show all cars
+    } else {
+      // Default behavior for public users - only show available cars
+      if (!req.user || !req.user.isAdmin) {
+        filter.availability = true;
+        filter.maintenanceStatus = 'available';
+      }
+    }
+
+    if (req.query.maintenanceStatus) {
+      filter.maintenanceStatus = req.query.maintenanceStatus;
+    }
 
     if (category) filter.category = category;
     if (transmission) filter.transmission = transmission;
     if (fuelType) filter.fuelType = fuelType;
     if (seats) filter.seats = parseInt(seats);
-    if (location) filter['location.branch'] = new RegExp(location, 'i');
+    if (location) filter['location'] = new RegExp(location, 'i');
 
     // Price range filter
     if (minPrice || maxPrice) {
@@ -164,7 +232,7 @@ router.post('/', authenticateToken, requireAdmin, validateCar, handleValidationE
 });
 
 // Update car (Admin only)
-router.put('/:id', authenticateToken, requireAdmin, validateObjectId, validateCar, handleValidationErrors, async (req, res) => {
+router.put('/:id', authenticateToken, requireAdmin, validateObjectId, validateCarUpdate, handleValidationErrors, async (req, res) => {
   try {
     const car = await Car.findByIdAndUpdate(
       req.params.id,
@@ -327,7 +395,7 @@ router.get('/meta/categories', async (req, res) => {
 // Get car locations/branches
 router.get('/meta/locations', async (req, res) => {
   try {
-    const locations = await Car.distinct('location.branch');
+    const locations = await Car.distinct('location');
     
     res.status(200).json({
       success: true,

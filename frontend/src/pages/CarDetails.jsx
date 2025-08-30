@@ -1,18 +1,49 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { sampleCars, resolveImagePaths, resolveGalleryPaths, categoryTranslations } from '../assets/assets';
+import { useLanguage } from '../hooks/useLanguage';
+import { useTranslations } from '../translations';
+import CarContext from '../context/CarContext';
+import { assets, categoryTranslations } from '../assets/assets';
 import HeroSection from '../components/CarsDetails/HeroSection';
 import PerformanceStats from '../components/CarsDetails/PerformanceStats';
 import AvailabilitySection from '../components/CarsDetails/AvailabilitySection';
 import DetailsTabSection from '../components/CarsDetails/DetailsTabSection';
-import { useLanguage } from '../hooks/useLanguage';
-import { useTranslations } from '../translations';
 
 const CarDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { language } = useLanguage();
   const t = useTranslations(language);
+  
+  // Helper function to resolve image paths from backend
+  const resolveImagePath = (imagePath) => {
+    if (!imagePath) return "/api/placeholder/400/240";
+    
+    // If it's already a full URL or starts with /, return as is
+    if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
+      return imagePath;
+    }
+    
+    // If it's a dot notation path like "cars.car1", resolve from assets
+    if (imagePath.includes('.')) {
+      const path = imagePath.split('.');
+      let resolved = assets;
+      
+      try {
+        path.forEach(key => {
+          resolved = resolved[key];
+        });
+        return resolved || "/api/placeholder/400/240";
+      } catch {
+        return "/api/placeholder/400/240";
+      }
+    }
+    
+    return imagePath;
+  };
+  
+  // Use CarContext for data management
+  const { cars } = useContext(CarContext);
   
   // Scroll to Top on Component Mount
   useEffect(() => {
@@ -25,8 +56,8 @@ const CarDetailPage = () => {
     navigate(path);
   };
   
-  // Find the Car by ID
-  const car = sampleCars.find(car => car.id === parseInt(id));
+  // Find the Car by ID from context
+  const car = cars.find(car => car._id === id || car.id === parseInt(id));
   
   // If Car is not Found, Show the Error UI
   if (!car) {
@@ -53,11 +84,9 @@ const CarDetailPage = () => {
     );
   }
   
-  // Resolve the Car Image Paths
-  const processedCar = resolveImagePaths([car], 'image')[0];
-  
-  // Resolve Gallery Paths as per your Requirement
-  const [resolvedCar] = resolveGalleryPaths([car]);
+  // Car data is already processed from the backend
+  const processedCar = car;
+  const resolvedCar = car;
   
   return (
     <div className="min-h-screen bg-black text-white">
@@ -67,7 +96,7 @@ const CarDetailPage = () => {
       {/* Availability Section */}
       <section className="py-8 px-4">
         <div className="max-w-7xl mx-auto">
-          <AvailabilitySection carId={car.id} />
+          <AvailabilitySection carId={car._id || car.id} />
         </div>
       </section>
       
@@ -104,14 +133,14 @@ const CarDetailPage = () => {
           
           {/* Updated grid with equal height cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {sampleCars
-              .filter(relatedCar => relatedCar.category === car.category && relatedCar.id !== car.id)
+            {cars
+              .filter(relatedCar => relatedCar.category === car.category && (relatedCar._id || relatedCar.id) !== (car._id || car.id))
               .slice(0, 3)
               .map((relatedCar, index) => {
-                const processedRelatedCar = resolveImagePaths([relatedCar], 'image')[0];
+                const processedRelatedCar = relatedCar;
                 return (
                   <div
-                    key={relatedCar.id}
+                    key={relatedCar._id || relatedCar.id}
                     className="relative group h-full" 
                     style={{
                       animationDelay: `${index * 200}ms`
@@ -125,7 +154,7 @@ const CarDetailPage = () => {
                       {/* Card Header - Fixed height */}
                       <div className="relative h-56 overflow-hidden flex-shrink-0">
                         <img
-                          src={processedRelatedCar.image || "/api/placeholder/400/240"}
+                          src={resolveImagePath(processedRelatedCar.image)}
                           alt={processedRelatedCar.name}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
@@ -189,7 +218,7 @@ const CarDetailPage = () => {
                         <div className="mt-auto">
                           <button
                             onClick={() => {
-                              navigateWithScroll(`/cars/${processedRelatedCar.id}`);
+                              navigateWithScroll(`/cars/${processedRelatedCar._id || processedRelatedCar.id}`);
                             }}
                             className="w-full relative overflow-hidden bg-gradient-to-r from-cyan-400 to-white text-black font-bold font-['Orbitron'] py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 group/btn cursor-pointer"
                           >

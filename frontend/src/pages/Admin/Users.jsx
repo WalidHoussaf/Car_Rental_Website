@@ -3,7 +3,10 @@ import { Navigate } from 'react-router-dom';
 import { api } from '../../config/api';
 import { useNotification } from '../../context/notificationUtils';
 import AuthContext from '../../context/authContext';
-import FuturisticModal from '../../components/Ui/FuturisticModal';
+import CreateEditUserModal from '../../components/Admin/CreateEditUserModal';
+import VerifyModal from '../../components/Admin/VerifyModal';
+import RoleChangeModal from '../../components/Admin/RoleChangeModal';
+import DeleteModal from '../../components/Admin/DeleteModal';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 
@@ -464,7 +467,7 @@ const AdminUsers = () => {
                             </div>
                             <div>
                               <div className="text-white font-medium">{u.firstName} {u.lastName}</div>
-                              <div className="text-gray-400 text-xs font-mono">#{u._id.slice(-8)}</div>
+                              <div className="text-gray-400 text-sm font-['Rationale']">#{u._id.slice(-8)}</div>
                             </div>
                           </div>
                         </td>
@@ -564,276 +567,46 @@ const AdminUsers = () => {
     </div>
     
     {/* Modals */}
-    {modal.type === 'verify' && (
-      <FuturisticModal
-        open
-        onClose={() => setModal({ type: null, user: null })}
-        title={t('verifyUser')}
-        actions={[
-          { 
-            label: t('cancel'), 
-            onClick: () => setModal({ type: null, user: null }),
-            icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            )
-          },
-          { 
-            label: processing ? t('verifying') : t('verify'), 
-            onClick: confirmVerify, 
-            variant: 'success', 
-            disabled: processing,
-            icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            )
-          }
-        ]}
-      >
-        <p className="text-sm text-gray-300 font-['Orbitron']">
-          {t('verifyUserText')}
-          <span className="text-green-600"> {modal.user.firstName} {modal.user.lastName}</span>?
-        </p>
-      </FuturisticModal>
-    )}
+    <VerifyModal
+      open={modal.type === 'verify'}
+      onClose={() => setModal({ type: null, user: null })}
+      user={modal.user}
+      onConfirm={confirmVerify}
+      processing={processing}
+      t={t}
+    />
 
-    {modal.type === 'role' && (
-      <FuturisticModal
-        open
-        onClose={() => setModal({ type: null, user: null })}
-        title={t('changeUserRole')}
-        actions={[
-          { 
-            label: t('cancel'), 
-            onClick: () => setModal({ type: null, user: null }),
-            icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            )
-          },
-          { 
-            label: processing ? t('updating') : t('setRoleTo', { role: t(roleChoice) }),
-            onClick: confirmRoleChange,
-            variant: 'primary',
-            disabled: processing,
-            icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-              </svg>
-            )
-          }
-        ]}
-      >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-300 font-['Orbitron']">{t('changeUserRoleText')} <span className="text-yellow-500">{modal.user.firstName} {modal.user.lastName}</span>.</p>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setRoleChoice('customer')}
-              className={`px-4 py-3 rounded-md border text-sm font-['Orbitron'] cursor-pointer transition-colors ${roleChoice === 'customer' ? 'border-cyan-400 text-cyan-300 bg-cyan-600/10' : 'border-cyan-900/40 text-gray-300 hover:bg-white/5'}`}
-            >{t('customer')}</button>
-            <button
-              onClick={() => setRoleChoice('admin')}
-              className={`px-4 py-3 rounded-md border text-sm font-['Orbitron'] cursor-pointer transition-colors ${roleChoice === 'admin' ? 'border-purple-400 text-purple-300 bg-purple-600/10' : 'border-purple-900/40 text-gray-300 hover:bg-white/5'}`}
-            >{t('admin')}</button>
-          </div>
-        </div>
-      </FuturisticModal>
-    )}
+    <RoleChangeModal
+      open={modal.type === 'role'}
+      onClose={() => setModal({ type: null, user: null })}
+      user={modal.user}
+      onConfirm={confirmRoleChange}
+      processing={processing}
+      roleChoice={roleChoice}
+      setRoleChoice={setRoleChoice}
+      t={t}
+    />
 
-    {modal.type === 'delete' && (
-      <FuturisticModal
-        open
-        onClose={() => setModal({ type: null, user: null })}
-        title={t('deleteUser')}
-        actions={[
-          { 
-            label: t('cancel'), 
-            onClick: () => setModal({ type: null, user: null }),
-            icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            )
-          },
-          { 
-            label: processing ? t('deleting') : t('delete'), 
-            onClick: confirmDelete, 
-            variant: 'danger', 
-            disabled: processing,
-            icon: (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 -0.5 21 21"
-                className="h-4 w-4"
-              >
-                <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
-                  <g transform="translate(-179.000000, -360.000000)" fill="currentColor">
-                    <g transform="translate(56.000000, 160.000000)">
-                      <path d="M130.35,216 L132.45,216 L132.45,208 L130.35,208 L130.35,216 Z M134.55,216 L136.65,216 L136.65,208 L134.55,208 L134.55,216 Z M128.25,218 L138.75,218 L138.75,206 L128.25,206 L128.25,218 Z M130.35,204 L136.65,204 L136.65,202 L130.35,202 L130.35,204 Z M138.75,204 L138.75,200 L128.25,200 L128.25,204 L123,204 L123,206 L126.15,206 L126.15,220 L140.85,220 L140.85,206 L144,206 L144,204 L138.75,204 Z" />
-                    </g>
-                  </g>
-                </g>
-              </svg>
-            )
-          }
-        ]}
-      >
-        <p className="text-sm text-gray-300 font-['Orbitron']">
-          {t('deleteUserText')}
-          <span className="text-red-600"> {modal.user.firstName} {modal.user.lastName}</span> ?
-        </p>
-      </FuturisticModal>
-    )}
+    <DeleteModal
+      open={modal.type === 'delete'}
+      onClose={() => setModal({ type: null, user: null })}
+      user={modal.user}
+      onConfirm={confirmDelete}
+      processing={processing}
+      t={t}
+    />
 
     {modal.type === 'create' && (
-      <FuturisticModal
+      <CreateEditUserModal
         open
+        mode="create"
+        form={createForm}
+        setForm={setCreateForm}
+        processing={processing}
         onClose={() => setModal({ type: null, user: null })}
-        title={t('createNewUser')}
-        actions={[
-          { 
-            label: t('cancel'), 
-            onClick: () => setModal({ type: null, user: null }),
-            icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            )
-          },
-          { 
-            label: processing ? t('creating') : t('create'), 
-            onClick: submitCreate, 
-            variant: 'primary', 
-            disabled: processing,
-            icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
-              </svg>
-            )
-          }
-        ]}
-      >
-        <form onSubmit={submitCreate} className="space-y-3">
-          {/* Personal Information */}
-          <div className="space-y-2">
-            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">{t('personalInformation')}</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder={t('firstName')}
-                value={createForm.firstName}
-                onChange={(e) => setCreateForm(f => ({ ...f, firstName: e.target.value }))}
-                autoComplete="given-name"
-                autoFocus
-                required
-              />
-              <input
-                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder={t('lastName')}
-                value={createForm.lastName}
-                onChange={(e) => setCreateForm(f => ({ ...f, lastName: e.target.value }))}
-                autoComplete="family-name"
-                required
-              />
-            </div>
-            <input
-              type="email"
-              className="w-full bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-              placeholder={t('emailAddress')}
-              value={createForm.email}
-              onChange={(e) => setCreateForm(f => ({ ...f, email: e.target.value }))}
-              autoComplete="email"
-              required
-            />
-            <input
-              type="date"
-              className="w-full bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-              value={createForm.dateOfBirth}
-              onChange={(e) => setCreateForm(f => ({ ...f, dateOfBirth: e.target.value }))}
-              required
-            />
-          </div>
-
-          {/* Contact & Security */}
-          <div className="space-y-2">
-            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">{t('contactSecurity')}</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="tel"
-                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder={t('phone')}
-                value={createForm.phone}
-                onChange={(e) => setCreateForm(f => ({ ...f, phone: e.target.value }))}
-                autoComplete="tel"
-                required
-              />
-              <input
-                type="password"
-                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder={t('password')}
-                value={createForm.password}
-                onChange={(e) => setCreateForm(f => ({ ...f, password: e.target.value }))}
-                autoComplete="new-password"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Address */}
-          <div className="space-y-2">
-            <h3 className="text-2xs font-medium text-cyan-300 font-['Rationale'] uppercase tracking-wide">{t('addressInformation')}</h3>
-            <input
-              className="w-full bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-              placeholder={t('streetAddress')}
-              value={createForm.street}
-              onChange={(e) => setCreateForm(f => ({ ...f, street: e.target.value }))}
-              autoComplete="street-address"
-              required
-            />
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder={t('city')}
-                value={createForm.city}
-                onChange={(e) => setCreateForm(f => ({ ...f, city: e.target.value }))}
-                autoComplete="address-level2"
-                required
-              />
-              <input
-                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder={t('stateProvince')}
-                value={createForm.state}
-                onChange={(e) => setCreateForm(f => ({ ...f, state: e.target.value }))}
-                autoComplete="address-level1"
-                required
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder={t('zipCode')}
-                value={createForm.zipCode}
-                onChange={(e) => setCreateForm(f => ({ ...f, zipCode: e.target.value }))}
-                pattern="[0-9]{5}"
-                inputMode="numeric"
-                autoComplete="postal-code"
-                required
-              />
-              <input
-                className="bg-black/40 border border-cyan-900/30 rounded py-2 px-3 focus:ring-1 focus:ring-cyan-500 focus:border-cyan-400 focus:outline-none placeholder:text-gray-400 font-['Orbitron'] text-sm text-gray-200"
-                placeholder={t('country')}
-                value={createForm.country}
-                onChange={(e) => setCreateForm(f => ({ ...f, country: e.target.value }))}
-                autoComplete="country-name"
-                required
-              />
-            </div>
-          </div>
-        </form>
-      </FuturisticModal>
+        onSubmit={submitCreate}
+        t={t}
+      />
     )}
   </>
 );

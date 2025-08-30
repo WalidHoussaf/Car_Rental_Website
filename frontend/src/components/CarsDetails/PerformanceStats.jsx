@@ -2,9 +2,17 @@ import React from 'react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 
-const PerformanceStats = ({ specifications }) => {
+const PerformanceStats = ({ specifications = {} }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
+  
+  // Provide fallback values for missing specifications
+  const safeSpecs = {
+    engine: specifications?.engine || 'N/A',
+    acceleration: specifications?.acceleration || 'N/A',
+    power: specifications?.power || specifications?.horsepower ? `${specifications.horsepower} hp` : 'N/A',
+    fuelEconomy: specifications?.fuelEconomy || 'N/A'
+  };
 
   return (
     <section className="py-12 bg-gradient-to-b from-black via-blue-950/50 to-black border-t border-b border-blue-500/20 backdrop-blur-lg relative overflow-hidden">
@@ -43,7 +51,7 @@ const PerformanceStats = ({ specifications }) => {
               </div>
               <div className="flex-grow flex items-center justify-center mb-4">
                 <div className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-white font-['Tomorrow']">
-                  {specifications.engine} 
+                  {safeSpecs.engine} 
                 </div>
               </div>
               <div className="mt-auto">
@@ -63,7 +71,7 @@ const PerformanceStats = ({ specifications }) => {
               </div>
               <div className="flex-grow flex items-center justify-center mb-4">
                 <div className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-white font-['Tomorrow']">
-                  {specifications.acceleration} 
+                  {safeSpecs.acceleration} 
                 </div>
               </div>
               <div className="mt-auto">
@@ -83,7 +91,7 @@ const PerformanceStats = ({ specifications }) => {
               </div>
               <div className="flex-grow flex items-center justify-center mb-4">
                 <div className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-white font-['Tomorrow']">
-                  {specifications.power} 
+                  {safeSpecs.power} 
                 </div>
               </div>
               <div className="mt-auto">
@@ -103,7 +111,7 @@ const PerformanceStats = ({ specifications }) => {
               </div>
               <div className="flex-grow flex items-center justify-center mb-4">
                 <div className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-white font-['Tomorrow']">
-                  {specifications.fuelEconomy} 
+                  {safeSpecs.fuelEconomy} 
                 </div>
               </div>
               <div className="mt-auto">

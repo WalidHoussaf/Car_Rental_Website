@@ -25,7 +25,7 @@ const HeroSection = ({ car }) => {
   
   // Handle booking
   const handleBookNow = () => {
-    navigate(`/booking/${car.id}`);
+    navigate(`/booking/${car._id || car.id}`);
   };
   
   // Handle navigation back to cars page

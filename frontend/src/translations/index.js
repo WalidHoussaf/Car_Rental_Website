@@ -259,9 +259,13 @@ export const translations = {
     failedToCreateUser: "Failed to create user",
     checkingAuthentication: "Checking authentication...",
     adminsCannotBeDeleted: "Admins cannot be deleted.",
-    verifyUser: "Verify user",
+    verifyUser: "Verify User",
+    verifyUserText: "Do you really want to verify this user",
     setRoleTo: "Set role to",
     roleChoice: "Select role",
+    dateOfBirth: "Date of Birth",
+    mustBe18OrOlder: "Must be 18 or older",
+    fiveDigitZipCode: "Zip code must be 5 digits",
 
     // Booking Management Section
     bookingManagement: "Booking Management",
@@ -892,9 +896,13 @@ export const translations = {
     checkingAuthentication: "Vérification de l'authentification...",
     loadingUsers: "Chargement des utilisateurs...",
     adminsCannotBeDeleted: "Les administrateurs ne peuvent pas être supprimés.",
-    verifyUser: "Vérifier l'utilisateur",
+    verifyUser: "Vérifier l'Utilisateur",
+    verifyUserText: "Voulez-vous vraiment vérifier l'utilisateur",
     setRoleTo: "Modifier le rôle",
     roleChoice: "Selectionnez un rôle",
+    dateOfBirth: "Date de naissance",
+    mustBe18OrOlder: "Doit avoir au moins 18 ans",
+    fiveDigitZipCode: "Le code postal doit contenir 5 chiffres",
 
      // Booking Management Section
      bookingManagement: "Gestion des réservations",

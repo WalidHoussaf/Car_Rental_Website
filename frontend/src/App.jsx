@@ -16,6 +16,7 @@ import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import AdminUsers from './pages/Admin/Users';
 import AdminBookings from './pages/Admin/Bookings';
+import AdminCars from './pages/Admin/Cars';
 import MyBookings from './pages/MyBookings';
 import NotFound from './pages/NotFound';
 import Privacy from './pages/Privacy';
@@ -42,6 +43,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/bookings" element={<AdminBookings />} />
+          <Route path="/admin/cars" element={<AdminCars />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />

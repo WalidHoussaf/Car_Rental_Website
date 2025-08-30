@@ -236,6 +236,36 @@ const Navbar = () => {
                       </Link>
                     )}
 
+                    {user?.role === 'admin' && (
+                      <Link
+                        to="/admin/cars"
+                        onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        role="menuitem"
+                      >
+                        <span className="text-cyan-300">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M3 13l2.2-5a2 2 0 0 1 1.9-1.2h9.8a2 2 0 0 1 1.9 1.2L21 13" />
+                            <path d="M4.5 13h15" />
+                            <path d="M7 13v2.5a1.5 1.5 0 1 1-3 0V14" />
+                            <path d="M20 14v1.5a1.5 1.5 0 1 1-3 0V13" />
+                            <circle cx="7" cy="18" r="1.8" />
+                            <circle cx="17" cy="18" r="1.8" />
+                          </svg>
+                        </span>
+                        <span>Car Management</span>
+                      </Link>
+                    )}
+
                     <Link
                       to="/my-bookings"
                       onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
