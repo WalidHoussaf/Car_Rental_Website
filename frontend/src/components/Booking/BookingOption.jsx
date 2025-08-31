@@ -215,7 +215,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
             <div className="space-y-6">
               <div className="flex justify-between items-center py-2">
                 <span className="text-gray-400 font-['Orbitron'] text-base">
-                  {t('baseRate').replace('{price}', car.price).replace('{days}', bookingDetails.totalDays)}
+                  {t('baseRate').replace('{price}', car.pricePerDay || car.price || 0).replace('{days}', bookingDetails.totalDays)}
                 </span>
                 <span className="text-white font-['Orbitron'] text-base font-medium">${basePrice}</span>
               </div>

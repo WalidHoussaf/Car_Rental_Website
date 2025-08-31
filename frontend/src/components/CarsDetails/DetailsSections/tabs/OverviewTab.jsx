@@ -22,9 +22,9 @@ const OverviewTab = ({ car }) => {
             <p>{t('luxuryExperience', { carName: car.name })}</p>
             
             <p>
-              {t('poweredBy')} {car.specifications.engine} {t('producing')} {car.specifications.horsepower || car.specifications.power}, {t('the')} {car.name} {t('deliversAcceleration')} {car.specifications.acceleration?.split(' ')[0] || 'record'} {t('seconds')}. {t('advancedTransmission', {
-                transmission: car.specifications.transmission, 
-                driveType: car.specifications.driveType || car.specifications.torque
+              {t('poweredBy')} {car.specifications?.engine || 'N/A'} {t('producing')} {car.specifications?.horsepower || car.specifications?.power || 'N/A'}, {t('the')} {car.name} {t('deliversAcceleration')} {car.specifications?.acceleration?.split(' ')[0] || 'record'} {t('seconds')}. {t('advancedTransmission', {
+                transmission: car.specifications?.transmission || 'N/A', 
+                driveType: car.specifications?.driveType || car.specifications?.torque || 'N/A'
               })}
             </p>
           </div>

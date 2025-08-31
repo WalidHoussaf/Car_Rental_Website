@@ -62,7 +62,7 @@ router.get('/all', authenticateToken, requireAdmin, async (req, res) => {
 
     const bookings = await Booking.find(filter)
       .populate('user', 'firstName lastName email phone')
-      .populate('car', 'make model year licensePlate location')
+      .populate('car', 'make model year location')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -247,7 +247,7 @@ router.patch('/:id/status', authenticateToken, requireAdmin, validateObjectId, h
       { status },
       { new: true, runValidators: true }
     ).populate('user', 'firstName lastName email')
-     .populate('car', 'make model licensePlate');
+     .populate('car', 'make model');
 
     if (!booking) {
       return res.status(404).json({

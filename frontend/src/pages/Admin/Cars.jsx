@@ -2,13 +2,14 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { api } from '../../config/api';
 import { useNotification } from '../../context/notificationUtils';
-import FuturisticModal from '../../components/Ui/FuturisticModal';
 import CreateEditCarModal from '../../components/Admin/CreateEditCarModal';
 import CarViewModal from '../../components/Admin/CarViewModal';
+import DeleteCarModal from '../../components/Admin/DeleteCarModal';
 import AuthContext from '../../context/authContext';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 import { locations as allLocations } from '../../assets/assets';
+import { getCarImage } from '../../utils/imageResolver';
 
 const PAGE_SIZE = 10;
 
@@ -24,10 +25,10 @@ const defaultForm = {
   imagesText: '',
   features: '', 
   description: '',
-  transmission: '',
-  fuelType: '',
-  seats: '',
-  doors: '',
+  transmission: 'automatic',
+  fuelType: 'gasoline',
+  seats: '5',
+  doors: '4',
   availability: true,
 };
 
@@ -35,7 +36,6 @@ const AdminCars = () => {
   const { showSuccess, showError } = useNotification();
   const { user: currentUser, isAuthenticated, loading: authLoading } = useContext(AuthContext);
   const [uploadingImages, setUploadingImages] = useState(false);
-  const [confirmAck, setConfirmAck] = useState(false);
   const { language } = useLanguage();
   const t = useTranslations(language);
 
@@ -228,7 +228,6 @@ const AdminCars = () => {
     setModal({ type: 'view', car });
   };
   const openDelete = (car) => {
-    setConfirmAck(false);
     setModal({ type: 'delete', car });
   };
 
@@ -237,30 +236,30 @@ const AdminCars = () => {
     setProcessing(true);
     try {
       // minimal validation
-      const required = ['name', 'category', 'pricePerDay', 'location', 'image'];
+      const required = ['name', 'make', 'model', 'category', 'pricePerDay', 'location', 'image'];
       for (const f of required) {
         if (!String(form[f] ?? '').trim()) {
-          showError('Please fill all required fields');
+          showError(`Please fill all required fields (missing: ${f})`);
           setProcessing(false);
           return;
         }
       }
       const payload = {
         name: form.name.trim(),
-        make: form.make?.trim() || null,
-        model: form.model?.trim() || null,
-        year: form.year ? Number(form.year) : null,
+        make: form.make.trim(),
+        model: form.model.trim(),
+        year: Number(form.year),
         category: form.category,
         pricePerDay: Number(form.pricePerDay),
         location: form.location.trim(),
         image: form.image.trim(),
         features: form.features ? form.features.split(',').map(s => s.trim()).filter(Boolean) : [],
         images: form.imagesText ? form.imagesText.split(',').map(s => s.trim()).filter(Boolean) : [],
-        description: form.description?.trim() || null,
-        transmission: form.transmission || null,
-        fuelType: form.fuelType || null,
-        seats: form.seats ? Number(form.seats) : null,
-        doors: form.doors ? Number(form.doors) : null,
+        description: form.description?.trim() || '',
+        transmission: form.transmission,
+        fuelType: form.fuelType,
+        seats: Number(form.seats),
+        doors: Number(form.doors),
         availability: form.availability,
       };
 
@@ -528,9 +527,9 @@ const AdminCars = () => {
                             <div className="flex items-center gap-3">
                               <div className="h-12 w-16 rounded bg-black/40 border border-cyan-900/30 overflow-hidden flex items-center justify-center">
                                 {(() => {
-                                  const src = c.image || (Array.isArray(c.images) ? c.images[0] : '') || (Array.isArray(c.gallery) ? c.gallery[0]?.path : '');
+                                  const src = getCarImage(c);
                                   return src ? (
-                                    <img src={src} alt={c.name} className="h-full w-full object-cover" />
+                                    <img src={src} alt={c.name} className="h-full w-full object-cover" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
                                   ) : (
                                     <div className="text-xs text-gray-500">No Image</div>
                                   );
@@ -626,50 +625,13 @@ const AdminCars = () => {
       />
 
       {/* Delete Modal */}
-      {modal.type === 'delete' && (
-        <FuturisticModal
-          open
-          onClose={() => { setConfirmAck(false); setModal({ type: null, car: null }); }}
-          title="Delete Car"
-          actions={[
-            { label: 'Cancel', onClick: () => { setConfirmAck(false); setModal({ type: null, car: null }); } },
-            { label: processing ? 'Deleting...' : 'Delete', onClick: confirmDelete, variant: 'danger', disabled: processing || !confirmAck },
-          ]}
-        >
-          <div className="space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="h-24 w-36 rounded bg-black/40 border border-red-900/40 overflow-hidden flex items-center justify-center">
-                {(() => {
-                  const c = modal.car || {};
-                  const src = c.image || (Array.isArray(c.images) ? c.images[0] : '') || (Array.isArray(c.gallery) ? c.gallery[0]?.path : '');
-                  return src ? (
-                    <img src={src} alt={c.name || 'car'} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="text-xs text-gray-500">No Image</div>
-                  );
-                })()}
-              </div>
-              <div>
-                <div className="text-lg font-semibold text-white">{modal.car?.name || `${modal.car?.make || ''} ${modal.car?.model || ''}`}</div>
-                <div className="text-gray-400 text-sm">{[modal.car?.make, modal.car?.model, modal.car?.year].filter(Boolean).join(' • ')}</div>
-              </div>
-            </div>
-
-            <div className="rounded-md border border-red-900/40 bg-red-950/30 p-3">
-              <div className="flex items-center gap-2 text-red-400 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM10.5 8.25a1.5 1.5 0 113 0v4.5a1.5 1.5 0 11-3 0V8.25zm1.5 8.25a1.125 1.125 0 100-2.25 1.125 1.125 0 000 2.25z" clipRule="evenodd" /></svg>
-                <span>Deleting this car is permanent.</span>
-              </div>
-              <p className="mt-2 text-sm text-gray-300">This will remove the car from listings. Existing bookings will not be deleted but may be impacted.</p>
-            </div>
-
-            <label className="flex items-start gap-2 text-sm text-gray-200 cursor-pointer">
-              <input type="checkbox" checked={confirmAck} onChange={(e) => setConfirmAck(e.target.checked)} />
-              <span>I understand that this action cannot be undone.</span>
-            </label>
-          </div>
-        </FuturisticModal>
-      )}
+      <DeleteCarModal
+        open={modal.type === 'delete'}
+        onClose={() => setModal({ type: null, car: null })}
+        car={modal.car}
+        onConfirm={confirmDelete}
+        processing={processing}
+      />
     </>
   );
 };

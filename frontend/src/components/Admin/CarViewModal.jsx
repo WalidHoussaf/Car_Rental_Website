@@ -1,11 +1,10 @@
 import React from 'react';
+import { getCarImage } from '../../utils/imageResolver';
 
 const CarViewModal = ({ open, onClose, car }) => {
   if (!open || !car) return null;
 
-  const getCarImage = () => {
-    return car.image || (Array.isArray(car.images) ? car.images[0] : '') || (Array.isArray(car.gallery) ? car.gallery[0]?.path : '');
-  };
+  const carImageSrc = getCarImage(car);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-20">
@@ -37,8 +36,8 @@ const CarViewModal = ({ open, onClose, car }) => {
           {/* Car Image and Basic Info */}
           <div className="flex items-start gap-6 mb-6">
             <div className="h-32 w-48 rounded-lg bg-black/40 border border-cyan-900/30 overflow-hidden flex items-center justify-center flex-shrink-0">
-              {getCarImage() ? (
-                <img src={getCarImage()} alt={car.name} className="h-full w-full object-cover" />
+              {carImageSrc ? (
+                <img src={carImageSrc} alt={car.name} className="h-full w-full object-cover" />
               ) : (
                 <div className="text-sm text-gray-500 font-['Orbitron']">No Image</div>
               )}

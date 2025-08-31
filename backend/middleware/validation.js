@@ -99,8 +99,6 @@ export const validateCarUpdate = [
   body('seats').optional().isInt({ min: 2, max: 9 }),
   body('doors').optional().isInt({ min: 2, max: 5 }),
   body('pricePerDay').optional().isFloat({ min: 0 }),
-  body('licensePlate').optional().trim().notEmpty(),
-  body('mileage').optional().isFloat({ min: 0 }),
   body('location').optional().isString().trim(),
   // Images
   body('image').optional().isString().trim(),
@@ -163,14 +161,6 @@ export const validateCar = [
     .isFloat({ min: 0 })
     .withMessage('Price per day must be a positive number'),
   
-  body('licensePlate')
-    .trim()
-    .notEmpty()
-    .withMessage('License plate is required'),
-  
-  body('mileage')
-    .isFloat({ min: 0 })
-    .withMessage('Mileage must be a positive number'),
   body('location')
     .trim()
     .notEmpty()

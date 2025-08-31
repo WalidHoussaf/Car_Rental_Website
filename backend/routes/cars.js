@@ -28,35 +28,29 @@ const storage = multer.diskStorage({
   }
 });
 
-// Upload car images (Admin only)
-router.post('/upload', authenticateToken, requireAdmin, (req, res, next) => {
-  const handler = upload.array('images', 10);
-  handler(req, res, (err) => {
-    if (err) {
-      return res.status(400).json({ success: false, message: err.message });
-    }
-    try {
-      const files = req.files || [];
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
-      const urls = files.map(f => ({
-        filename: f.filename,
-        url: `${baseUrl}/uploads/${f.filename}`,
-        mimetype: f.mimetype,
-        size: f.size,
-      }));
-      return res.status(201).json({ success: true, data: { files: urls } });
-    } catch (e) {
-      return res.status(500).json({ success: false, message: 'Upload failed', error: e.message });
-    }
-  });
-});
-
 const fileFilter = (req, file, cb) => {
   if (/^image\//.test(file.mimetype)) cb(null, true);
   else cb(new Error('Only image files are allowed'));
 };
 
 const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024, files: 10 } });
+
+// Upload car images (Admin only)
+router.post('/upload', authenticateToken, requireAdmin, upload.array('images', 10), (req, res) => {
+  try {
+    const files = req.files || [];
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const urls = files.map(f => ({
+      filename: f.filename,
+      url: `${baseUrl}/uploads/${f.filename}`,
+      mimetype: f.mimetype,
+      size: f.size,
+    }));
+    return res.status(201).json({ success: true, data: { files: urls } });
+  } catch (e) {
+    return res.status(500).json({ success: false, message: 'Upload failed', error: e.message });
+  }
+});
 
 // Get all cars with filtering and pagination
 router.get('/', validateCarSearch, handleValidationErrors, optionalAuth, async (req, res) => {

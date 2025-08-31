@@ -32,7 +32,7 @@ const CarHighlights = ({ car }) => {
       <div className="space-y-4">
         <HighlightItem 
           title={t('explosivePerformance') || "Explosive Performance"} 
-          description={`${t('accelerateFrom') || 'Accelerate from'} 0-60 mph ${t('inJust') || 'in just'} ${car.specifications.acceleration?.split(' ')[0] || 'record'} ${t('secondsWith') || 'seconds with'} ${car.specifications.horsepower} ${t('ofRawPower') || 'of raw power'}.`} 
+          description={`${t('accelerateFrom') || 'Accelerate from'} 0-60 mph ${t('inJust') || 'in just'} ${car.specifications?.acceleration?.split(' ')[0] || 'record'} ${t('secondsWith') || 'seconds with'} ${car.specifications?.horsepower || 'N/A'} ${t('ofRawPower') || 'of raw power'}.`} 
         />
         
         <HighlightItem 

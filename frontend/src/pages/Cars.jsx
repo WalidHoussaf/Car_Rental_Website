@@ -197,7 +197,8 @@ const CarsPage = () => {
     }
     
     // Filter by Price Range
-    if (car.price < localFilters.priceRange[0] || car.price > localFilters.priceRange[1]) {
+    const carPrice = car.pricePerDay || car.price || 0;
+    if (carPrice < localFilters.priceRange[0] || carPrice > localFilters.priceRange[1]) {
       return false;
     }
     
@@ -453,7 +454,7 @@ const CarsPage = () => {
                         {/* Price Badge */}
                         <div className="absolute bottom-3 right-3">
                           <div className="px-3 py-1 rounded-md bg-black/80 backdrop-blur-sm text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] border border-cyan-500/20">
-                            ${car.price}{t('day')}
+                            ${car.pricePerDay || car.price || 0}{t('day')}
                           </div>
                         </div>
                       </div>

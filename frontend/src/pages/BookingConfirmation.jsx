@@ -325,7 +325,7 @@ const BookingConfirmation = () => {
                 <div className="flex justify-between items-center border-b border-blue-900/30 pb-3 group/item hover:border-green-500/50 transition-colors duration-300">
                   <span className="text-white group-hover/item:text-green-100 transition-colors duration-300">{t('vehicleRental')}</span>
                   <span className="text-cyan-400 font-medium group-hover/item:text-green-300 transition-colors duration-300">
-                    ${carDetails.price} × {bookingDetails.totalDays} {t('days')}
+                    ${carDetails.pricePerDay || carDetails.price || 0} × {bookingDetails.totalDays} {t('days')}
                   </span>
                 </div>
                 

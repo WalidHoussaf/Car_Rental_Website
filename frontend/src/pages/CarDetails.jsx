@@ -174,7 +174,7 @@ const CarDetailPage = () => {
                           <div className="px-4 py-2 rounded-lg bg-black/80 backdrop-blur-sm border border-cyan-400/30">
                             <div className="text-cyan-400 text-xs font-['Orbitron'] uppercase tracking-wider">Price</div>
                             <div className="text-white text-lg font-bold font-['Orbitron']">
-                              ${processedRelatedCar.price}<span className="text-sm text-gray-400">/{t('day')}</span>
+                              ${processedRelatedCar.pricePerDay || processedRelatedCar.price || 0}<span className="text-sm text-gray-400">/{t('day')}</span>
                             </div>
                           </div>
                         </div>

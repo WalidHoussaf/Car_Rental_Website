@@ -27,13 +27,9 @@ const carSchema = new mongoose.Schema({
   },
   
   // Pricing and rating
-  price: {
-    type: Number,
-    required: [true, 'Price per day is required'],
-    min: [0, 'Price cannot be negative']
-  },
   pricePerDay: {
     type: Number,
+    required: [true, 'Price per day is required'],
     min: [0, 'Price cannot be negative']
   },
   rating: {
@@ -113,17 +109,6 @@ const carSchema = new mongoose.Schema({
     type: Number,
     min: [2, 'Car must have at least 2 doors'],
     max: [5, 'Car cannot have more than 5 doors']
-  },
-  licensePlate: {
-    type: String,
-    unique: true,
-    sparse: true,
-    trim: true,
-    uppercase: true
-  },
-  mileage: {
-    type: Number,
-    min: [0, 'Mileage cannot be negative']
   },
   availability: {
     type: Boolean,
