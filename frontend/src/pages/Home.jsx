@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import { Link } from 'react-router-dom';
 import { assets, resolveImagePaths } from '../assets/assets';
 import HowItWorks from '../components/Home/HowItWorks';
@@ -6,7 +6,8 @@ import FeaturedCars from '../components/Home/FeaturedCars';
 import PopularDestinations from '../components/Home/PopularDestinations';
 import Testimonials from '../components/Home/Testimonials';
 import NewsletterSection from '../components/Home/NewsletterSection';
- 
+import CarContext from '../context/CarContext';
+
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
 
@@ -14,6 +15,7 @@ const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { language } = useLanguage();
   const t = useTranslations(language);
+  const { cars } = useContext(CarContext);
   
   // Hero Slides Captions 
   const heroMessages = [
@@ -31,8 +33,8 @@ const HomePage = () => {
     }
   ];
 
-  // Get Data From Assets.js
-  const featuredCars = resolveImagePaths(assets.data.featuredCars, 'image');
+  // Get featured cars from CarContext 
+  const featuredCars = cars.slice(0, 3);
   const destinations = resolveImagePaths(assets.data.destinations, 'image');
   const testimonials = resolveImagePaths(assets.data.testimonials, 'photo');
 

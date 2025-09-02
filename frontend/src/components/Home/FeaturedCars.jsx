@@ -2,68 +2,64 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
+import { assets } from '../../assets/assets';
 
 const FeaturedCars = ({ featuredCars }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
 
+  // Helper function to resolve image paths from backend
+  const resolveImagePath = (imagePath) => {
+    if (!imagePath) return "/api/placeholder/400/240";
+    
+    // If it's already a full URL or starts with /, return as is
+    if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
+      return imagePath;
+    }
+    
+    // If it's a dot notation path like "cars.car1", resolve from assets
+    if (imagePath.includes('.')) {
+      const path = imagePath.split('.');
+      let resolved = assets;
+      
+      try {
+        path.forEach(key => {
+          resolved = resolved[key];
+        });
+        return resolved || "/api/placeholder/400/240";
+      } catch {
+        return "/api/placeholder/400/240";
+      }
+    }
+    
+    return imagePath;
+  };
+
+  // Normalize horsepower to a plain value without the 'hp' unit
+  const normalizeHorsepower = (value) => {
+    if (value === undefined || value === null) return '';
+    const str = String(value).toLowerCase().replace(/\s*hp\s*$/,'').trim();
+    return str;
+  };
+
   // Helper function to get car-specific specs
   const getCarSpecs = (car) => {
-    // Default values if not specified
-    const defaults = {
-      horsepower: '415',
-      acceleration: '5.6s',
-      seats: '5',
-      transmission: '9-Speed Automatic'
-    };
+    // Use backend specifications if available
+    if (car.specifications) {
+      return {
+        horsepower: normalizeHorsepower(car.specifications.power) || '415',
+        acceleration: car.specifications.acceleration || '5.6s',
+        seats: car.specifications.seatingCapacity || car.seats || '5',
+        transmission: car.specifications.transmission || car.transmission || '9-Speed Automatic'
+      };
+    }
 
-    // Car Sample for now until the backend is ready
-    const specsByModel = {
-      'Tesla Cybertruck': {
-        horsepower: '845',
-        acceleration: '2.6s',
-        seats: '5',
-        transmission: 'Single-Speed'
-      },
-      'BMW i7': {
-        horsepower: '544',
-        acceleration: '4.5s',
-        seats: '4',
-        transmission: '8-Speed Automatic'
-      },
-      'Mercedes G-Class': {
-        horsepower: '416',
-        acceleration: '5.6s',
-        seats: '5',
-        transmission: '9-Speed Automatic'
-      },
-      'Audi e-tron GT': {
-        horsepower: '590',
-        acceleration: '3.3s',
-        seats: '4',
-        transmission: 'Single-Speed'
-      },
-      'Porsche Taycan': {
-        horsepower: '750',
-        acceleration: '2.8s',
-        seats: '4',
-        transmission: '2-Speed Automatic'
-      },
-      'Lamborghini Urus': {
-        horsepower: '650',
-        acceleration: '3.6s',
-        seats: '5',
-        transmission: '8-Speed Automatic'
-      }
-    };
-
-    // Use model specific data or fall back to defaults
-    const specs = specsByModel[car.name] || {};
+    // Fallback to car properties or defaults
     return {
-      horsepower: car.horsepower || specs.horsepower || defaults.horsepower,
-      acceleration: car.acceleration || specs.acceleration || defaults.acceleration,
-      seats: car.seats || specs.seats || defaults.seats,
-      transmission: car.transmission || specs.transmission || defaults.transmission
+      horsepower: normalizeHorsepower(car.horsepower) || '415',
+      acceleration: car.acceleration || '5.6s', 
+      seats: car.seats || '5',
+      transmission: car.transmission || '9-Speed Automatic'
     };
   };
 
@@ -103,7 +99,7 @@ const FeaturedCars = ({ featuredCars }) => {
             const specs = getCarSpecs(car);
             return (
             <div
-              key={car.id}
+              key={car._id || car.id}
                 className="relative bg-black rounded-xl overflow-hidden border border-cyan-900/30 shadow-lg transform transition-all duration-500 hover:scale-[1.02] hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] group"
               >
                
@@ -113,7 +109,7 @@ const FeaturedCars = ({ featuredCars }) => {
                 <div className="relative h-56 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
                 <img
-                  src={car.image}
+                  src={resolveImagePath(car.image)}
                   alt={car.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
@@ -180,12 +176,12 @@ const FeaturedCars = ({ featuredCars }) => {
                 {/* Price and CTA */}
                   <div className="flex justify-between items-center">
                     <div className="transform transition-all duration-300 group-hover:scale-105 group-hover:translate-x-1">
-                      <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] group-hover:text-cyan-400 transition-colors duration-300">${car.price}</span>
-                      <span className="text-sm text-gray-400 font-['Orbitron'] transition-colors duration-300">/{t('day')}</span>
+                      <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] group-hover:text-cyan-400 transition-colors duration-300">${car.pricePerDay || car.price}</span>
+                      <span className="text-sm text-gray-400 font-['Orbitron'] transition-colors duration-300">{t('day')}</span>
                   </div>
                   
                   <Link
-                    to={`/cars/${car.id}`}
+                    to={`/cars/${car._id || car.id}`}
                       className="relative px-6 py-2 text-sm font-medium text-black bg-gradient-to-r from-white to-cyan-400 border border-cyan-500/50 rounded-lg hover:from-cyan-400 hover:to-white transition-all duration-300 font-['Orbitron'] transform hover:scale-105 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)]"
                     >
                       <span className="relative z-10">{t('details')}</span>
