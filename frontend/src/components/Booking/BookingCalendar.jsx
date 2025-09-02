@@ -3,6 +3,7 @@ import { useTranslations } from '../../translations';
 import { useLanguage } from '../../hooks/useLanguage';
 import CalendarDateIcon from '../Ui/Icons/CalendarDateIcon';
 import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
+import { getNumericPrice } from '../../utils/price';
 
 
 const DatePicker = forwardRef(({ selected, onChange, minDate, className, ...props }, ref) => {
@@ -233,25 +234,11 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
                 
                 <div className="flex justify-between items-center py-3">
                   <span className="text-gray-400 font-['Orbitron'] text-sm">{t('dailyRate')}</span>
-                  <span className="text-white font-['Orbitron'] text-sm font-medium">${car.price}</span>
+                  <span className="text-white font-['Orbitron'] text-sm font-medium">${getNumericPrice(car)}</span>
                 </div>
                 
                 <div className="h-px bg-gradient-to-r from-transparent via-blue-900/50 to-transparent"></div>
                 
-                {/* Total */}
-                <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-lg p-4 border border-cyan-500/20">
-                  <div className="flex justify-between items-center">
-                    <span className="text-cyan-400 font-['Orbitron'] font-medium text-base">{t('estimatedTotal')}</span>
-                    <span className="text-xl lg:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
-                      ${car.price * totalDays}
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Disclaimer */}
-                <p className="text-gray-500 text-xs font-['Orbitron'] text-center leading-relaxed px-2">
-                  {t('finalPriceChange')}
-                </p>
               </div>
             </div>
           </div>

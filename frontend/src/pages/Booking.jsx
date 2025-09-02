@@ -9,6 +9,7 @@ import BookingSummary from '../components/Booking/BookingSummary';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
 import CarContext from '../context/CarContext';
+import { calcBasePrice } from '../utils/price';
 
 const Booking = () => {
   const { id } = useParams();
@@ -104,7 +105,7 @@ const Booking = () => {
     const totalDays = Math.ceil(differenceInTime / (1000 * 3600 * 24)) || 1;
     
     // Calculate base price
-    const basePrice = car ? car.price * totalDays : 0;
+    const basePrice = car ? calcBasePrice(car, totalDays) : 0;
     
     setBookingDetails(prev => ({
       ...prev,
@@ -128,7 +129,7 @@ const Booking = () => {
   };
   
   const handleOptionSelection = (options, additionalPrice) => {
-    const basePrice = car ? car.price * bookingDetails.totalDays : 0;
+    const basePrice = car ? calcBasePrice(car, bookingDetails.totalDays) : 0;
     
     setBookingDetails(prev => ({
       ...prev,

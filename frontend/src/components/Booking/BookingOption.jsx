@@ -8,6 +8,7 @@ import WifiIcon from '../Ui/Icons/WifiIcon';
 import ChildSeatIcon from '../Ui/Icons/ChildSeatIcon';
 import AdditionalDriverIcon from '../Ui/Icons/AdditionalDriverIcon';
 import OptionsIcon from '../Ui/Icons/OptionsIcon';
+import { calcBasePrice, getNumericPrice } from '../../utils/price';
 
 const getOptionIcon = (iconId) => {
   switch(iconId) {
@@ -83,7 +84,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
   };
   
   // Base price calculation
-  const basePrice = car ? car.price * bookingDetails.totalDays : 0;
+  const basePrice = car ? calcBasePrice(car, bookingDetails.totalDays) : 0;
   const additionalPrice = calculateAdditionalPrice();
   const totalPrice = basePrice + additionalPrice;
   
@@ -215,7 +216,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
             <div className="space-y-6">
               <div className="flex justify-between items-center py-2">
                 <span className="text-gray-400 font-['Orbitron'] text-base">
-                  {t('baseRate').replace('{price}', car.pricePerDay || car.price || 0).replace('{days}', bookingDetails.totalDays)}
+                  {t('baseRate').replace('{price}', getNumericPrice(car)).replace('{days}', bookingDetails.totalDays)}
                 </span>
                 <span className="text-white font-['Orbitron'] text-base font-medium">${basePrice}</span>
               </div>

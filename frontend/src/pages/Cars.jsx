@@ -255,13 +255,19 @@ const CarsPage = () => {
     return true;
   });
   
+  // Helper to get a numeric price consistently
+  const getNumericPrice = (car) => {
+    const p = (car.pricePerDay ?? car.price ?? 0);
+    return typeof p === 'string' ? parseFloat(p) : p;
+  };
+  
   // Sort Cars
   const sortedCars = [...filteredCars].sort((a, b) => {
     switch (sortBy) {
       case 'price-low':
-        return a.price - b.price;
+        return getNumericPrice(a) - getNumericPrice(b);
       case 'price-high':
-        return b.price - a.price;
+        return getNumericPrice(b) - getNumericPrice(a);
       case 'rating':
         return b.rating - a.rating;
       default:

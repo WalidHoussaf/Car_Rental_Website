@@ -7,6 +7,8 @@ import DestinationIcon from '../Ui/Icons/DestinationIcon';
 import CreditCardIcon from '../Ui/Icons/CreditCardIcon';
 import StarIcon from '../Ui/Icons/StarIcon';
 import CheckmarkIcon from '../Ui/Icons/CheckmarkIcon';
+import { calcBasePrice } from '../../utils/price';
+import { resolveImagePath } from '../../utils/images';
 
 const PayPalIcon = () => (
   <img src={assets.paypal} alt="PayPal" className="h-12 w-12 object-contain align-middle" />
@@ -43,22 +45,7 @@ const CustomRadio = ({ id, name, value, checked, onChange, children }) => (
   </label>
 );
 
-// Function to resolve image paths
-const resolvePath = (path) => {
-  if (!path || typeof path !== 'string') return null;
-  
-  // If it's a reference to assets (format: "cars.tesla")
-  if (path.includes('.')) {
-    const parts = path.split('.');
-    if (parts.length === 2) {
-      const category = parts[0];
-      const key = parts[1];
-      const result = assets[category] && assets[category][key];
-      return result;
-    }
-  }
-  return path;
-};
+// Use shared image resolver
 
 const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPreviousStep }) => {
   const { language } = useLanguage();
@@ -73,32 +60,22 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
   useEffect(() => {
     if (!car) return;
     
-    let image = null;
-    
-    // Attempt 1: Use car.image if it's an asset reference
-    if (car.image && typeof car.image === 'string' && car.image.includes('.')) {
-      image = resolvePath(car.image);
-    }
-    
-    // Attempt 2: Look up by ID (car1, car2, etc.)
+    let image = resolveImagePath(car.image);
+
+    // Fallback 1: Look up by ID (car1, car2, etc.) if not resolved
     if (!image && car.id && assets.cars[`car${car.id}`]) {
       image = assets.cars[`car${car.id}`];
     }
-    
-    // Attempt 3: Look up by brand name
+
+    // Fallback 2: Look up by brand name if still missing
     if (!image && car.name) {
       const carBrand = car.name.toLowerCase().split(' ')[0];
-      
-      if (carBrand === 'tesla' && assets.cars.tesla) {
-        image = assets.cars.tesla;
-      } else if (carBrand === 'bmw' && assets.cars.bmw) {
-        image = assets.cars.bmw;
-      } else if (carBrand === 'mercedes' && assets.cars.mercedes) {
-        image = assets.cars.mercedes;
-      }
+      if (carBrand === 'tesla' && assets.cars.tesla) image = assets.cars.tesla;
+      else if (carBrand === 'bmw' && assets.cars.bmw) image = assets.cars.bmw;
+      else if (carBrand === 'mercedes' && assets.cars.mercedes) image = assets.cars.mercedes;
     }
-    
-    setCarImage(image);
+
+    setCarImage(image || null);
   }, [car]);
   
   // Date formatting helper
@@ -212,7 +189,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
                     <div className="text-cyan-400/80 text-sm">{bookingDetails.totalDays} {t('days')}</div>
                   </div>
                   <div className="text-white font-['Orbitron'] font-bold text-lg">
-                    ${car.price * bookingDetails.totalDays}
+                    ${calcBasePrice(car, bookingDetails.totalDays)}
                   </div>
                 </div>
               </div>
@@ -300,7 +277,7 @@ const BookingSummary = ({ car, bookingDetails, bookingStep, onSubmit, onPrevious
           <div className="flex justify-between items-center">
             <span className="text-cyan-400 font-['Orbitron'] font-semibold text-lg">{t('totalAmount')}</span>
             <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-500 font-['Orbitron']">
-              ${bookingDetails.totalPrice || (car.price * (bookingDetails.totalDays || 1))}
+              ${bookingDetails.totalPrice || calcBasePrice(car, bookingDetails.totalDays || 1)}
             </span>
           </div>
         </div>

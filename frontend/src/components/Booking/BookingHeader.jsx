@@ -7,6 +7,7 @@ import LocationStepIcon from '../Ui/Icons/LocationStepIcon';
 import OptionsStepIcon from '../Ui/Icons/OptionsStepIcon';
 import SummaryStepIcon from '../Ui/Icons/SummaryStepIcon';
 import ArrowLeftIcon from '../Ui/Icons/ArrowLeftIcon';
+import { getNumericPrice } from '../../utils/price';
 
 const BookingHeader = ({ car, bookingStep }) => {
   const { language } = useLanguage();
@@ -61,7 +62,7 @@ const BookingHeader = ({ car, bookingStep }) => {
               <div className="mt-6 md:mt-0 flex items-center bg-black/50 p-4 rounded-lg border border-gray-800/50 backdrop-blur-sm shadow-lg hover:shadow-cyan-900/20 transition-all duration-300 transform hover:scale-105">
                 <span className="text-gray-400 mr-2 text-sm font-['Orbitron']">{t('startingAt')}</span>
                 <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
-                  ${car?.price || '---'}
+                  ${car ? getNumericPrice(car) : '---'}
                 </span>
                 <span className="text-gray-400 ml-1 text-sm font-['Orbitron']">{t('day')}</span>
               </div>

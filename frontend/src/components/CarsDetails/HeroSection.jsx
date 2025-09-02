@@ -23,6 +23,13 @@ const HeroSection = ({ car }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
+  // Normalize price (support pricePerDay or price and handle strings)
+  const getDisplayPrice = () => {
+    const p = (car.pricePerDay ?? car.price ?? 0);
+    const n = typeof p === 'string' ? parseFloat(p) : p;
+    return Number.isFinite(n) ? n : 0;
+  };
+
   // Handle booking
   const handleBookNow = () => {
     navigate(`/booking/${car._id || car.id}`);
@@ -108,7 +115,7 @@ const HeroSection = ({ car }) => {
               <div className="md:mt-0 animate-fade-in">
                 <div className="px-6 py-4 rounded-lg bg-black/70 backdrop-blur-lg border border-gray-800/50 shadow-xl hover:shadow-blue-900/20 transition-all duration-300 transform hover:scale-105">
                   <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] text-center">
-                    ${car.price}
+                    ${getDisplayPrice()}
                     <span className="text-gray-400 text-sm font-normal ml-1">{t('day')}</span>
                   </div>
                   <div className="mt-1 text-xs text-gray-400 text-center font-['Orbitron']">{t('premiumExperience')}</div>
