@@ -232,7 +232,7 @@ export const validateCarSearch = [
   
   query('category')
     .optional()
-    .isIn(['economy', 'compact', 'midsize', 'fullsize', 'luxury', 'suv', 'sport', 'convertible', 'van'])
+    .isIn(['all', 'economy', 'compact', 'midsize', 'fullsize', 'luxury', 'suv', 'sport', 'convertible', 'van'])
     .withMessage('Please select a valid category'),
 
   query('availability')

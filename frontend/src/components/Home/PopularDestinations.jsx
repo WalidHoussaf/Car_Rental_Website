@@ -99,7 +99,7 @@ const PopularDestinations = ({ destinations }) => {
         {/* CTA Button */}
         <div className="text-center mt-16">
           <Link
-            to="/cars"
+            to="/cars?location=all"
             className="inline-flex items-center px-8 py-4 text-lg font-medium text-black bg-gradient-to-r from-white to-cyan-400 border border-cyan-500/50 rounded-lg hover:from-cyan-400 hover:to-white transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.4)] group"
           >
             <span className="relative z-10 font-['Orbitron'] mr-2">

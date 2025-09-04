@@ -15,7 +15,7 @@ const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { language } = useLanguage();
   const t = useTranslations(language);
-  const { cars } = useContext(CarContext);
+  const { featuredCars } = useContext(CarContext);
   
   // Hero Slides Captions 
   const heroMessages = [
@@ -33,8 +33,8 @@ const HomePage = () => {
     }
   ];
 
-  // Get featured cars from CarContext 
-  const featuredCars = cars.slice(0, 3);
+  // Use first 3 featured cars for display
+  const displayFeaturedCars = featuredCars.slice(0, 3);
   const destinations = resolveImagePaths(assets.data.destinations, 'image');
   const testimonials = resolveImagePaths(assets.data.testimonials, 'photo');
 
@@ -135,7 +135,7 @@ const HomePage = () => {
       </div>
 
       {/* Featured Cars Section */}
-      <FeaturedCars featuredCars={featuredCars} />
+      <FeaturedCars featuredCars={displayFeaturedCars} />
 
       {/* Bottom Border Glow */}
       <div className="relative h-px w-full overflow-hidden">

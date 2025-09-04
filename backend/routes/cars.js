@@ -94,11 +94,14 @@ router.get('/', validateCarSearch, handleValidationErrors, optionalAuth, async (
       filter.maintenanceStatus = req.query.maintenanceStatus;
     }
 
-    if (category) filter.category = category;
+    if (category && category !== 'all') filter.category = category;
     if (transmission) filter.transmission = transmission;
     if (fuelType) filter.fuelType = fuelType;
     if (seats) filter.seats = parseInt(seats);
-    if (location) filter['location'] = new RegExp(location, 'i');
+    if (location && location !== 'all') {
+      // Use $regex with $options for better MongoDB compatibility
+      filter.location = { $regex: location, $options: 'i' };
+    }
 
     // Price range filter
     if (minPrice || maxPrice) {

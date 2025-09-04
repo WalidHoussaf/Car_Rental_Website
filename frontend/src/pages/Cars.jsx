@@ -109,9 +109,22 @@ const CarsPage = () => {
   }, [handleSearchUpdate]);
   
   
-  // Initialize Cars Data - now handled by CarContext
+  // Initialize Cars Data and handle URL parameters
   useEffect(() => {
-  }, []);
+    // Handle URL parameters on component mount
+    if (locationParam && locationParam !== 'all') {
+      setLocalFilters(prev => ({ ...prev, location: locationParam }));
+      updateFilters({ location: locationParam });
+    } else if (locationParam === 'all') {
+      // Reset location filter when 'all' is specified
+      setLocalFilters(prev => ({ ...prev, location: 'all' }));
+      updateFilters({ location: 'all' });
+    }
+    if (categoryParam && categoryParam !== 'all') {
+      setLocalFilters(prev => ({ ...prev, category: categoryParam }));
+      updateFilters({ category: categoryParam });
+    }
+  }, [locationParam, categoryParam]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Handle Scroll to Cars Section
   const scrollToCarsSection = () => {
@@ -177,19 +190,10 @@ const CarsPage = () => {
     navigate('/cars', { replace: true });
   };
   
-  // Filter Cars Based on Current Filters
+  // Filter Cars Based on Current Filters (client-side filtering for non-location filters only)
   const filteredCars = cars.filter(car => {
-    // Filter by Location
-    if (localFilters.location !== 'all') {
-      // Handle Both String and Array Locations
-      if (Array.isArray(car.location)) {
-        if (!car.location.includes(localFilters.location)) {
-          return false;
-        }
-      } else if (car.location !== localFilters.location) {
-        return false;
-      }
-    }
+    // Skip location filtering here - it's handled by backend
+    // Location filtering is done server-side via API
     
     // Filter by Category
     if (localFilters.category !== 'all' && car.category !== localFilters.category) {

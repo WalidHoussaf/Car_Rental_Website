@@ -131,13 +131,9 @@ const seedData = async () => {
         features: ['Air Conditioning', 'Bluetooth', 'Backup Camera', 'USB Ports'],
         image: 'https://via.placeholder.com/400x300?text=Toyota+Camry',
         images: ['https://via.placeholder.com/400x300?text=Toyota+Camry'],
-        licensePlate: 'ABC123',
-        mileage: 15000,
-        location: {
-          branch: 'Downtown',
-          address: '123 Main St, Downtown',
-          coordinates: { latitude: 40.7128, longitude: -74.0060 }
-        }
+        licensePlate: 'VWX234',
+        mileage: 5000,
+        location: 'mohammedia'
       },
       {
         make: 'Honda',
@@ -154,11 +150,7 @@ const seedData = async () => {
         images: ['https://via.placeholder.com/400x300?text=Honda+Civic'],
         licensePlate: 'DEF456',
         mileage: 25000,
-        location: {
-          branch: 'Airport',
-          address: '456 Airport Rd, Terminal 1',
-          coordinates: { latitude: 40.6892, longitude: -74.1745 }
-        }
+        location: 'rabat'
       },
       {
         make: 'BMW',
@@ -175,11 +167,7 @@ const seedData = async () => {
         images: ['https://via.placeholder.com/400x300?text=BMW+X5'],
         licensePlate: 'GHI789',
         mileage: 8000,
-        location: {
-          branch: 'Uptown',
-          address: '789 Luxury Ave, Uptown',
-          coordinates: { latitude: 40.7831, longitude: -73.9712 }
-        }
+        location: 'marrakesh'
       },
       {
         make: 'Ford',
@@ -196,11 +184,7 @@ const seedData = async () => {
         images: ['https://via.placeholder.com/400x300?text=Ford+Escape'],
         licensePlate: 'JKL012',
         mileage: 18000,
-        location: {
-          branch: 'Downtown',
-          address: '123 Main St, Downtown',
-          coordinates: { latitude: 40.7128, longitude: -74.0060 }
-        }
+        location: 'casablanca'
       },
       {
         make: 'Nissan',
@@ -217,11 +201,7 @@ const seedData = async () => {
         images: ['https://via.placeholder.com/400x300?text=Nissan+Versa'],
         licensePlate: 'MNO345',
         mileage: 35000,
-        location: {
-          branch: 'Airport',
-          address: '456 Airport Rd, Terminal 1',
-          coordinates: { latitude: 40.6892, longitude: -74.1745 }
-        }
+        location: 'rabat'
       },
       {
         make: 'Mercedes-Benz',
@@ -238,11 +218,7 @@ const seedData = async () => {
         images: ['https://via.placeholder.com/400x300?text=Mercedes+C-Class'],
         licensePlate: 'PQR678',
         mileage: 12000,
-        location: {
-          branch: 'Uptown',
-          address: '789 Luxury Ave, Uptown',
-          coordinates: { latitude: 40.7831, longitude: -73.9712 }
-        }
+        location: 'marrakesh'
       },
       {
         make: 'Chevrolet',
@@ -259,11 +235,7 @@ const seedData = async () => {
         images: ['https://via.placeholder.com/400x300?text=Chevrolet+Tahoe'],
         licensePlate: 'STU901',
         mileage: 22000,
-        location: {
-          branch: 'Downtown',
-          address: '123 Main St, Downtown',
-          coordinates: { latitude: 40.7128, longitude: -74.0060 }
-        }
+        location: 'casablanca'
       },
       {
         make: 'Tesla',
@@ -280,11 +252,7 @@ const seedData = async () => {
         images: ['https://via.placeholder.com/400x300?text=Tesla+Model+3'],
         licensePlate: 'VWX234',
         mileage: 5000,
-        location: {
-          branch: 'Tech District',
-          address: '321 Innovation Blvd, Tech District',
-          coordinates: { latitude: 40.7589, longitude: -73.9851 }
-        }
+        location: 'mohammedia'
       }
     ];
 

@@ -7,6 +7,7 @@ const CarContext = createContext();
 
 export const CarProvider = ({ children }) => {
   const [cars, setCars] = useState([]);
+  const [featuredCars, setFeaturedCars] = useState([]);
   const [selectedCar, setSelectedCar] = useState(null);
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -116,14 +117,29 @@ export const CarProvider = ({ children }) => {
     }
   };
 
+  // Fetch featured cars (unfiltered)
+  const fetchFeaturedCars = async () => {
+    try {
+      const response = await api.cars.getAll({ limit: 6 }); // Get 6 cars for featured section
+      if (response.success) {
+        setFeaturedCars(response.data.cars);
+      }
+    } catch (error) {
+      console.error('Failed to fetch featured cars:', error);
+    }
+  };
+
   // Update filters
   const updateFilters = (newFilters) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    const updatedFilters = { ...filters, ...newFilters };
+    setFilters(updatedFilters);
+    // Refetch cars with new filters
+    fetchCars(updatedFilters);
   };
 
   // Clear filters
   const clearFilters = () => {
-    setFilters({
+    const clearedFilters = {
       category: '',
       minPrice: '',
       maxPrice: '',
@@ -132,7 +148,10 @@ export const CarProvider = ({ children }) => {
       seats: '',
       location: '',
       search: ''
-    });
+    };
+    setFilters(clearedFilters);
+    // Refetch cars with cleared filters
+    fetchCars(clearedFilters);
   };
 
   // Load initial data
@@ -141,6 +160,7 @@ export const CarProvider = ({ children }) => {
       await fetchCars();
       await fetchCategories();
       await fetchLocations();
+      await fetchFeaturedCars();
     };
     
     loadInitialData();
@@ -148,6 +168,7 @@ export const CarProvider = ({ children }) => {
 
   const value = {
     cars,
+    featuredCars,
     selectedCar,
     categories,
     locations,
@@ -156,6 +177,7 @@ export const CarProvider = ({ children }) => {
     filters,
     pagination,
     fetchCars,
+    fetchFeaturedCars,
     getCarById,
     checkAvailability,
     updateFilters,
