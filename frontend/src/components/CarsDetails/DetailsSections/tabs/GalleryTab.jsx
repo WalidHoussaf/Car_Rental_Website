@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, X, Maximize, ZoomIn, ZoomOut, Download, Heart, Share2 } from 'lucide-react';
 import { useLanguage } from '../../../../hooks/useLanguage';
 import { useTranslations } from '../../../../translations';
+import { resolveImagePath } from '../../../../utils/imageResolver';
+import { assets } from '../../../../assets/assets';
 
 const GalleryTab = ({ car }) => {
   const { language } = useLanguage();
@@ -24,26 +26,52 @@ const GalleryTab = ({ car }) => {
     
     // Always add main image first if it exists
     if (car?.image) {
-      imageArray.push({ path: car.image, alt: `${car.name} main view` });
+      const resolvedMainImage = resolveImagePath(car.image);
+      imageArray.push({ path: resolvedMainImage, alt: `${car.name} main view` });
     }
     
-    // Add gallery images if they exist
+    // Add gallery images if they exist (new cars)
     if (hasGallery) {
       car.gallery.forEach((img, index) => {
+        const resolvedPath = resolveImagePath(img.path || img);
         imageArray.push({
-          path: img.path || img,
+          path: resolvedPath,
           alt: img.alt || `${car.name} gallery image ${index + 1}`
         });
       });
+    }
+    // Check for galleryRef (old cars from assets)
+    else if (car?.galleryRef) {
+      try {
+        const parts = car.galleryRef.split('.');
+        let galleryObj = assets;
+        for (const part of parts) {
+          galleryObj = galleryObj[part];
+        }
+        
+        if (galleryObj && typeof galleryObj === 'object') {
+          Object.values(galleryObj).forEach((imgPath, index) => {
+            if (typeof imgPath === 'string') {
+              imageArray.push({
+                path: imgPath,
+                alt: `${car.name} gallery image ${index + 1}`
+              });
+            }
+          });
+        }
+      } catch (error) {
+        console.warn('Error resolving galleryRef:', car.galleryRef, error);
+      }
     }
     
     // Add images array if it exists and we don't have enough images yet
     if (hasImages && imageArray.length < 6) {
       car.images.forEach((img, index) => {
+        const resolvedPath = resolveImagePath(img);
         // Avoid duplicates
-        if (!imageArray.some(existing => existing.path === img)) {
+        if (!imageArray.some(existing => existing.path === resolvedPath)) {
           imageArray.push({
-            path: img,
+            path: resolvedPath,
             alt: `${car.name} image ${index + 1}`
           });
         }
@@ -52,7 +80,7 @@ const GalleryTab = ({ car }) => {
     
     // If we still don't have enough images, create some variations of the main image
     if (imageArray.length < 3 && car?.image) {
-      const mainImage = car.image;
+      const mainImage = resolveImagePath(car.image);
       for (let i = imageArray.length; i < 3; i++) {
         imageArray.push({
           path: mainImage,
@@ -62,7 +90,7 @@ const GalleryTab = ({ car }) => {
     }
     
     return imageArray;
-  }, [hasGallery, hasImages, car?.image, car?.gallery, car?.images, car?.name]);
+  }, [hasGallery, hasImages, car?.image, car?.gallery, car?.images, car?.name, car?.galleryRef]);
 
   // Load favorites from localStorage on component mount
   useEffect(() => {

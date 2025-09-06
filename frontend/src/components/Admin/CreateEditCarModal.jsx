@@ -377,6 +377,219 @@ const CreateEditCarModal = ({
                 </Field>
               </div>
 
+              {/* Performance Metrics Section */}
+              <SectionTitle>Performance Metrics</SectionTitle>
+
+              <div className="lg:col-span-6">
+                <Field label="Engine" help="Engine type and displacement (e.g., 2.0L Turbo I4)">
+                  <Input 
+                    value={form.engine} 
+                    onChange={(e) => setForm({ ...form, engine: e.target.value })} 
+                    placeholder="e.g., 2.0L Turbo I4" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-6">
+                <Field label="Horsepower" help="Engine power in HP (e.g., 300 HP or 90 hp to 155 hp)">
+                  <Input 
+                    value={form.horsepower} 
+                    onChange={(e) => setForm({ ...form, horsepower: e.target.value })} 
+                    placeholder="e.g., 300 HP or 90 hp to 155 hp" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-6">
+                <Field label="Acceleration (0-60 mph)" help="Time to accelerate from 0 to 60 mph">
+                  <Input 
+                    value={form.acceleration} 
+                    onChange={(e) => setForm({ ...form, acceleration: e.target.value })} 
+                    placeholder="e.g., 5.2 seconds" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-6">
+                <Field label="Fuel Economy" help="Miles per gallon or L/100km">
+                  <Input 
+                    value={form.fuelEconomy} 
+                    onChange={(e) => setForm({ ...form, fuelEconomy: e.target.value })} 
+                    placeholder="e.g., 28 MPG city / 35 MPG highway" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-6">
+                <Field label="Power" help="Engine power output">
+                  <Input 
+                    value={form.power} 
+                    onChange={(e) => setForm({ ...form, power: e.target.value })} 
+                    placeholder="e.g., 429 hp" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-6">
+                <Field label="Torque" help="Engine torque output">
+                  <Input 
+                    value={form.torque} 
+                    onChange={(e) => setForm({ ...form, torque: e.target.value })} 
+                    placeholder="e.g., 384 lb-ft" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-6">
+                <Field label="Top Speed" help="Maximum speed">
+                  <Input 
+                    value={form.topSpeed} 
+                    onChange={(e) => setForm({ ...form, topSpeed: e.target.value })} 
+                    placeholder="e.g., 155 mph" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-6">
+                <Field label="Range" help="Driving range (for electric/hybrid vehicles)">
+                  <Input 
+                    value={form.range} 
+                    onChange={(e) => setForm({ ...form, range: e.target.value })} 
+                    placeholder="e.g., 300 miles" 
+                  />
+                </Field>
+              </div>
+
+              {/* Capacity & Physical Specs Section */}
+              <SectionTitle>Capacity & Physical Specifications</SectionTitle>
+
+              <div className="lg:col-span-3">
+                <Field label="Seating Capacity" help="Number of passengers">
+                  <NumberInput
+                    name="seatingCapacity"
+                    min={1}
+                    max={20}
+                    step={1}
+                    value={form.seatingCapacity}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === '' || (Number(v) >= 1 && Number(v) <= 20)) {
+                        setForm({ ...form, seatingCapacity: v });
+                      }
+                    }}
+                    placeholder="e.g., 5"
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-3">
+                <Field label="Luggage Capacity" help="Trunk/cargo space (cubic feet)">
+                  <NumberInput
+                    name="luggage"
+                    min={0}
+                    max={200}
+                    step={0.1}
+                    value={form.luggage}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === '' || (Number(v) >= 0 && Number(v) <= 200)) {
+                        setForm({ ...form, luggage: v });
+                      }
+                    }}
+                    placeholder="e.g., 15.5"
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-3">
+                <Field label="Spec Doors" help="Number of doors (specifications)">
+                  <NumberInput
+                    name="specDoors"
+                    min={2}
+                    max={6}
+                    step={1}
+                    value={form.specDoors}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === '' || (Number(v) >= 2 && Number(v) <= 6)) {
+                        setForm({ ...form, specDoors: v });
+                      }
+                    }}
+                    placeholder="e.g., 4"
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-3">
+                <Field label="Spec Transmission" help="Detailed transmission type">
+                  <Input 
+                    value={form.specTransmission} 
+                    onChange={(e) => setForm({ ...form, specTransmission: e.target.value })} 
+                    placeholder="e.g., 9-Speed Automatic" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-4">
+                <Field label="Weight" help="Vehicle weight">
+                  <Input 
+                    value={form.weight} 
+                    onChange={(e) => setForm({ ...form, weight: e.target.value })} 
+                    placeholder="e.g., 4,740 lbs" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-4">
+                <Field label="Length" help="Vehicle length">
+                  <Input 
+                    value={form.length} 
+                    onChange={(e) => setForm({ ...form, length: e.target.value })} 
+                    placeholder="e.g., 208.2 inches" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-4">
+                <Field label="Width" help="Vehicle width">
+                  <Input 
+                    value={form.width} 
+                    onChange={(e) => setForm({ ...form, width: e.target.value })} 
+                    placeholder="e.g., 76.9 inches" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-4">
+                <Field label="Height" help="Vehicle height">
+                  <Input 
+                    value={form.height} 
+                    onChange={(e) => setForm({ ...form, height: e.target.value })} 
+                    placeholder="e.g., 59.2 inches" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-4">
+                <Field label="Wheelbase" help="Distance between front and rear axles">
+                  <Input 
+                    value={form.wheelbase} 
+                    onChange={(e) => setForm({ ...form, wheelbase: e.target.value })} 
+                    placeholder="e.g., 126.6 inches" 
+                  />
+                </Field>
+              </div>
+
+              <div className="lg:col-span-4">
+                <Field label="Drive Type" help="Drivetrain configuration">
+                  <Input 
+                    value={form.driveType} 
+                    onChange={(e) => setForm({ ...form, driveType: e.target.value })} 
+                    placeholder="e.g., All-Wheel Drive" 
+                  />
+                </Field>
+              </div>
+
               {/* Features & Description Section */}
               <SectionTitle>Features & Description</SectionTitle>
 

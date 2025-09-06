@@ -10,7 +10,7 @@ const SpecsSection = ({ title, icon, specs, specKeys }) => {
     <div className="bg-gradient-to-br from-gray-900/50 to-black/50 border border-cyan-400 rounded-xl p-6">
       <h3 className="text-xl font-bold text-white font-['Orbitron'] mb-6 flex items-center">
         {icon}
-        {t(title.toLowerCase().replace(/\s+/g, '_'))}
+        {title.includes(' ') ? title : t(title.toLowerCase().replace(/\s+/g, '_'))}
       </h3>
       
       <div className="space-y-4">

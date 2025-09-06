@@ -6,26 +6,28 @@ import { useTranslations } from '../../../../translations';
 const SpecificationsTab = ({ car }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
-  
+ 
   // Group specs by category
-  const performanceSpecs = ['engine', 'horsepower', 'torque', 'acceleration', 'topSpeed', 'transmission'];
-  const dimensionSpecs = ['weight', 'length', 'width', 'height', 'wheelbase', 'driveType'];
+  const performanceSpecs = ['engine', 'horsepower', 'power', 'torque', 'acceleration', 'topSpeed', 'transmission', 'fuelEconomy', 'range'];
+  const dimensionSpecs = ['weight', 'length', 'width', 'height', 'wheelbase', 'driveType', 'seatingCapacity', 'luggage', 'doors'];
  
   return (
     <div className="relative overflow-hidden rounded-lg p-8">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-black z-0"></div>
+      
       {/* Content */}
       <div className="relative z-10">
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-white font-['Orbitron'] mb-6">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('technicalSpecifications')}</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400">{t('technicalSpecifications')}</span>
           </h2>
           <p className="text-gray-300 text-2xs font-['Orbitron']">
             {t('exploreEngineering', { carName: car && car.name ? car.name : '' })}
           </p>
         </div>
        
+        {/* Performance and Dimensions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <SpecsSection
             title="performance"
@@ -40,7 +42,7 @@ const SpecificationsTab = ({ car }) => {
           />
          
           <SpecsSection
-            title="dimensions_weight"
+            title="Dimensions, Weight and Capacity"
             icon={
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-cyan-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -55,6 +57,5 @@ const SpecificationsTab = ({ car }) => {
     </div>
   );
 };
-
 
 export default SpecificationsTab;

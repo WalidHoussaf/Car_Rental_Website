@@ -30,6 +30,25 @@ const defaultForm = {
   seats: '5',
   doors: '4',
   availability: true,
+  // All specification fields
+  engine: '',
+  power: '',
+  torque: '',
+  acceleration: '',
+  fuelEconomy: '',
+  range: '',
+  seatingCapacity: '',
+  luggage: '',
+  specDoors: '',
+  specTransmission: '',
+  horsepower: '',
+  topSpeed: '',
+  weight: '',
+  length: '',
+  width: '',
+  height: '',
+  wheelbase: '',
+  driveType: '',
 };
 
 const AdminCars = () => {
@@ -221,6 +240,25 @@ const AdminCars = () => {
       ...car,
       features: Array.isArray(car.features) ? car.features.join(', ') : (car.features || ''),
       imagesText: Array.isArray(car.images) ? car.images.join(', ') : '',
+      // All specification fields from specifications
+      engine: car.specifications?.engine || '',
+      power: car.specifications?.power || '',
+      torque: car.specifications?.torque || '',
+      acceleration: car.specifications?.acceleration || '',
+      fuelEconomy: car.specifications?.fuelEconomy || '',
+      range: car.specifications?.range || '',
+      seatingCapacity: car.specifications?.seatingCapacity || '',
+      luggage: car.specifications?.luggage || '',
+      specDoors: car.specifications?.doors || '',
+      specTransmission: car.specifications?.transmission || '',
+      horsepower: car.specifications?.horsepower || '',
+      topSpeed: car.specifications?.topSpeed || '',
+      weight: car.specifications?.weight || '',
+      length: car.specifications?.length || '',
+      width: car.specifications?.width || '',
+      height: car.specifications?.height || '',
+      wheelbase: car.specifications?.wheelbase || '',
+      driveType: car.specifications?.driveType || '',
     });
     setModal({ type: 'edit', car });
   };
@@ -261,6 +299,27 @@ const AdminCars = () => {
         seats: Number(form.seats),
         doors: Number(form.doors),
         availability: form.availability,
+        // Complete specifications
+        specifications: {
+          engine: form.engine?.trim() || '',
+          power: form.power?.trim() || '',
+          torque: form.torque?.trim() || '',
+          acceleration: form.acceleration?.trim() || '',
+          fuelEconomy: form.fuelEconomy?.trim() || '',
+          range: form.range?.trim() || '',
+          seatingCapacity: form.seatingCapacity ? Number(form.seatingCapacity) : null,
+          luggage: form.luggage ? Number(form.luggage) : null,
+          doors: form.specDoors ? Number(form.specDoors) : null,
+          transmission: form.specTransmission?.trim() || '',
+          horsepower: form.horsepower?.trim() || '',
+          topSpeed: form.topSpeed?.trim() || '',
+          weight: form.weight?.trim() || '',
+          length: form.length?.trim() || '',
+          width: form.width?.trim() || '',
+          height: form.height?.trim() || '',
+          wheelbase: form.wheelbase?.trim() || '',
+          driveType: form.driveType?.trim() || '',
+        },
       };
 
       if (modal.type === 'create') {
