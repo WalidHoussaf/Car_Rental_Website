@@ -1,7 +1,12 @@
 import React from 'react';
 import { getCarImage } from '../../utils/imageResolver';
+import { useLanguage } from '../../hooks/useLanguage';
+import { useTranslations } from '../../translations';
 
 const CarViewModal = ({ open, onClose, car }) => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
   if (!open || !car) return null;
 
   const carImageSrc = getCarImage(car);
@@ -17,7 +22,7 @@ const CarViewModal = ({ open, onClose, car }) => {
         <div className="flex items-center justify-between px-6 py-4 border-b border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <div className="w-1 h-6 bg-gradient-to-b from-cyan-400 to-cyan-600 rounded-full"></div>
-            <h3 className="text-cyan-300 font-['Orbitron'] text-lg font-semibold tracking-wide">View Car</h3>
+            <h3 className="text-cyan-300 font-['Orbitron'] text-lg font-semibold tracking-wide">{t('adminCarsViewCar')}</h3>
           </div>
           <button
             type="button"
@@ -39,7 +44,7 @@ const CarViewModal = ({ open, onClose, car }) => {
               {carImageSrc ? (
                 <img src={carImageSrc} alt={car.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="text-sm text-gray-500 font-['Orbitron']">No Image</div>
+                <div className="text-sm text-gray-500 font-['Orbitron']">{t('adminCarsNoImage')}</div>
               )}
             </div>
             <div className="flex-1">
@@ -50,7 +55,7 @@ const CarViewModal = ({ open, onClose, car }) => {
                 {[car.make, car.model, car.year].filter(Boolean).join(' • ')}
               </div>
               <div className="text-gray-300 text-sm font-['Orbitron'] text-justify leading-relaxed">
-                {car.description || 'No description available'}
+                {car.description || t('adminCarsNoDescriptionAvailable')}
               </div>
             </div>
           </div>
@@ -58,27 +63,27 @@ const CarViewModal = ({ open, onClose, car }) => {
           {/* Car Details Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
             <div className="bg-black/30 border border-cyan-900/30 rounded-lg p-3">
-              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">Category</div>
+              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">{t('adminCarsCategory')}</div>
               <div className="text-white font-medium capitalize font-['Orbitron']">{car.category || '-'}</div>
             </div>
             <div className="bg-black/30 border border-cyan-900/30 rounded-lg p-3">
-              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">Location</div>
+              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">{t('adminCarsLocation')}</div>
               <div className="text-white font-medium capitalize font-['Orbitron']">{car.location?.branch || car.location || '-'}</div>
             </div>
             <div className="bg-black/30 border border-cyan-900/30 rounded-lg p-3">
-              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">Price/Day</div>
+              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">{t('adminCarsPricePerDay')}</div>
               <div className="text-white font-medium font-['Orbitron']">${car.pricePerDay ?? car.price ?? '-'}</div>
             </div>
             <div className="bg-black/30 border border-cyan-900/30 rounded-lg p-3">
-              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">Transmission</div>
+              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">{t('adminCarsTransmission')}</div>
               <div className="text-white font-medium capitalize font-['Orbitron']">{car.transmission || '-'}</div>
             </div>
             <div className="bg-black/30 border border-cyan-900/30 rounded-lg p-3">
-              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">Fuel Type</div>
+              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">{t('adminCarsFuelType')}</div>
               <div className="text-white font-medium capitalize font-['Orbitron']">{car.fuelType || '-'}</div>
             </div>
             <div className="bg-black/30 border border-cyan-900/30 rounded-lg p-3">
-              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">Seats/Doors</div>
+              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-1">{t('adminCarsSeatsSlashDoors')}</div>
               <div className="text-white font-medium font-['Orbitron']">{[car.seats, car.doors].filter(Boolean).join(' / ') || '-'}</div>
             </div>
           </div>
@@ -86,7 +91,7 @@ const CarViewModal = ({ open, onClose, car }) => {
           {/* Features */}
           {car.features && car.features.length > 0 && (
             <div className="mt-6">
-              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-3">Features</div>
+              <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-3">{t('adminCarsFeatures')}</div>
               <div className="flex flex-wrap gap-2">
                 {car.features.map((feature, index) => (
                   <span
@@ -102,13 +107,13 @@ const CarViewModal = ({ open, onClose, car }) => {
 
           {/* Availability Status */}
           <div className="mt-6 flex items-center justify-between">
-            <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide">Availability Status</div>
+            <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide">{t('adminCarsAvailabilityStatus')}</div>
             <span className={`px-3 py-1 rounded-full text-xs font-['Orbitron'] ${
               car.availability 
                 ? 'bg-green-600/20 text-green-300 border border-green-500/30' 
                 : 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30'
             }`}>
-              {car.availability ? 'Available' : 'Unavailable'}
+              {car.availability ? t('adminCarsAvailable') : t('adminCarsUnavailable')}
             </span>
           </div>
         </div>

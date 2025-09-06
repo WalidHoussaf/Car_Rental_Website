@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import NumberInput from '../Ui/NumberInput';
+import { useLanguage } from '../../hooks/useLanguage';
+import { useTranslations } from '../../translations';
 
 const Field = ({ label, required, children, help, className = '' }) => (
   <div className={`flex flex-col gap-2 ${className}`}>
@@ -7,7 +9,7 @@ const Field = ({ label, required, children, help, className = '' }) => (
       {label}{required ? ' *' : ''}
     </label>
     {children}
-    {help ? <p className="text-sm text-gray-400 mt-1">{help}</p> : null}
+    {help ? <p className="text-sm text-gray-400 mt-1 font-['Rationale']">{help}</p> : null}
   </div>
 );
 
@@ -54,7 +56,10 @@ const CreateEditCarModal = ({
   onClose,
   onSubmit,
 }) => {
-  const title = mode === 'create' ? 'Create a New Car' : 'Edit Car';
+  const { language } = useLanguage();
+  const t = useTranslations(language);
+  
+  const title = mode === 'create' ? t('adminCarsCreateCar') : t('adminCarsUpdateCar');
 
   const [openDropdown, setOpenDropdown] = useState(null); 
   const categoryRef = useRef(null);
@@ -81,15 +86,15 @@ const CreateEditCarModal = ({
   };
 
   const transmissionOptions = [
-    { label: 'Manual', value: 'manual' },
-    { label: 'Automatic', value: 'automatic' },
+    { label: t('adminCarsManual'), value: 'manual' },
+    { label: t('adminCarsAutomatic'), value: 'automatic' },
   ];
 
   const fuelTypeOptions = [
-    { label: 'Gasoline', value: 'gasoline' },
-    { label: 'Diesel', value: 'diesel' },
-    { label: 'Hybrid', value: 'hybrid' },
-    { label: 'Electric', value: 'electric' },
+    { label: t('adminCarsGasoline'), value: 'gasoline' },
+    { label: t('adminCarsDiesel'), value: 'diesel' },
+    { label: t('adminCarsHybrid'), value: 'hybrid' },
+    { label: t('adminCarsElectric'), value: 'electric' },
   ];
 
   if (!open) return null;
@@ -124,27 +129,27 @@ const CreateEditCarModal = ({
             <form onSubmit={onSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
               {/* Basic Information Section */}
-              <SectionTitle>Basic Information</SectionTitle>
+              <SectionTitle>{t('adminCarsBasicInformation')}</SectionTitle>
               
               <div className="lg:col-span-6">
-                <Field label="Car Name" required>
+                <Field label={t('adminCarsCarName')} required>
                   <Input 
                     value={form.name} 
                     onChange={(e) => setForm({ ...form, name: e.target.value })} 
-                    placeholder="Enter car name" 
+                    placeholder={t('adminCarsEnterCarName')} 
                   />
                 </Field>
               </div>
               
               <div className="lg:col-span-6">
-                <Field label="Category" required>
+                <Field label={t('adminCarsCategory')} required>
                   <div className="relative" ref={categoryRef}>
                     <button
                       type="button"
                       onClick={() => setOpenDropdown(openDropdown === 'category' ? null : 'category')}
                       className="w-full text-left font-['Orbitron'] bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 rounded-xl py-3.5 px-5 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 transition-all duration-300 hover:border-cyan-600/40 flex justify-between items-center"
                     >
-                      <span className="capitalize">{form.category ? form.category : 'Select Category'}</span>
+                      <span className="capitalize">{form.category ? form.category : t('adminCarsSelectCategory')}</span>
                       <svg className={`h-5 w-5 text-cyan-400 transition-transform duration-200 ${openDropdown === 'category' ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" /></svg>
                     </button>
                     {openDropdown === 'category' && (
@@ -163,7 +168,7 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Make">
+                <Field label={t('adminCarsMake')}>
                   <Input 
                     value={form.make} 
                     onChange={(e) => setForm({ ...form, make: e.target.value })} 
@@ -173,7 +178,7 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Model">
+                <Field label={t('adminCarsModel')}>
                   <Input 
                     value={form.model} 
                     onChange={(e) => setForm({ ...form, model: e.target.value })} 
@@ -183,7 +188,7 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Year">
+                <Field label={t('adminCarsYear')}>
                   <NumberInput
                     name="year"
                     min={1900}
@@ -202,10 +207,10 @@ const CreateEditCarModal = ({
               </div>
 
               {/* Pricing & Location Section */}
-              <SectionTitle>Pricing & Location</SectionTitle>
+              <SectionTitle>{t('adminCarsPricingLocation')}</SectionTitle>
 
               <div className="lg:col-span-6 font-['Rationale']">
-                <Field label="Price per Day" required help="Enter amount in local currency">
+                <Field label={t('adminCarsPricePerDay')} required help={t('adminCarsEnterAmountInLocalCurrency')}>
                   <NumberInput
                     name="pricePerDay"
                     min={0}
@@ -223,31 +228,31 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-6">
-                <Field label="Location" required>
+                <Field label={t('adminCarsLocation')} required>
                   <Input 
                     value={form.location} 
                     onChange={(e) => setForm({ ...form, location: e.target.value })} 
-                    placeholder="City, Country" 
+                    placeholder={t('adminCarsCityCountry')} 
                   />
                 </Field>
               </div>
 
               {/* Media Section */}
-              <SectionTitle>Media & Images</SectionTitle>
+              <SectionTitle>{t('adminCarsMediaImages')}</SectionTitle>
 
               <div className="lg:col-span-12 font-['Rationale']">
-                <Field label="Main Image URL" required help="Primary image displayed in listings">
+                <Field label={t('adminCarsMainImageUrl')} required help={t('adminCarsPrimaryImageDisplayed')}>
                   <Input 
                     value={form.image} 
                     onChange={(e) => setForm({ ...form, image: e.target.value })} 
-                    placeholder="https://example.com/car-image.jpg" 
+                    placeholder={t('adminCarsImageUrlPlaceholder')} 
                     className="w-full" 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-12 font-['Rationale']">
-                <Field label="Upload Images" help="Select multiple images from your device">
+                <Field label={t('adminCarsUploadImages')} help={t('adminCarsSelectMultipleImages')}>
                   <div className="relative group">
                     <div className="flex items-center gap-4 p-6 border-2 border-dashed border-cyan-900/30 rounded-xl bg-gradient-to-br from-black/30 to-black/10 hover:border-cyan-600/50 transition-all duration-300 group-hover:bg-black/40">
                       <div className="flex items-center gap-3">
@@ -265,7 +270,7 @@ const CreateEditCarModal = ({
                       {uploadingImages && (
                         <span className="text-sm text-cyan-400 flex items-center gap-3 ml-auto">
                           <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-                          <span className="font-medium">Uploading...</span>
+                          <span className="font-medium">{t('adminCarsUploading')}</span>
                         </span>
                       )}
                     </div>
@@ -274,28 +279,28 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-12 font-['Rationale']">
-                <Field label="Additional Image URLs" help="Comma-separated URLs for gallery images">
+                <Field label={t('adminCarsAdditionalImageUrls')} help={t('adminCarsCommaSeparatedUrls')}>
                   <Input 
                     value={form.imagesText} 
                     onChange={(e) => setForm({ ...form, imagesText: e.target.value })} 
-                    placeholder="https://image1.jpg, https://image2.jpg, https://image3.jpg" 
+                    placeholder={t('adminCarsMultipleImageUrlsPlaceholder')} 
                     className="w-full" 
                   />
                 </Field>
               </div>
 
               {/* Vehicle Details Section */}
-              <SectionTitle>Vehicle Specifications</SectionTitle>
+              <SectionTitle>{t('adminCarsVehicleSpecifications')}</SectionTitle>
 
               <div className="lg:col-span-3">
-                <Field label="Transmission">
+                <Field label={t('adminCarsTransmission')}>
                   <div className="relative" ref={transmissionRef}>
                     <button
                       type="button"
                       onClick={() => setOpenDropdown(openDropdown === 'transmission' ? null : 'transmission')}
                       className="w-full text-left font-['Orbitron'] bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 rounded-xl py-3.5 px-5 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 transition-all duration-300 hover:border-cyan-600/40 flex justify-between items-center"
                     >
-                      {transmissionOptions.find(o => o.value === form.transmission)?.label || 'Select Type'}
+                      {transmissionOptions.find(o => o.value === form.transmission)?.label || t('adminCarsSelectType')}
                       <svg className={`h-5 w-5 text-cyan-400 transition-transform duration-200 ${openDropdown === 'transmission' ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" /></svg>
                     </button>
                     {openDropdown === 'transmission' && (
@@ -314,14 +319,14 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-3">
-                <Field label="Fuel Type">
+                <Field label={t('adminCarsFuelType')}>
                   <div className="relative" ref={fuelTypeRef}>
                     <button
                       type="button"
                       onClick={() => setOpenDropdown(openDropdown === 'fuelType' ? null : 'fuelType')}
                       className="w-full text-left font-['Orbitron'] bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 rounded-xl py-3.5 px-5 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 transition-all duration-300 hover:border-cyan-600/40 flex justify-between items-center"
                     >
-                      {fuelTypeOptions.find(o => o.value === form.fuelType)?.label || 'Select Fuel'}
+                      {fuelTypeOptions.find(o => o.value === form.fuelType)?.label || t('adminCarsSelectType')}
                       <svg className={`h-5 w-5 text-cyan-400 transition-transform duration-200 ${openDropdown === 'fuelType' ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" /></svg>
                     </button>
                     {openDropdown === 'fuelType' && (
@@ -340,7 +345,7 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-3">
-                <Field label="Seats">
+                <Field label={t('adminCarsSeats')}>
                   <NumberInput
                     name="seats"
                     min={1}
@@ -359,7 +364,7 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-3">
-                <Field label="Doors">
+                <Field label={t('adminCarsDoors')}>
                   <NumberInput
                     name="doors"
                     min={2}
@@ -378,93 +383,93 @@ const CreateEditCarModal = ({
               </div>
 
               {/* Performance Metrics Section */}
-              <SectionTitle>Performance Metrics</SectionTitle>
+              <SectionTitle>{t('adminCarsPerformanceMetrics')}</SectionTitle>
 
               <div className="lg:col-span-6">
-                <Field label="Engine" help="Engine type and displacement (e.g., 2.0L Turbo I4)">
+                <Field label={t('adminCarsEngine')} help={t('adminCarsEngineDisplacement')}>
                   <Input 
                     value={form.engine} 
                     onChange={(e) => setForm({ ...form, engine: e.target.value })} 
-                    placeholder="e.g., 2.0L Turbo I4" 
+                    placeholder={t('adminCarsEnginePlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-6">
-                <Field label="Horsepower" help="Engine power in HP (e.g., 300 HP or 90 hp to 155 hp)">
+                <Field label={t('adminCarsHorsepower')} help={t('adminCarsHorsepowerRange')}>
                   <Input 
                     value={form.horsepower} 
                     onChange={(e) => setForm({ ...form, horsepower: e.target.value })} 
-                    placeholder="e.g., 300 HP or 90 hp to 155 hp" 
+                    placeholder={t('adminCarsHorsepowerPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-6">
-                <Field label="Acceleration (0-60 mph)" help="Time to accelerate from 0 to 60 mph">
+                <Field label={t('adminCarsAcceleration')} help={t('adminCarsAccelerationTime')}>
                   <Input 
                     value={form.acceleration} 
                     onChange={(e) => setForm({ ...form, acceleration: e.target.value })} 
-                    placeholder="e.g., 5.2 seconds" 
+                    placeholder={t('adminCarsAccelerationPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-6">
-                <Field label="Fuel Economy" help="Miles per gallon or L/100km">
+                <Field label={t('adminCarsFuelEconomy')} help={t('adminCarsFuelEconomyMpg')}>
                   <Input 
                     value={form.fuelEconomy} 
                     onChange={(e) => setForm({ ...form, fuelEconomy: e.target.value })} 
-                    placeholder="e.g., 28 MPG city / 35 MPG highway" 
+                    placeholder={t('adminCarsFuelEconomyPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-6">
-                <Field label="Power" help="Engine power output">
+                <Field label={t('adminCarsPower')} help={t('adminCarsPowerHelp')}>
                   <Input 
                     value={form.power} 
                     onChange={(e) => setForm({ ...form, power: e.target.value })} 
-                    placeholder="e.g., 429 hp" 
+                    placeholder={t('adminCarsPowerPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-6">
-                <Field label="Torque" help="Engine torque output">
+                <Field label={t('adminCarsTorque')} help={t('adminCarsTorqueHelp')}>
                   <Input 
                     value={form.torque} 
                     onChange={(e) => setForm({ ...form, torque: e.target.value })} 
-                    placeholder="e.g., 384 lb-ft" 
+                    placeholder={t('adminCarsTorquePlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-6">
-                <Field label="Top Speed" help="Maximum speed">
+                <Field label={t('adminCarsTopSpeed')} help={t('adminCarsTopSpeedHelp')}>
                   <Input 
                     value={form.topSpeed} 
                     onChange={(e) => setForm({ ...form, topSpeed: e.target.value })} 
-                    placeholder="e.g., 155 mph" 
+                    placeholder={t('adminCarsTopSpeedPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-6">
-                <Field label="Range" help="Driving range (for electric/hybrid vehicles)">
+                <Field label={t('adminCarsRange')} help={t('adminCarsRangeHelp')}>
                   <Input 
                     value={form.range} 
                     onChange={(e) => setForm({ ...form, range: e.target.value })} 
-                    placeholder="e.g., 300 miles" 
+                    placeholder={t('adminCarsRangePlaceholder')} 
                   />
                 </Field>
               </div>
 
               {/* Capacity & Physical Specs Section */}
-              <SectionTitle>Capacity & Physical Specifications</SectionTitle>
+              <SectionTitle>{t('adminCarsCapacityPhysicalSpecs')}</SectionTitle>
 
               <div className="lg:col-span-3">
-                <Field label="Seating Capacity" help="Number of passengers">
+                <Field label={t('adminCarsSeatingCapacity')} help={t('adminCarsNumberOfPassengers')}>
                   <NumberInput
                     name="seatingCapacity"
                     min={1}
@@ -483,7 +488,7 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-3">
-                <Field label="Luggage Capacity" help="Trunk/cargo space (cubic feet)">
+                <Field label={t('adminCarsLuggageCapacity')} help={t('adminCarsTrunkCargoSpace')}>
                   <NumberInput
                     name="luggage"
                     min={0}
@@ -502,7 +507,7 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-3">
-                <Field label="Spec Doors" help="Number of doors (specifications)">
+                <Field label={t('adminCarsSpecDoors')} help={t('adminCarsNumberOfDoorsSpecs')}>
                   <NumberInput
                     name="specDoors"
                     min={2}
@@ -521,90 +526,90 @@ const CreateEditCarModal = ({
               </div>
 
               <div className="lg:col-span-3">
-                <Field label="Spec Transmission" help="Detailed transmission type">
+                <Field label={t('adminCarsSpecTransmission')} help={t('adminCarsDetailedTransmissionType')}>
                   <Input 
                     value={form.specTransmission} 
                     onChange={(e) => setForm({ ...form, specTransmission: e.target.value })} 
-                    placeholder="e.g., 9-Speed Automatic" 
+                    placeholder={t('adminCarsSpecTransmissionPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Weight" help="Vehicle weight">
+                <Field label={t('adminCarsWeight')} help={t('adminCarsVehicleWeight')}>
                   <Input 
                     value={form.weight} 
                     onChange={(e) => setForm({ ...form, weight: e.target.value })} 
-                    placeholder="e.g., 4,740 lbs" 
+                    placeholder={t('adminCarsWeightPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Length" help="Vehicle length">
+                <Field label={t('adminCarsLength')} help={t('adminCarsVehicleLength')}>
                   <Input 
                     value={form.length} 
                     onChange={(e) => setForm({ ...form, length: e.target.value })} 
-                    placeholder="e.g., 208.2 inches" 
+                    placeholder={t('adminCarsLengthPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Width" help="Vehicle width">
+                <Field label={t('adminCarsWidth')} help={t('adminCarsVehicleWidth')}>
                   <Input 
                     value={form.width} 
                     onChange={(e) => setForm({ ...form, width: e.target.value })} 
-                    placeholder="e.g., 76.9 inches" 
+                    placeholder={t('adminCarsWidthPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Height" help="Vehicle height">
+                <Field label={t('adminCarsHeight')} help={t('adminCarsVehicleHeight')}>
                   <Input 
                     value={form.height} 
                     onChange={(e) => setForm({ ...form, height: e.target.value })} 
-                    placeholder="e.g., 59.2 inches" 
+                    placeholder={t('adminCarsHeightPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Wheelbase" help="Distance between front and rear axles">
+                <Field label={t('adminCarsWheelbase')} help={t('adminCarsWheelbaseHelp')}>
                   <Input 
                     value={form.wheelbase} 
                     onChange={(e) => setForm({ ...form, wheelbase: e.target.value })} 
-                    placeholder="e.g., 126.6 inches" 
+                    placeholder={t('adminCarsWheelbasePlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Drive Type" help="Drivetrain configuration">
+                <Field label={t('adminCarsDriveType')} help={t('adminCarsDrivetrainConfiguration')}>
                   <Input 
                     value={form.driveType} 
                     onChange={(e) => setForm({ ...form, driveType: e.target.value })} 
-                    placeholder="e.g., All-Wheel Drive" 
+                    placeholder={t('adminCarsDriveTypePlaceholder')} 
                   />
                 </Field>
               </div>
 
               {/* Features & Description Section */}
-              <SectionTitle>Features & Description</SectionTitle>
+              <SectionTitle>{t('adminCarsDescription')}</SectionTitle>
 
               <div className="lg:col-span-8 font-['Rationale']">
-                <Field label="Features" help="Comma-separated list of car features">
+                <Field label={t('adminCarsCarFeatures')} help={t('adminCarsCommaSeparatedFeatures')}>
                   <Input 
                     value={form.features} 
                     onChange={(e) => setForm({ ...form, features: e.target.value })} 
-                    placeholder="Air Conditioning, GPS Navigation, Bluetooth, USB Ports" 
+                    placeholder={t('adminCarsFeaturesPlaceholder')} 
                   />
                 </Field>
               </div>
 
               <div className="lg:col-span-4">
-                <Field label="Availability Status">
+                <Field label={t('adminCarsAvailableForRent')}>
                   <div className="flex items-center h-14 px-5 bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 rounded-xl hover:border-cyan-600/40 transition-all duration-300 group">
                     <label className="flex items-center font-['Orbitron'] gap-4 text-gray-300 group-hover:text-gray-200 transition-colors cursor-pointer">
                       <div className="relative">
@@ -618,18 +623,18 @@ const CreateEditCarModal = ({
                           <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                         )}
                       </div>
-                      <span className="text-sm font-medium">Available for booking</span>
+                      <span className="text-sm font-medium">{t('adminCarsAvailableForBooking')}</span>
                     </label>
                   </div>
                 </Field>
               </div>
 
               <div className="lg:col-span-12 mb-6 font-['Rationale']">
-                <Field label="Description" help="Brief description highlighting key selling points">
+                <Field label={t('adminCarsCarDescription')} help={t('adminCarsDescribeCarFeatures')}>
                   <Textarea 
                     value={form.description} 
                     onChange={(e) => setForm({ ...form, description: e.target.value })} 
-                    placeholder="Describe the car's condition, unique features, or any important details customers should know..."
+                    placeholder={t('adminCarsDescriptionPlaceholder')}
                     rows={4}
                     className="w-full"
                   />
@@ -647,7 +652,7 @@ const CreateEditCarModal = ({
             onClick={onClose}
             className="px-8 py-3 rounded-xl bg-transparent border-2 border-gray-600/40 text-gray-300 hover:bg-gray-600/10 hover:border-gray-500/60 hover:text-white transition-all duration-300 font-['Orbitron'] text-sm tracking-wide font-medium group cursor-pointer"
           >
-            <span className="group-hover:scale-95 transition-transform duration-200 inline-block">Cancel</span>
+            <span className="group-hover:scale-95 transition-transform duration-200 inline-block">{t('adminCarsCancel')}</span>
           </button>
           <button
             type="button"
@@ -660,9 +665,9 @@ const CreateEditCarModal = ({
               {processing ? (
                 <span className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Saving...
+                  {t('adminCarsSaving')}
                 </span>
-              ) : 'Save'}
+              ) : (mode === 'create' ? t('adminCarsCreateCar') : t('adminCarsUpdateCar'))}
             </span>
           </button>
         </div>
