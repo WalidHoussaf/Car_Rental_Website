@@ -14,12 +14,19 @@ router.get('/dashboard/stats', authenticateToken, requireAdmin, async (req, res)
     const totalUsers = await User.countDocuments();
     const totalBookings = await Booking.countDocuments();
     
-    // Get total revenue
+    // Get total revenue (includes confirmed, active, and completed bookings)
     const revenueResult = await Booking.aggregate([
-      { $match: { status: { $in: ['completed', 'confirmed'] } } },
+      { $match: { status: { $in: ['confirmed', 'active', 'completed'] } } },
       { $group: { _id: null, total: { $sum: '$totalAmount' } } }
     ]);
     const revenue = revenueResult[0]?.total || 0;
+    
+    // Get pending revenue
+    const pendingRevenueResult = await Booking.aggregate([
+      { $match: { status: 'pending' } },
+      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+    ]);
+    const pendingRevenue = pendingRevenueResult[0]?.total || 0;
     
     // Get total cars
     const totalCars = await Car.countDocuments();
@@ -30,7 +37,8 @@ router.get('/dashboard/stats', authenticateToken, requireAdmin, async (req, res)
         totalUsers,
         totalBookings,
         totalCars,
-        revenue
+        revenue,
+        pendingRevenue
       }
     });
   } catch (error) {

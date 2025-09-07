@@ -97,6 +97,15 @@ const AdminCars = () => {
     return localizedLocations.find(l => l.value === locationFilter)?.label || 'Location';
   }, [locationFilter, localizedLocations]);
 
+  // Helper function to get translated category name
+  const getTranslatedCategory = (categoryName) => {
+    if (!categoryName) return t('adminCarsAllCategories');
+    // Try to get translation for the category, fallback to original name if no translation exists
+    const translationKey = categoryName.toLowerCase();
+    const translated = t(translationKey);
+    return translated !== translationKey ? translated : categoryName;
+  };
+
   const [modal, setModal] = useState({ type: null, car: null }); // type: 'create' | 'edit' | 'delete'
   const [form, setForm] = useState(defaultForm);
   const [processing, setProcessing] = useState(false);
@@ -125,12 +134,12 @@ const AdminCars = () => {
           image: prev.image || urls[0],
           imagesText: [...(prev.imagesText ? prev.imagesText.split(',').map(s => s.trim()).filter(Boolean) : []), ...urls].join(', ')
         }));
-        showSuccess('Images uploaded');
+        showSuccess(t('adminCarsImagesUploaded'));
       } else {
-        showError('No images returned from server');
+        showError(t('adminCarsNoImagesReturned'));
       }
     } catch (err) {
-      showError(err?.message || 'Failed to upload images');
+      showError(err?.message || t('adminCarsFailedToUploadImages'));
     } finally {
       setUploadingImages(false);
       // reset the input so user can re-select same files if needed
@@ -176,8 +185,8 @@ const AdminCars = () => {
         throw new Error(res?.message || 'Failed to load cars');
       }
     } catch {
-      setError('Failed to load cars');
-      showError('Failed to load cars');
+      setError(t('adminCarsFailedToLoadCars'));
+      showError(t('adminCarsFailedToLoadCars'));
     } finally {
       setLoading(false);
     }
@@ -277,7 +286,7 @@ const AdminCars = () => {
       const required = ['name', 'make', 'model', 'category', 'pricePerDay', 'location', 'image'];
       for (const f of required) {
         if (!String(form[f] ?? '').trim()) {
-          showError(`Please fill all required fields (missing: ${f})`);
+          showError(t('adminCarsPleaseFilAllRequiredFields').replace('{field}', f));
           setProcessing(false);
           return;
         }
@@ -328,15 +337,15 @@ const AdminCars = () => {
 
       if (modal.type === 'create') {
         await api.cars.create(payload);
-        showSuccess('Car created');
+        showSuccess(t('adminCarsCarCreated'));
       } else if (modal.type === 'edit' && modal.car?._id) {
         await api.cars.update(modal.car._id, payload);
-        showSuccess('Car updated');
+        showSuccess(t('adminCarsCarUpdated'));
       }
       setModal({ type: null, car: null });
       await fetchCars({ page: 1 });
     } catch {
-      showError('Operation failed');
+      showError(t('adminCarsOperationFailed'));
     } finally {
       setProcessing(false);
     }
@@ -347,12 +356,12 @@ const AdminCars = () => {
     setProcessing(true);
     try {
       await api.cars.delete(modal.car._id);
-      showSuccess('Car deleted');
+      showSuccess(t('adminCarsCarDeleted'));
       const newPage = cars.length === 1 && page > 1 ? page - 1 : page;
       await fetchCars({ page: newPage });
       setModal({ type: null, car: null });
     } catch (e) {
-      showError(e?.message || 'Failed to delete car');
+      showError(e?.message || t('adminCarsFailedToDeleteCar'));
     } finally {
       setProcessing(false);
     }
@@ -389,21 +398,21 @@ const AdminCars = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent mb-2 leading-tight">Car Management</h1>
-                <p className="text-gray-400 mb-3">Create, update, and manage cars in your fleet.</p>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent mb-2 leading-tight">{t('adminCarsManagement')}</h1>
+                <p className="text-gray-400 mb-3">{t('adminCarsManagementDescription')}</p>
                 <div className="w-24 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
               </div>
               <div className="text-right flex items-end gap-4">
                 <div>
                   <div className="text-2xl font-bold text-white">{totalItems}</div>
-                  <div className="text-sm text-gray-400">Total Cars</div>
+                  <div className="text-sm text-gray-400">{t('adminCarsTotalCars')}</div>
                 </div>
                 <button onClick={openCreate} className="px-6 py-3 text-base rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer font-['Orbitron']">
                   <span className="inline-flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
                       <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
                     </svg>
-                    Add Car
+                    {t('adminCarsAddCar')}
                   </span>
                 </button>
               </div>
@@ -417,14 +426,14 @@ const AdminCars = () => {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search (make, model, category)"
+                  placeholder={t('adminCarsSearchPlaceholder')}
                   className="bg-black/40 border border-cyan-900/30 rounded-md py-2 px-3 focus:ring-2 focus:ring-cyan-500 focus:outline-none placeholder:text-gray-400 text-gray-200 md:col-span-2 w-full"
                 />
                 <button type="submit" className="px-6 py-2 text-base rounded-md border border-cyan-600/40 text-white bg-cyan-600/20 hover:bg-cyan-600/30 transition-colors cursor-pointer flex items-center justify-center gap-2 w-full md:w-auto">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                  Search
+                  {t('adminCarsSearch')}
                 </button>
                 {/* Category Dropdown */}
                 <div className="relative" ref={categoryDropdownRef}>
@@ -433,7 +442,7 @@ const AdminCars = () => {
                     onClick={() => setIsCategoryDropdownOpen(v => !v)}
                     className="w-full px-3 py-2 bg-black/40 border border-cyan-900/30 rounded-md text-gray-200 flex items-center justify-between hover:bg-white/5 transition-colors"
                   >
-                    <span className="truncate capitalize">{category || 'All Categories'}</span>
+                    <span className="truncate capitalize">{getTranslatedCategory(category)}</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className={`h-4 w-4 ml-2 transition-transform ${isCategoryDropdownOpen ? 'rotate-180' : ''}`}
@@ -446,8 +455,8 @@ const AdminCars = () => {
                   {isCategoryDropdownOpen && (
                     <div className="absolute z-30 mt-1 w-full bg-black border border-cyan-900/30 rounded-md shadow-lg overflow-hidden">
                       <ul className="max-h-60 overflow-y-auto divide-y divide-cyan-900/20">
-                        {["All Categories", ...categories].map((opt) => {
-                          const value = opt === 'All Categories' ? '' : opt;
+                        {[t('adminCarsAllCategories'), ...categories].map((opt) => {
+                          const value = opt === t('adminCarsAllCategories') ? '' : opt;
                           const active = (category || '') === value;
                           return (
                             <li key={opt || 'all'}>
@@ -460,7 +469,7 @@ const AdminCars = () => {
                                 }}
                                 className={`w-full text-left px-3 py-2 text-sm capitalize ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'}`}
                               >
-                                {opt}
+                                {opt === t('adminCarsAllCategories') ? opt : getTranslatedCategory(opt)}
                               </button>
                             </li>
                           );
@@ -476,7 +485,12 @@ const AdminCars = () => {
                     onClick={() => setIsAvailabilityDropdownOpen(v => !v)}
                     className="w-full px-3 py-2 bg-black/40 border border-cyan-900/30 rounded-md text-gray-200 flex items-center justify-between hover:bg-white/5 transition-colors"
                   >
-                    <span className="truncate capitalize">{availabilityFilter === 'all' ? 'All Statuses' : availabilityFilter}</span>
+                    <span className="truncate capitalize">{
+                      availabilityFilter === 'all' ? t('adminCarsAllStatuses') : 
+                      availabilityFilter === 'available' ? t('adminCarsAvailable') : 
+                      availabilityFilter === 'unavailable' ? t('adminCarsUnavailable') : 
+                      availabilityFilter
+                    }</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className={`h-4 w-4 ml-2 transition-transform ${isAvailabilityDropdownOpen ? 'rotate-180' : ''}`}
@@ -501,7 +515,9 @@ const AdminCars = () => {
                                 }}
                                 className={`w-full text-left px-3 py-2 text-sm capitalize ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'}`}
                               >
-                                {opt === 'all' ? 'All Statuses' : opt}
+                                {opt === 'all' ? t('adminCarsAllStatuses') : 
+                                 opt === 'available' ? t('adminCarsAvailable') : 
+                                 opt === 'unavailable' ? t('adminCarsUnavailable') : opt}
                               </button>
                             </li>
                           );
@@ -555,7 +571,7 @@ const AdminCars = () => {
                   )}
                 </div>
                 <button type="button" onClick={() => { setSearch(''); setCategory(''); setLocationFilter(''); setAvailabilityFilter('all'); fetchCars({ page: 1, search: '', category: '', location: '', availability: 'all' }); }} className="px-6 py-2 text-base rounded-md border border-gray-600/40 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer w-full md:w-auto">
-                  Reset
+                  {t('adminCarsReset')}
                 </button>
               </form>
 
@@ -564,21 +580,21 @@ const AdminCars = () => {
                 <table className="min-w-full text-left text-sm">
                   <thead className="bg-black/60 text-gray-400">
                     <tr>
-                      <th className="py-4 px-4 font-medium">Car</th>
-                      <th className="py-4 px-4 font-medium">Category</th>
-                      <th className="py-4 px-4 font-medium">Location</th>
-                      <th className="py-4 px-4 font-medium">Price/Day</th>
-                      <th className="py-4 px-4 font-medium">Availability</th>
-                      <th className="py-4 px-4 text-right font-medium">Actions</th>
+                      <th className="py-4 px-4 font-medium">{t('adminCarsTableCar')}</th>
+                      <th className="py-4 px-4 font-medium">{t('adminCarsTableCategory')}</th>
+                      <th className="py-4 px-4 font-medium">{t('adminCarsTableLocation')}</th>
+                      <th className="py-4 px-4 font-medium">{t('adminCarsTablePricePerDay')}</th>
+                      <th className="py-4 px-4 font-medium">{t('adminCarsTableAvailability')}</th>
+                      <th className="py-4 px-4 text-right font-medium">{t('adminCarsTableActions')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-cyan-900/30">
                     {loading ? (
-                      <tr><td className="py-6 text-center text-gray-400" colSpan={6}>Loading cars...</td></tr>
+                      <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('adminCarsLoadingCars')}</td></tr>
                     ) : error ? (
-                      <tr><td className="py-6 text-center text-red-300" colSpan={6}>Failed to load cars</td></tr>
+                      <tr><td className="py-6 text-center text-red-300" colSpan={6}>{t('adminCarsFailedToLoadCars')}</td></tr>
                     ) : cars.length === 0 ? (
-                      <tr><td className="py-6 text-center text-gray-400" colSpan={6}>No cars found</td></tr>
+                      <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('adminCarsNoCarsFound')}</td></tr>
                     ) : (
                       cars.map((c) => (
                         <tr key={c._id} className="border-b border-cyan-900/20 hover:bg-white/5 transition-colors">
@@ -590,7 +606,7 @@ const AdminCars = () => {
                                   return src ? (
                                     <img src={src} alt={c.name} className="h-full w-full object-cover" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
                                   ) : (
-                                    <div className="text-xs text-gray-500">No Image</div>
+                                    <div className="text-xs text-gray-500">{t('adminCarsNoImage')}</div>
                                   );
                                 })()}
                               </div>
@@ -600,27 +616,27 @@ const AdminCars = () => {
                               </div>
                             </div>
                           </td>
-                          <td className="py-4 px-4 capitalize text-gray-300">{c.category}</td>
+                          <td className="py-4 px-4 capitalize text-gray-300">{getTranslatedCategory(c.category)}</td>
                           <td className="py-4 px-4 text-gray-300 capitalize">{c.location || '-'}</td>
                           <td className="py-4 px-4 text-gray-300">${c.pricePerDay ?? c.price}</td>
                           <td className="py-4 px-4">
                             <span className={`px-2 py-0.5 rounded text-xs ${c.availability ? 'bg-green-600/20 text-green-300 border border-green-500/30' : 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30'}`}>
-                              {c.availability ? 'Available' : 'Unavailable'}
+                              {c.availability ? t('adminCarsAvailable') : t('adminCarsUnavailable')}
                             </span>
                           </td>
                           <td className="py-4 px-4">
                             <div className="flex items-center justify-end gap-2">
                               <button onClick={() => openView(c)} className="px-3 py-1.5 text-xs rounded-md border border-gray-600/40 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer flex items-center gap-1 uppercase">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3.5C5 3.5 1.73 7.11.46 9a1 1 0 000 1c1.27 1.89 4.54 5.5 9.54 5.5s8.27-3.61 9.54-5.5a1 1 0 000-1C18.27 7.11 15 3.5 10 3.5zm0 10a4.5 4.5 0 110-9 4.5 4.5 0 010 9z"/><circle cx="10" cy="9" r="2.5"/></svg>
-                                View
+                                {t('adminCarsView')}
                               </button>
                               <button onClick={() => openEdit(c)} className="px-3 py-1.5 text-xs rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer flex items-center gap-1 uppercase">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793z" /><path d="M11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.829-2.828z" /></svg>
-                                Edit
+                                {t('adminCarsEdit')}
                               </button>
                               <button onClick={() => openDelete(c)} className="px-3 py-1.5 text-xs rounded-md border border-red-600/40 text-red-300 hover:bg-red-600/15 transition-colors cursor-pointer flex items-center gap-1 uppercase">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
-                                Delete
+                                {t('adminCarsDelete')}
                               </button>
                             </div>
                           </td>
@@ -634,18 +650,18 @@ const AdminCars = () => {
               {/* Pagination */}
               <div className="mt-6 flex items-center justify-between text-sm text-gray-300 bg-black/40 rounded-lg p-4 border border-cyan-900/30">
                 <div className="flex items-center gap-4">
-                  <div>Showing <span className="text-white font-medium">{Math.min((page - 1) * PAGE_SIZE + 1, totalItems)}</span> to <span className="text-white font-medium">{Math.min(page * PAGE_SIZE, totalItems)}</span> of <span className="text-white font-medium">{totalItems}</span> cars</div>
+                  <div>{t('adminCarsShowing')} <span className="text-white font-medium">{Math.min((page - 1) * PAGE_SIZE + 1, totalItems)}</span> {t('adminCarsTo')} <span className="text-white font-medium">{Math.min(page * PAGE_SIZE, totalItems)}</span> {t('adminCarsOf')} <span className="text-white font-medium">{totalItems}</span> {t('adminCarsCars')}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button disabled={page <= 1 || loading} onClick={() => fetchCars({ page: page - 1 })} className={`px-4 py-2 rounded-md border transition-colors flex items-center gap-2 ${page <= 1 || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                    Previous
+                    {t('adminCarsPrevious')}
                   </button>
                   <div className="px-3 py-2 bg-cyan-600/20 border border-cyan-600/40 rounded-md text-cyan-300">
                     {page} of {totalPages}
                   </div>
                   <button disabled={page >= totalPages || loading} onClick={() => fetchCars({ page: page + 1 })} className={`px-4 py-2 rounded-md border transition-colors flex items-center gap-2 ${page >= totalPages || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}>
-                    Next
+                    {t('adminCarsNext')}
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                   </button>
                 </div>

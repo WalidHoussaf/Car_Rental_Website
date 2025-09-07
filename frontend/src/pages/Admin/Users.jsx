@@ -323,7 +323,7 @@ const AdminUsers = () => {
               </div>
               <button
                 onClick={openCreate}
-                className="px-4 py-2 rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer font-['Orbitron'] text-sm"
+                className="px-6 py-3 text-base rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer font-['Orbitron']"
               >
                 <span className="inline-flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">

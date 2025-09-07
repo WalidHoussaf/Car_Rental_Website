@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import NumberInput from '../Ui/NumberInput';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
+import { locations as allLocations } from '../../assets/assets';
 
 const Field = ({ label, required, children, help, className = '' }) => (
   <div className={`flex flex-col gap-2 ${className}`}>
@@ -61,15 +62,24 @@ const CreateEditCarModal = ({
   
   const title = mode === 'create' ? t('adminCarsCreateCar') : t('adminCarsUpdateCar');
 
+  // Localized locations (excluding 'all' option for form)
+  const localizedLocations = useMemo(() => {
+    return allLocations.filter(loc => loc.value !== 'all').map(loc => ({
+      value: loc.value,
+      label: loc.label?.[language] || String(loc.value || ''),
+    }));
+  }, [language]);
+
   const [openDropdown, setOpenDropdown] = useState(null); 
   const categoryRef = useRef(null);
   const transmissionRef = useRef(null);
   const fuelTypeRef = useRef(null);
+  const locationRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (openDropdown) {
-        const refs = { 'category': categoryRef, 'transmission': transmissionRef, 'fuelType': fuelTypeRef };
+        const refs = { 'category': categoryRef, 'transmission': transmissionRef, 'fuelType': fuelTypeRef, 'location': locationRef };
         const currentRef = refs[openDropdown];
         if (currentRef && currentRef.current && !currentRef.current.contains(event.target)) {
           setOpenDropdown(null);
@@ -197,7 +207,8 @@ const CreateEditCarModal = ({
                     value={form.year}
                     onChange={(e) => {
                       const v = e.target.value;
-                      if (v === '' || (Number(v) >= 1900 && Number(v) <= 2030)) {
+                      // Allow empty value or partial input (less than 4 digits) or valid complete years
+                      if (v === '' || v.length < 4 || (Number(v) >= 1900 && Number(v) <= 2030)) {
                         setForm({ ...form, year: v });
                       }
                     }}
@@ -229,11 +240,45 @@ const CreateEditCarModal = ({
 
               <div className="lg:col-span-6">
                 <Field label={t('adminCarsLocation')} required>
-                  <Input 
-                    value={form.location} 
-                    onChange={(e) => setForm({ ...form, location: e.target.value })} 
-                    placeholder={t('adminCarsCityCountry')} 
-                  />
+                  <div className="relative" ref={locationRef}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'location' ? null : 'location')}
+                      className="w-full bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 font-['Orbitron'] rounded-xl py-3.5 px-5 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 transition-all duration-300 hover:border-cyan-600/40 text-left flex items-center justify-between"
+                    >
+                      <span className="capitalize">
+                        {form.location ? localizedLocations.find(loc => loc.value === form.location)?.label || form.location : t('adminCarsSelectLocation')}
+                      </span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`h-4 w-4 ml-2 transition-transform ${openDropdown === 'location' ? 'rotate-180' : ''}`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                    {openDropdown === 'location' && (
+                      <div className="absolute z-30 mt-1 w-full bg-black border border-cyan-900/30 rounded-md shadow-lg overflow-hidden">
+                        <ul className="max-h-60 overflow-y-auto divide-y divide-cyan-900/20">
+                          {localizedLocations.map((location) => (
+                            <li key={location.value}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setForm({ ...form, location: location.value });
+                                  setOpenDropdown(null);
+                                }}
+                                className={`w-full text-left px-3 py-2 text-sm capitalize font-['Orbitron'] ${form.location === location.value ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'}`}
+                              >
+                                {location.label}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </Field>
               </div>
 

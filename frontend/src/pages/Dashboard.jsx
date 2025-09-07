@@ -12,7 +12,8 @@ const Dashboard = () => {
     totalUsers: 0,
     totalBookings: 0,
     totalCars: 0,
-    revenue: 0
+    revenue: 0,
+    pendingRevenue: 0
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,9 +21,12 @@ const Dashboard = () => {
   const numberFmt = new Intl.NumberFormat('en-US');
   const moneyFmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
-  // Simple sparkline helpers (demo data until backend trend endpoints are available)
-  const bookingsTrend = [12, 18, 14, 20, 22, 19, 25, 23, 28, 26, 30, 34];
-  const revenueTrend = [800, 1200, 950, 1600, 1500, 1700, 1800, 1750, 2100, 2000, 2300, 2600];
+  // Trend data from backend
+  const [trendData, setTrendData] = useState({
+    bookingsTrend: [],
+    revenueTrend: []
+  });
+  const [recentBookings, setRecentBookings] = useState([]);
   const sparklinePath = (data, width = 220, height = 48, pad = 4) => {
     if (!data || data.length === 0) return '';
     const w = width - pad * 2;
@@ -42,12 +46,27 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await api.users.getDashboardStats();
-        if (response.success) {
-          setStats(response.data);
+        const [statsResponse, bookingsResponse] = await Promise.all([
+          api.users.getDashboardStats(),
+          api.bookings.getAll({ limit: 5, sort: '-createdAt' })
+        ]);
+        
+        if (statsResponse.success) {
+          setStats(statsResponse.data);
+          // Set trend data if available from backend
+          if (statsResponse.data.trends) {
+            setTrendData({
+              bookingsTrend: statsResponse.data.trends.bookings || [],
+              revenueTrend: statsResponse.data.trends.revenue || []
+            });
+          }
+        }
+        
+        if (bookingsResponse.success) {
+          setRecentBookings(bookingsResponse.data.bookings || []);
         }
       } catch (error) {
-        console.error('Failed to fetch dashboard stats:', error);
+        console.error('Failed to fetch dashboard data:', error);
       } finally {
         setIsLoading(false);
       }
@@ -213,7 +232,14 @@ const Dashboard = () => {
                     {language === 'fr' ? 'Revenus' : 'Revenue'}
                   </h3>
                 </div>
-                <p className="text-3xl font-bold">{moneyFmt.format(stats.revenue)}</p>
+                <p className="text-3xl font-bold">
+                  {moneyFmt.format(stats.revenue)}
+                  {stats.pendingRevenue > 0 && (
+                    <span className="text-lg text-gray-400 ml-2">
+                      (+{moneyFmt.format(stats.pendingRevenue)} pending)
+                    </span>
+                  )}
+                </p>
               </div>
             </div>
           )}
@@ -229,7 +255,7 @@ const Dashboard = () => {
                 <span className="text-xs text-gray-400">{language === 'fr' ? '12 derniers points' : 'Last 12 points'}</span>
               </div>
               <svg viewBox="0 0 220 48" className="w-full h-12">
-                <path d={sparklinePath(bookingsTrend)} className="stroke-cyan-400" fill="none" strokeWidth="2" strokeLinecap="round" />
+                <path d={sparklinePath(trendData.bookingsTrend)} className="stroke-cyan-400" fill="none" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </div>
             {/* Revenue Trend */}
@@ -241,7 +267,7 @@ const Dashboard = () => {
                 <span className="text-xs text-gray-400">{language === 'fr' ? '12 derniers points' : 'Last 12 points'}</span>
               </div>
               <svg viewBox="0 0 220 48" className="w-full h-12">
-                <path d={sparklinePath(revenueTrend)} className="stroke-purple-400" fill="none" strokeWidth="2" strokeLinecap="round" />
+                <path d={sparklinePath(trendData.revenueTrend)} className="stroke-purple-400" fill="none" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </div>
           </div>
@@ -274,7 +300,7 @@ const Dashboard = () => {
                 <p className="text-sm text-gray-400">{language === 'fr' ? 'Gérer les réservations' : 'Manage reservations'}</p>
               </button>
 
-              <button className="p-4 bg-green-600/15 hover:bg-green-600/25 border border-green-600/30 rounded-lg transition-colors text-left group cursor-pointer">
+              <button onClick={() => navigate('/admin/cars')} className="p-4 bg-green-600/15 hover:bg-green-600/25 border border-green-600/30 rounded-lg transition-colors text-left group cursor-pointer">
                 <div className="flex items-center gap-3 mb-1">
                   <div className="h-9 w-9 rounded-lg bg-green-500/15 border border-green-500/30 flex items-center justify-center text-green-300">
                     {/* Car wrench icon */}
@@ -304,7 +330,12 @@ const Dashboard = () => {
           <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6 mt-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-semibold">{language === 'fr' ? 'Réservations récentes' : 'Recent Bookings'}</h2>
-              <span className="text-xs text-gray-400">{language === 'fr' ? 'Exemple de données' : 'Sample data'}</span>
+              <button 
+                onClick={() => navigate('/admin/bookings')}
+                className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer"
+              >
+                {language === 'fr' ? 'Voir tout' : 'View all'}
+              </button>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
@@ -319,21 +350,37 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-cyan-900/30">
-                  {[{id:'#B-1021', name:'John D.', car:'Tesla Model 3', dates:'Aug 01-03', status:'Paid', amount: 189},
-                    {id:'#B-1020', name:'Sara K.', car:'BMW X5', dates:'Jul 28-31', status:'Pending', amount: 299},
-                    {id:'#B-1019', name:'Alex P.', car:'Audi A4', dates:'Jul 25-27', status:'Refunded', amount: 0}
-                  ].map((r) => (
-                    <tr key={r.id} className="hover:bg-white/5">
-                      <td className="py-3 pr-4 text-gray-300">{r.id}</td>
-                      <td className="py-3 pr-4">{r.name}</td>
-                      <td className="py-3 pr-4">{r.car}</td>
-                      <td className="py-3 pr-4 text-gray-300">{r.dates}</td>
-                      <td className="py-3 pr-4">
-                        <span className={`px-2 py-0.5 rounded text-xs ${r.status === 'Paid' ? 'bg-green-500/20 text-green-300 border border-green-500/30' : r.status === 'Pending' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' : 'bg-gray-500/20 text-gray-300 border border-gray-500/30'}`}>{r.status}</span>
+                  {recentBookings.length > 0 ? recentBookings.map((booking) => {
+                    const startDate = new Date(booking.startDate).toLocaleDateString();
+                    const endDate = new Date(booking.endDate).toLocaleDateString();
+                    const statusColors = {
+                      confirmed: 'bg-green-500/20 text-green-300 border border-green-500/30',
+                      pending: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
+                      cancelled: 'bg-red-500/20 text-red-300 border border-red-500/30',
+                      completed: 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                    };
+                    
+                    return (
+                      <tr key={booking._id} className="hover:bg-white/5">
+                        <td className="py-3 pr-4 text-gray-300">#{booking._id.slice(-6)}</td>
+                        <td className="py-3 pr-4">{booking.user?.firstName} {booking.user?.lastName}</td>
+                        <td className="py-3 pr-4">{booking.car?.name}</td>
+                        <td className="py-3 pr-4 text-gray-300">{startDate} - {endDate}</td>
+                        <td className="py-3 pr-4">
+                          <span className={`px-2 py-0.5 rounded text-xs capitalize ${statusColors[booking.status] || 'bg-gray-500/20 text-gray-300 border border-gray-500/30'}`}>
+                            {booking.status}
+                          </span>
+                        </td>
+                        <td className="py-3 pr-4 text-right">{moneyFmt.format(booking.totalAmount)}</td>
+                      </tr>
+                    );
+                  }) : (
+                    <tr>
+                      <td colSpan="6" className="py-8 text-center text-gray-400">
+                        {language === 'fr' ? 'Aucune réservation récente' : 'No recent bookings'}
                       </td>
-                      <td className="py-3 pr-4 text-right">{r.amount ? moneyFmt.format(r.amount) : '-'}</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

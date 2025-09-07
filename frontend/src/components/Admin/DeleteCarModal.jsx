@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getCarImage } from '../../utils/imageResolver';
+import { useLanguage } from '../../hooks/useLanguage';
+import { useTranslations } from '../../translations';
 
 const DeleteCarModal = ({ 
   open, 
@@ -8,6 +10,8 @@ const DeleteCarModal = ({
   onConfirm, 
   processing = false 
 }) => {
+  const { language } = useLanguage();
+  const t = useTranslations(language);
   const [confirmAck, setConfirmAck] = useState(false);
 
   // Reset confirmation when modal opens/closes
@@ -52,7 +56,7 @@ const DeleteCarModal = ({
         <div className="flex items-center justify-between px-6 py-4 border-b border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-red-600 rounded-full"></div>
-            <h3 className="text-red-300 font-['Orbitron'] text-lg font-semibold tracking-wide">Delete Car</h3>
+            <h3 className="text-red-300 font-['Orbitron'] text-lg font-semibold tracking-wide">{t('adminCarsDeleteCar')}</h3>
           </div>
           <button
             type="button"
@@ -74,7 +78,7 @@ const DeleteCarModal = ({
               {carImageSrc ? (
                 <img src={carImageSrc} alt={car.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="text-xs text-gray-500 font-['Orbitron']">No Image</div>
+                <div className="text-xs text-gray-500 font-['Orbitron']">{t('adminCarsNoImage')}</div>
               )}
             </div>
             <div className="flex-1">
@@ -96,10 +100,10 @@ const DeleteCarModal = ({
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                 <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM10.5 8.25a1.5 1.5 0 113 0v4.5a1.5 1.5 0 11-3 0V8.25zm1.5 8.25a1.125 1.125 0 100-2.25 1.125 1.125 0 000 2.25z" clipRule="evenodd" />
               </svg>
-              <span>Warning: Permanent Action</span>
+              <span>{t('adminCarsDeleteWarning')}</span>
             </div>
             <p className="text-sm text-gray-300 font-['Rationale'] leading-relaxed">
-              This will permanently remove the car from your fleet. Existing bookings will not be deleted but may be impacted. This action cannot be undone.
+              {t('adminCarsDeleteMessage')}
             </p>
           </div>
 
@@ -118,7 +122,7 @@ const DeleteCarModal = ({
                 )}
               </div>
               <span className="font-['Orbitron'] group-hover:text-white transition-colors">
-                I understand that this action cannot be undone and will permanently delete this car.
+                {t('adminCarsDeleteConfirmation')}
               </span>
             </label>
           </div>
@@ -131,7 +135,7 @@ const DeleteCarModal = ({
             onClick={handleCancel}
             className="px-6 py-3 rounded-xl bg-transparent border-2 border-gray-600/40 text-gray-300 hover:bg-gray-600/10 hover:border-gray-500/60 hover:text-white transition-all duration-300 font-['Orbitron'] text-sm tracking-wide font-medium group cursor-pointer"
           >
-            <span className="group-hover:scale-95 transition-transform duration-200 inline-block">Cancel</span>
+            <span className="group-hover:scale-95 transition-transform duration-200 inline-block">{t('cancel')}</span>
           </button>
           <button
             type="button"
@@ -144,14 +148,14 @@ const DeleteCarModal = ({
               {processing ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Deleting...
+                  {t('adminCarsDeleting')}
                 </>
               ) : (
                 <>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                     <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
                   </svg>
-                  Delete Car
+                  {t('adminCarsDeleteCar')}
                 </>
               )}
             </span>
