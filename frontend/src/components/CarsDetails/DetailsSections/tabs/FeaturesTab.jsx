@@ -49,7 +49,7 @@ const FeaturesTab = ({ car }) => {
           </p>
         </div>
        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-rows-[repeat(auto-fit,minmax(0,1fr))]">
           {car.features && car.features.length > 0 ? (
             car.features.map((feature, index) => {
               // Get feature translation if it exists

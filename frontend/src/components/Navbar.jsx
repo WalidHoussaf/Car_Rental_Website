@@ -125,7 +125,7 @@ const Navbar = () => {
           </div>
 
           {/* Right side - Search, Login/Register, Language Switcher */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             {/* Search Button - Always present but conditionally visible */}
             <div className={`transition-all duration-300 ${isOnCarsPage ? 'w-auto opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
               <button 

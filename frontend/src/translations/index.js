@@ -18,7 +18,7 @@ export const translations = {
     clearSearch: "Clear search",
     closeSearch: "Close search",
     showLess: "Show Less",
-    showMore: "Show {count} More",
+    showMore: "Show More",
     signedInAs: "Signed in as",
     manageUsers: "Users Management",
     
@@ -158,6 +158,19 @@ export const translations = {
     discoverFeatures: "Discover the exceptional features that make the {carName} stand apart.",
     noFeaturesAvailable: "No features available for this vehicle.",
     defaultFeatureDescription: "Experience the finest in automotive technology and comfort with this premium feature.",
+    
+    // Feature descriptions
+    featureDesc_bluetooth: "Connect your devices wirelessly for hands-free calling, music streaming, and seamless integration with your smartphone.",
+    featureDesc_navigation: "Advanced GPS navigation system with real-time traffic updates, voice guidance, and points of interest.",
+    featureDesc_gps: "Precise GPS positioning system for accurate navigation and location services in any weather condition.",
+    featureDesc_driver_assistance: "Comprehensive safety systems including collision detection, lane keeping assist, and automatic emergency braking.",
+    featureDesc_performance: "High-performance engine technology delivering exceptional power, efficiency, and driving dynamics.",
+    featureDesc_battery: "Advanced battery technology providing extended range, fast charging capabilities, and optimal energy management.",
+    featureDesc_audio: "Premium sound system with crystal-clear audio, multiple speakers, and customizable sound profiles.",
+    featureDesc_climate: "Intelligent climate control system maintaining optimal temperature and air quality for maximum comfort.",
+    featureDesc_connectivity: "High-speed internet connectivity enabling real-time updates, streaming, and connected services.",
+    featureDesc_security: "Advanced security features including alarm system, immobilizer, and remote monitoring capabilities.",
+    featureDesc_camera: "Multiple camera system providing 360-degree visibility, parking assistance, and enhanced safety monitoring.",
     
     // Feature translations
     feature_adaptive_cruise_control: "Adaptive Cruise Control",
@@ -785,6 +798,10 @@ export const translations = {
     confirmAndBook_now: "Confirm & Book Now",
     backToOptions: "Back to Options",
     
+    // Time selection
+    pickupTime: "Pickup Time",
+    dropoffTime: "Dropoff Time",
+    
     // Booking Confirmation
     bookingConfirmed: "Booking Confirmed",
     thankYouForBooking: "Thank you for your booking!",
@@ -806,6 +823,12 @@ export const translations = {
     receiptDownloaded: "Receipt downloaded successfully!",
     receiptError: "Error generating receipt. Please try again.",
     clickToLearnMore: "Click to learn more",
+    
+    // Location validation messages
+    pleaseSelectPickupLocation: "Please select a pickup location",
+    pleaseSelectDropoffLocation: "Please select a dropoff location", 
+    locationNotAvailable: "This location is not available for the selected dates",
+    loading: "Loading...",
   },
   
   fr: {
@@ -966,6 +989,19 @@ export const translations = {
     discoverFeatures: "Découvrez les caractéristiques exceptionnelles qui distinguent la {carName}.",
     noFeaturesAvailable: "Pas de caractéristiques disponibles pour ce véhicule.",
     defaultFeatureDescription: "Découvrez le meilleur de la technologie automobile et du confort avec cette fonctionnalité premium.",
+    
+    // Feature descriptions
+    featureDesc_bluetooth: "Connectez vos appareils sans fil pour les appels mains libres, la diffusion de musique et l'intégration transparente avec votre smartphone.",
+    featureDesc_navigation: "Système de navigation GPS avancé avec mises à jour du trafic en temps réel, guidage vocal et points d'intérêt.",
+    featureDesc_gps: "Système de positionnement GPS précis pour une navigation exacte et des services de localisation par tous temps.",
+    featureDesc_driver_assistance: "Systèmes de sécurité complets incluant la détection de collision, l'assistance au maintien de voie et le freinage d'urgence automatique.",
+    featureDesc_performance: "Technologie de moteur haute performance offrant une puissance exceptionnelle, une efficacité et une dynamique de conduite.",
+    featureDesc_battery: "Technologie de batterie avancée offrant une autonomie étendue, des capacités de charge rapide et une gestion énergétique optimale.",
+    featureDesc_audio: "Système audio premium avec son cristallin, haut-parleurs multiples et profils sonores personnalisables.",
+    featureDesc_climate: "Système de climatisation intelligent maintenant une température et une qualité d'air optimales pour un confort maximal.",
+    featureDesc_connectivity: "Connectivité internet haut débit permettant les mises à jour en temps réel, le streaming et les services connectés.",
+    featureDesc_security: "Fonctionnalités de sécurité avancées incluant système d'alarme, antidémarrage et capacités de surveillance à distance.",
+    featureDesc_camera: "Système de caméras multiples offrant une visibilité à 360 degrés, assistance au stationnement et surveillance de sécurité renforcée.",
     
     // Feature translations
     feature_adaptive_cruise_control: "Régulateur de vitesse adaptatif",
@@ -1616,7 +1652,16 @@ export const translations = {
     receiptDownloaded: "Reçu téléchargé avec succès !",
     receiptError: "Erreur lors de la génération du reçu. Veuillez réessayer.",
     clickToLearnMore: "Cliquez pour en savoir plus",
+    
+    // Location validation messages
+    pleaseSelectPickupLocation: "Veuillez sélectionner un lieu de prise en charge",
+    pleaseSelectDropoffLocation: "Veuillez sélectionner un lieu de retour",
+    locationNotAvailable: "Ce lieu n'est pas disponible pour les dates sélectionnées",
     confirmAndBook_now: "Confirmer et Réserver",
+    
+    // Time selection
+    pickupTime: "Heure de prise en charge",
+    dropoffTime: "Heure de retour",
   }
 };
 

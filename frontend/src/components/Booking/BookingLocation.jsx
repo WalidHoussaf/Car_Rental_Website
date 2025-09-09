@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Select from 'react-select';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
+import locationService from '../../services/locationService';
 import MapMarkerIcon from '../Ui/Icons/MapMarkerIcon';
 import SpinnerIcon from '../Ui/Icons/SpinnerIcon';
 import CheckmarkIcon from '../Ui/Icons/CheckmarkIcon';
@@ -10,27 +11,15 @@ import DestinationIcon from '../Ui/Icons/DestinationIcon';
 import ArrowLeftIcon from '../Ui/Icons/ArrowLeftIcon';
 import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
 
-// Location coordinates
-const LOCATIONS_COORDINATES = {
-  'casablanca': { lat: 33.5731, lng: -7.5898 },
-  'marrakech': { lat: 31.6295, lng: -7.9811 },
-  'marrakesh': { lat: 31.6295, lng: -7.9811 }, 
-  'rabat': { lat: 34.0209, lng: -6.8416 },
-  'fes': { lat: 34.0181, lng: -5.0078 },
-  'tangier': { lat: 35.7595, lng: -5.8340 },
-  'agadir': { lat: 30.4278, lng: -9.5981 },
-  'kenitra': { lat: 34.2610, lng: -6.5802 },
-  'mohammedia': { lat: 33.6861, lng: -7.3828 }
-};
-
 // Interactive map component using OpenStreetMap with Leaflet
-const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
+const InteractiveMap = ({ pickup, dropoff, sameLocation, locations }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState(null);
 
   // Loading Leaflet resources
   useEffect(() => {
@@ -58,6 +47,10 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
 
         scriptElement.onload = () => {
           setMapLoaded(true);
+        };
+        
+        scriptElement.onerror = () => {
+          setMapError('Failed to load map resources');
         };
       } catch (error) {
         console.error('Error loading Leaflet:', error);
@@ -102,8 +95,9 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    if (pickup && LOCATIONS_COORDINATES[pickup]) {
-      const pickupCoords = LOCATIONS_COORDINATES[pickup];
+    const pickupLocation = locations?.find(loc => loc.id === pickup);
+    if (pickup && pickupLocation) {
+      const pickupCoords = pickupLocation.coordinates;
       
       // Create custom icon for pickup point
       const pickupIcon = window.L.divIcon({
@@ -120,7 +114,7 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
       // Add pickup marker
       const pickupMarker = window.L.marker([pickupCoords.lat, pickupCoords.lng], { 
         icon: pickupIcon,
-        title: `${pickup.charAt(0).toUpperCase() + pickup.slice(1)} Branch` 
+        title: `${pickupLocation.displayName[language] || pickupLocation.name} Branch` 
       }).addTo(map);
       
       markersRef.current.push(pickupMarker);
@@ -132,8 +126,9 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
     }
 
     // Add dropoff marker if different
-    if (!sameLocation && dropoff && LOCATIONS_COORDINATES[dropoff]) {
-      const dropoffCoords = LOCATIONS_COORDINATES[dropoff];
+    const dropoffLocation = locations?.find(loc => loc.id === dropoff);
+    if (!sameLocation && dropoff && dropoffLocation) {
+      const dropoffCoords = dropoffLocation.coordinates;
       
       // Create custom icon for dropoff point
       const dropoffIcon = window.L.divIcon({
@@ -150,31 +145,42 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation }) => {
       // Add dropoff marker
       const dropoffMarker = window.L.marker([dropoffCoords.lat, dropoffCoords.lng], { 
         icon: dropoffIcon,
-        title: `${dropoff.charAt(0).toUpperCase() + dropoff.slice(1)} Branch` 
+        title: `${dropoffLocation.displayName[language] || dropoffLocation.name} Branch` 
       }).addTo(map);
       
       markersRef.current.push(dropoffMarker);
 
       // If the two points are different, adjust view to see both
-      if (pickup !== dropoff) {
+      if (pickup !== dropoff && pickupLocation) {
         const bounds = window.L.latLngBounds(
-          [LOCATIONS_COORDINATES[pickup].lat, LOCATIONS_COORDINATES[pickup].lng],
+          [pickupLocation.coordinates.lat, pickupLocation.coordinates.lng],
           [dropoffCoords.lat, dropoffCoords.lng]
         );
         map.fitBounds(bounds, { padding: [30, 30] });
       }
     }
-  }, [mapLoaded, pickup, dropoff, sameLocation]);
+  }, [mapLoaded, pickup, dropoff, sameLocation, locations, language]);
 
   return (
     <div className="relative h-64 bg-black/60 rounded-xl mb-8 overflow-hidden border border-blue-900/20 group-hover:border-blue-900/40 transition-all duration-300">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 z-10 pointer-events-none"></div>
       
-      {!mapLoaded && (
+      {!mapLoaded && !mapError && (
         <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-20">
           <div className="text-gray-500 font-['Orbitron'] flex flex-col items-center">
             <SpinnerIcon className="mb-2" />
             <span>{t('loadingMap')}</span>
+          </div>
+        </div>
+      )}
+      
+      {mapError && (
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-20">
+          <div className="text-red-400 font-['Orbitron'] flex flex-col items-center text-center p-4">
+            <svg className="w-8 h-8 mb-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm">{mapError}</span>
           </div>
         </div>
       )}
@@ -189,21 +195,59 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
   const t = useTranslations(language);
   const [pickup, setPickup] = useState(bookingDetails.pickupLocation || '');
   const [dropoff, setDropoff] = useState(bookingDetails.dropoffLocation || '');
+  const [pickupTime, setPickupTime] = useState('09:00');
+  const [dropoffTime, setDropoffTime] = useState('18:00');
   const [sameLocation, setSameLocation] = useState(true);
+  const [locations, setLocations] = useState([]);
+  const [availableLocations, setAvailableLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
   
-  // Available locations based on car availability
-  const availableLocations = Array.isArray(car.location) 
-    ? car.location.map(loc => ({ value: loc, label: loc.charAt(0).toUpperCase() + loc.slice(1) }))
-    : [{ value: car.location, label: car.location.charAt(0).toUpperCase() + car.location.slice(1) }];
-  
-  // When component mounts, initialize with bookingDetails
+  // Load available locations when component mounts
   useEffect(() => {
-    if (bookingDetails.pickupLocation && bookingDetails.dropoffLocation) {
+    const loadLocations = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const result = await locationService.getAvailableLocationsForCar(car.id);
+        
+        if (result.success) {
+          setLocations(result.data);
+          
+          // Format locations for select component
+          const formattedResult = await locationService.getFormattedLocationsForSelect(language, car.id);
+          if (formattedResult.success) {
+            setAvailableLocations(formattedResult.options);
+          }
+        } else {
+          setError(result.error);
+          // Fallback to car's location data if service fails
+          const fallbackLocations = Array.isArray(car.location) 
+            ? car.location.map(loc => ({ value: loc, label: loc.charAt(0).toUpperCase() + loc.slice(1) }))
+            : [{ value: car.location, label: car.location.charAt(0).toUpperCase() + car.location.slice(1) }];
+          setAvailableLocations(fallbackLocations);
+        }
+      } catch (err) {
+        console.error('Error loading locations:', err);
+        setError('Failed to load locations');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadLocations();
+  }, [car.id, car.location, language]);
+
+  // Initialize with bookingDetails when locations are loaded
+  useEffect(() => {
+    if (bookingDetails.pickupLocation && bookingDetails.dropoffLocation && locations.length > 0) {
       setPickup(bookingDetails.pickupLocation);
       setDropoff(bookingDetails.dropoffLocation);
       setSameLocation(bookingDetails.pickupLocation === bookingDetails.dropoffLocation);
     }
-  }, [bookingDetails]);
+  }, [bookingDetails, locations]);
   
   // When sameLocation changes, update dropoff
   useEffect(() => {
@@ -234,8 +278,9 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       border: '1px solid rgba(59, 130, 246, 0.3)',
       borderRadius: '0.75rem',
       padding: '0.5rem',
-      zIndex: 50,
-      boxShadow: '0 4px 12px rgba(0, 200, 255, 0.15)'
+      zIndex: 9999,
+      boxShadow: '0 4px 12px rgba(0, 200, 255, 0.15)',
+      position: 'relative'
     }),
     option: (provided, state) => ({
       ...provided,
@@ -263,7 +308,68 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
     }),
   };
   
-  const handleContinue = () => {
+  // Validate location availability before continuing
+  const validateAndContinue = async () => {
+    setValidationErrors({});
+    
+    if (!pickup) {
+      setValidationErrors(prev => ({ ...prev, pickup: t('pleaseSelectPickupLocation') }));
+      return;
+    }
+    
+    if (!sameLocation && !dropoff) {
+      setValidationErrors(prev => ({ ...prev, dropoff: t('pleaseSelectDropoffLocation') }));
+      return;
+    }
+    
+    // Validate pickup location availability
+    if (bookingDetails.startDate && bookingDetails.endDate) {
+      // Create date objects with selected times
+      const startDateTime = new Date(bookingDetails.startDate);
+      const endDateTime = new Date(bookingDetails.endDate);
+      
+      // Set the selected times
+      const [pickupHour, pickupMinute] = pickupTime.split(':').map(Number);
+      const [dropoffHour, dropoffMinute] = dropoffTime.split(':').map(Number);
+      
+      startDateTime.setHours(pickupHour, pickupMinute, 0, 0);
+      endDateTime.setHours(dropoffHour, dropoffMinute, 0, 0);
+      
+      const pickupValidation = await locationService.validateLocationAvailability(
+        pickup, 
+        startDateTime, 
+        endDateTime, 
+        car.id
+      );
+      
+      if (!pickupValidation.success || !pickupValidation.available) {
+        setValidationErrors(prev => ({ 
+          ...prev, 
+          pickup: pickupValidation.error || t('locationNotAvailable') 
+        }));
+        return;
+      }
+      
+      // Validate dropoff location if different
+      if (!sameLocation) {
+        const dropoffValidation = await locationService.validateLocationAvailability(
+          dropoff, 
+          startDateTime, 
+          endDateTime, 
+          car.id
+        );
+        
+        if (!dropoffValidation.success || !dropoffValidation.available) {
+          setValidationErrors(prev => ({ 
+            ...prev, 
+            dropoff: dropoffValidation.error || t('locationNotAvailable') 
+          }));
+          return;
+        }
+      }
+    }
+    
+    // All validations passed, proceed
     onLocationSelection(pickup, dropoff);
   };
   
@@ -302,17 +408,64 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                   <Select
                     options={availableLocations}
                     value={availableLocations.find(loc => loc.value === pickup)}
-                    onChange={(selected) => setPickup(selected.value)}
+                    onChange={(selected) => {
+                      setPickup(selected.value);
+                      // Clear validation error when user makes a selection
+                      if (validationErrors.pickup) {
+                        setValidationErrors(prev => ({ ...prev, pickup: null }));
+                      }
+                    }}
                     styles={selectStyles}
                     isSearchable={false}
+                    isDisabled={loading}
                   />
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
-                   
-                  </div>
+                  {validationErrors.pickup && (
+                    <p className="mt-2 text-sm text-red-400 font-['Orbitron']">
+                      {validationErrors.pickup}
+                    </p>
+                  )}
                   <p className="mt-3 text-sm text-gray-500 font-['Orbitron']">
                     {t('vehicleOnlySelectLocations')}
                   </p>
                 </div>
+                
+                {/* Pickup Time Selection */}
+                {pickup && (
+                  <div className="mt-4">
+                    <label className="text-sm font-medium text-gray-400 mb-2 font-['Orbitron'] flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                      </svg>
+                      {t('pickupTime')}
+                    </label>
+                    <Select
+                      options={Array.from({ length: 15 }, (_, i) => {
+                        const hour = 6 + i;
+                        const time24 = `${hour.toString().padStart(2, '0')}:00`;
+                        const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
+                        return { value: time24, label: time12 };
+                      })}
+                      value={Array.from({ length: 15 }, (_, i) => {
+                        const hour = 6 + i;
+                        const time24 = `${hour.toString().padStart(2, '0')}:00`;
+                        const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
+                        return { value: time24, label: time12 };
+                      }).find(option => option.value === pickupTime)}
+                      onChange={(selected) => setPickupTime(selected.value)}
+                      styles={{
+                        ...selectStyles,
+                        control: (provided, state) => ({
+                          ...selectStyles.control(provided, state),
+                          borderColor: state.isFocused ? '#22d3ee' : 'rgba(59, 130, 246, 0.3)',
+                          boxShadow: state.isFocused ? '0 0 0 2px #22d3ee' : 'none',
+                        }),
+                        menuPortal: (provided) => ({ ...provided, zIndex: 9999 })
+                      }}
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                    />
+                  </div>
+                )}
               </div>
               
               {/* Same Location Toggle */}
@@ -345,12 +498,58 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                     <Select
                       options={availableLocations}
                       value={availableLocations.find(loc => loc.value === dropoff)}
-                      onChange={(selected) => setDropoff(selected.value)}
+                      onChange={(selected) => {
+                        setDropoff(selected.value);
+                        // Clear validation error when user makes a selection
+                        if (validationErrors.dropoff) {
+                          setValidationErrors(prev => ({ ...prev, dropoff: null }));
+                        }
+                      }}
                       styles={selectStyles}
                       isSearchable={false}
+                      isDisabled={loading}
                     />
-                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
-                    </div>
+                    {validationErrors.dropoff && (
+                      <p className="mt-2 text-sm text-red-400 font-['Orbitron']">
+                        {validationErrors.dropoff}
+                      </p>
+                    )}
+                  </div>
+                  
+                  {/* Dropoff Time Selection */}
+                  <div className="mt-4">
+                    <label className="text-sm font-medium text-gray-400 mb-2 font-['Orbitron'] flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                      </svg>
+                      {t('dropoffTime')}
+                    </label>
+                    <Select
+                      options={Array.from({ length: 15 }, (_, i) => {
+                        const hour = 6 + i;
+                        const time24 = `${hour.toString().padStart(2, '0')}:00`;
+                        const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
+                        return { value: time24, label: time12 };
+                      })}
+                      value={Array.from({ length: 15 }, (_, i) => {
+                        const hour = 6 + i;
+                        const time24 = `${hour.toString().padStart(2, '0')}:00`;
+                        const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
+                        return { value: time24, label: time12 };
+                      }).find(option => option.value === dropoffTime)}
+                      onChange={(selected) => setDropoffTime(selected.value)}
+                      styles={{
+                        ...selectStyles,
+                        control: (provided, state) => ({
+                          ...selectStyles.control(provided, state),
+                          borderColor: state.isFocused ? '#a855f7' : 'rgba(59, 130, 246, 0.3)',
+                          boxShadow: state.isFocused ? '0 0 0 2px #a855f7' : 'none',
+                        }),
+                        menuPortal: (provided) => ({ ...provided, zIndex: 9999 })
+                      }}
+                      isSearchable={false}
+                      menuPortalTarget={document.body}
+                    />
                   </div>
                 </div>
               )}
@@ -370,38 +569,57 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
               <InteractiveMap 
                 pickup={pickup} 
                 dropoff={dropoff} 
-                sameLocation={sameLocation} 
+                sameLocation={sameLocation}
+                locations={locations}
               />
               
               <div className="space-y-6">
-                <div className="flex items-start p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30 group">
-                  <div className="w-10 h-10 flex-shrink-0 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 mt-1 transition-all duration-300 group-hover:bg-cyan-500/30">
-                    <LocationPinIcon />
+                {pickup && (
+                  <div className="flex items-start p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30 group">
+                    <div className="w-10 h-10 flex-shrink-0 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 mt-1 transition-all duration-300 group-hover:bg-cyan-500/30">
+                      <LocationPinIcon />
+                    </div>
+                    <div className="ml-4">
+                      <h4 className="text-base font-medium text-white font-['Orbitron'] mb-1">
+                        {(() => {
+                          const pickupLocation = locations.find(loc => loc.id === pickup);
+                          return pickupLocation 
+                            ? `${pickupLocation.displayName[language] || pickupLocation.name} ${language === 'fr' ? 'Agence' : 'Branch'}`
+                            : `${pickup.charAt(0).toUpperCase() + pickup.slice(1)} ${language === 'fr' ? 'Agence' : 'Branch'}`;
+                        })()} 
+                      </h4>
+                      <p className="text-sm text-gray-400 font-['Orbitron'] mb-2">
+                        {(() => {
+                          const pickupLocation = locations.find(loc => loc.id === pickup);
+                          return pickupLocation?.address?.[language] || t('branchAddress', { location: pickup.charAt(0).toUpperCase() + pickup.slice(1) });
+                        })()}
+                      </p>
+                      <p className="text-sm text-cyan-400 font-['Orbitron']">
+                        {t('branchOpeningHours')}
+                      </p>
+                    </div>
                   </div>
-                  <div className="ml-4">
-                    <h4 className="text-base font-medium text-white font-['Orbitron'] mb-1">
-                      {pickup.charAt(0).toUpperCase() + pickup.slice(1)} {language === 'fr' ? 'Agence' : 'Branch'}
-                    </h4>
-                    <p className="text-sm text-gray-400 font-['Orbitron'] mb-2">
-                      {t('branchAddress', { location: pickup.charAt(0).toUpperCase() + pickup.slice(1) })}
-                    </p>
-                    <p className="text-sm text-cyan-400 font-['Orbitron']">
-                      {t('branchOpeningHours')}
-                    </p>
-                  </div>
-                </div>
+                )}
                 
-                {!sameLocation && (
+                {!sameLocation && dropoff && (
                   <div className="flex items-start p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-purple-500/30 group">
                     <div className="w-10 h-10 flex-shrink-0 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mt-1 transition-all duration-300 group-hover:bg-purple-500/30">
                       <DestinationIcon />
                     </div>
                     <div className="ml-4">
                       <h4 className="text-base font-medium text-white font-['Orbitron'] mb-1">
-                        {dropoff.charAt(0).toUpperCase() + dropoff.slice(1)} {language === 'fr' ? 'Agence' : 'Branch'}
+                        {(() => {
+                          const dropoffLocation = locations.find(loc => loc.id === dropoff);
+                          return dropoffLocation 
+                            ? `${dropoffLocation.displayName[language] || dropoffLocation.name} ${language === 'fr' ? 'Agence' : 'Branch'}`
+                            : `${dropoff.charAt(0).toUpperCase() + dropoff.slice(1)} ${language === 'fr' ? 'Agence' : 'Branch'}`;
+                        })()} 
                       </h4>
                       <p className="text-sm text-gray-400 font-['Orbitron'] mb-2">
-                        {t('branchAddress', { location: dropoff.charAt(0).toUpperCase() + dropoff.slice(1) })}
+                        {(() => {
+                          const dropoffLocation = locations.find(loc => loc.id === dropoff);
+                          return dropoffLocation?.address?.[language] || t('branchAddress', { location: dropoff.charAt(0).toUpperCase() + dropoff.slice(1) });
+                        })()}
                       </p>
                       <p className="text-sm text-purple-400 font-['Orbitron']">
                         {t('branchOpeningHours')}
@@ -414,6 +632,18 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
           </div>
         </div>
         
+        {/* Error Display */}
+        {error && (
+          <div className="mt-8 p-4 bg-red-900/20 border border-red-500/30 rounded-xl">
+            <div className="flex items-center text-red-400 font-['Orbitron']">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {error}
+            </div>
+          </div>
+        )}
+        
         {/* Navigation Buttons */}
         <div className="mt-12 flex flex-col sm:flex-row justify-between gap-4">
           <button
@@ -425,11 +655,21 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
           </button>
           
           <button
-            onClick={handleContinue}
-            className="px-8 py-4 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] text-lg rounded-lg flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-cyan-500/20 hover:scale-105 transform cursor-pointer"
+            onClick={validateAndContinue}
+            disabled={loading || !pickup || (!sameLocation && !dropoff)}
+            className="px-8 py-4 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] text-lg rounded-lg flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-cyan-500/20 hover:scale-105 transform cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {t('continueToOptions')}
-            <ArrowRightIcon className="h-6 w-6 ml-3" />
+            {loading ? (
+              <>
+                <SpinnerIcon className="h-5 w-5 mr-3" />
+                {t('loading')}
+              </>
+            ) : (
+              <>
+                {t('continueToOptions')}
+                <ArrowRightIcon className="h-6 w-6 ml-3" />
+              </>
+            )}
           </button>
         </div>
       </div>

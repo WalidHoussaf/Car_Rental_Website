@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
+import { api } from '../../config/api';
 
 const AvailabilitySection = ({ carId }) => {
   const navigate = useNavigate();
@@ -33,10 +34,32 @@ const AvailabilitySection = ({ carId }) => {
     return selectedDateObj >= todayDateObj;
   }, []);
 
+  // Function to find next available date
+  const findNextAvailableDate = useCallback(async (startDate) => {
+    try {
+      // Check availability for the next 30 days
+      for (let i = 1; i <= 30; i++) {
+        const checkDate = new Date(startDate);
+        checkDate.setDate(checkDate.getDate() + i);
+        const dateString = checkDate.toISOString().split('T')[0];
+        
+        const response = await api.cars.checkAvailability(carId, dateString, dateString);
+        if (response.success && response.data.available) {
+          return dateString;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error finding next available date:', error);
+      return null;
+    }
+  }, [carId]);
+
   // Function to check availability
   const checkAvailability = useCallback(async (date) => {
     setLoading(true);
     setDateError(null);
+    setNextAvailableDate(null);
     
     // Validate date is not in the past
     if (!isValidDate(date)) {
@@ -47,29 +70,29 @@ const AvailabilitySection = ({ carId }) => {
     }
     
     try {
-      // Simulating API call with timeout
-      // API call to the backend
-      await new Promise(resolve => setTimeout(resolve, 600));
+      // Make actual API call to check availability
+      const response = await api.cars.checkAvailability(carId, date, date);
       
-      // Simulate availability based on car ID and date
-      // Replace with actual API call
-      const available = Math.random() > 0.3; // 70% chance of being available
-      
-      setIsAvailable(available);
-      
-      if (!available) {
-        // If not available, set next available date to 3-7 days in the future
-        const daysToAdd = Math.floor(Math.random() * 5) + 3;
-        const nextDate = new Date(date);
-        nextDate.setDate(nextDate.getDate() + daysToAdd);
-        setNextAvailableDate(nextDate.toISOString().split('T')[0]);
+      if (response.success) {
+        const available = response.data.available;
+        setIsAvailable(available);
+        
+        if (!available) {
+          // Find the next available date
+          const nextDate = await findNextAvailableDate(date);
+          setNextAvailableDate(nextDate);
+        }
+      } else {
+        throw new Error(response.message || 'Failed to check availability');
       }
     } catch (error) {
-      console.error("Error checking availability:", error);
+      console.error('Error checking availability:', error);
+      setIsAvailable(false);
+      setDateError(t('errorCheckingAvailability') || 'Error checking availability. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [t, isValidDate]);
+  }, [t, isValidDate, carId, findNextAvailableDate]);
 
   // Handle date selection with validation
   const handleDateChange = (newDate) => {
