@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect, forwardRef } from 'react';
+import PropTypes from 'prop-types';
+import { format, differenceInDays } from 'date-fns';
 import { useTranslations } from '../../translations';
 import { useLanguage } from '../../hooks/useLanguage';
 import CalendarDateIcon from '../Ui/Icons/CalendarDateIcon';
@@ -6,21 +8,48 @@ import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
 import { getNumericPrice } from '../../utils/price';
 
 
-const DatePicker = forwardRef(({ selected, onChange, minDate, className, ...props }, ref) => {
+const DatePicker = forwardRef(({ 
+  selected, 
+  onChange, 
+  minDate, 
+  className, 
+  placeholder = '',
+  ...props 
+}, ref) => {
+  // Format date safely without timezone issues
+  const formatDateForInput = (date) => {
+    if (!date) return '';
+    return format(date, 'yyyy-MM-dd');
+  };
+
+  // Parse date from input value
+  const handleDateChange = (e) => {
+    const value = e.target.value;
+    if (value) {
+      // Create date at local midnight to avoid timezone shifts
+      const [year, month, day] = value.split('-').map(Number);
+      const localDate = new Date(year, month - 1, day);
+      onChange(localDate);
+    } else {
+      onChange(null);
+    }
+  };
+
   return (
     <input
       ref={ref}
       type="date"
-      value={selected ? selected.toISOString().split('T')[0] : ''}
-      onChange={(e) => onChange(new Date(e.target.value))}
-      min={minDate ? minDate.toISOString().split('T')[0] : ''}
+      value={formatDateForInput(selected)}
+      onChange={handleDateChange}
+      min={formatDateForInput(minDate)}
       className={className}
+      placeholder={placeholder}
       {...props}
     />
   );
 });
 
-const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, onDateSelection = () => {} }) => {
+const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
@@ -30,7 +59,11 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date(new Date().setDate(new Date().getDate() + 3)));
   const [validationError, setValidationError] = useState('');
+  const [maxDurationWarning, setMaxDurationWarning] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
+  
+  // Configuration
+  const MAX_RENTAL_DAYS = 90; // Maximum rental duration
   
   // Get tomorrow's date for min start date
   const tomorrow = new Date();
@@ -45,14 +78,48 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
 
   const totalDays = calculateDays();
   
-  // Validation effect
+  // Calculate total cost
+  const calculateTotalCost = () => {
+    if (!startDate || !endDate || !car?.pricePerDay) {
+      return 0;
+    }
+    
+    const days = calculateDays();
+    const numericPrice = getNumericPrice(car);
+    return days * numericPrice;
+  };
+
+  const totalCost = calculateTotalCost();
+  
+  // Validation with max duration checking
   useEffect(() => {
-    if (startDate && endDate && endDate <= startDate) {
-      setValidationError(t('validationError'));
+    if (!startDate || !endDate) {
+      setValidationError('');
+      setMaxDurationWarning('');
+      return;
+    }
+
+    // Check if end date is before or same as start date
+    if (endDate <= startDate) {
+      setValidationError(t('validationErrors') || 'Return date must be after pickup date');
+      setMaxDurationWarning('');
+      return;
+    }
+
+    // Check max rental duration
+    const daysDifference = differenceInDays(endDate, startDate);
+    if (daysDifference > MAX_RENTAL_DAYS) {
+      setValidationError('');
+      setMaxDurationWarning(t('maxRentalDurationWarning') || `Maximum rental duration is ${MAX_RENTAL_DAYS} days`);
+    } else if (daysDifference > MAX_RENTAL_DAYS * 0.8) {
+      // Warning when approaching max duration (80% threshold)
+      setValidationError('');
+      setMaxDurationWarning(t('approachingMaxDuration') || `Rental duration is ${daysDifference} days (max: ${MAX_RENTAL_DAYS})`);
     } else {
       setValidationError('');
+      setMaxDurationWarning('');
     }
-  }, [startDate, endDate, t]);
+  }, [startDate, endDate, t, MAX_RENTAL_DAYS]);
   
   // Quick select handlers
   const handleQuickSelect = (days) => {
@@ -67,9 +134,17 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
     setTimeout(() => setIsAnimating(false), 300);
   };
   
+  // Calculate dynamic max date for end date picker
+  const getMaxEndDate = () => {
+    if (!startDate) return null;
+    const maxDate = new Date(startDate);
+    maxDate.setDate(startDate.getDate() + MAX_RENTAL_DAYS);
+    return maxDate;
+  };
+
   // Handle continue button click
   const handleContinue = () => {
-    if (startDate && endDate && !validationError) {
+    if (startDate && endDate && !validationError && !maxDurationWarning) {
       setIsAnimating(true);
       setTimeout(() => {
         onDateSelection(startDate, endDate);
@@ -145,7 +220,7 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
                     selected={startDate}
                     onChange={(date) => {
                       setStartDate(date);
-                      if (endDate < date) {
+                      if (endDate && date && endDate < date) {
                         const newEndDate = new Date(date);
                         newEndDate.setDate(date.getDate() + 1);
                         setEndDate(newEndDate);
@@ -171,6 +246,7 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
                     selected={endDate}
                     onChange={(date) => setEndDate(date)}
                     minDate={startDate ? new Date(startDate.getTime() + 86400000) : tomorrow}
+                    max={getMaxEndDate() ? format(getMaxEndDate(), 'yyyy-MM-dd') : undefined}
                     className="w-full px-4 py-4 bg-black/80 border border-blue-500/30 rounded-lg text-white font-['Orbitron'] text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500/50 transition-all duration-300 hover:border-cyan-500/50"
                   />
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-colors duration-300 group-hover:text-cyan-400 pointer-events-none">
@@ -179,17 +255,23 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
               </div>
             </div>
 
-            {/* Validation Error */}
+            {/* Validation Messages */}
             {validationError && (
-              <div className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+              <div className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg transform transition-all duration-300 ease-in-out">
                 <p className="text-red-400 font-['Orbitron'] text-sm">{validationError}</p>
+              </div>
+            )}
+            
+            {maxDurationWarning && !validationError && (
+              <div className="px-4 py-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg transform transition-all duration-300 ease-in-out">
+                <p className="text-yellow-400 font-['Orbitron'] text-sm">{maxDurationWarning}</p>
               </div>
             )}
           </div>
 
           {/* Preview Section - Right Column */}
           <div className="lg:col-span-1">
-            <div className={`backdrop-blur-sm bg-black/50 p-6 lg:p-8 rounded-xl border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 overflow-hidden group sticky top-4 ${isAnimating ? 'scale-105' : ''}`}>
+            <div className={`backdrop-blur-sm bg-black/50 p-6 lg:p-8 rounded-xl border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-500 ease-out overflow-hidden group sticky top-4 transform ${isAnimating ? 'scale-105 shadow-cyan-500/20' : 'scale-100'}`}>
               {/* Header */}
               <div className="text-center mb-8">
                 <h3 className="text-lg md:text-xl text-cyan-400 font-['Orbitron'] flex items-center justify-center">
@@ -239,6 +321,14 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
                 
                 <div className="h-px bg-gradient-to-r from-transparent via-blue-900/50 to-transparent"></div>
                 
+                {/* Total Cost */}
+                <div className="flex justify-between items-center py-4 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 rounded-lg px-4 -mx-2">
+                  <span className="text-cyan-400 font-['Orbitron'] text-base font-semibold">{t('totalCost') || 'Total Cost'}</span>
+                  <span className="text-white font-['Orbitron'] text-lg font-bold">
+                    ${totalCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </span>
+                </div>
+                
               </div>
             </div>
           </div>
@@ -248,12 +338,12 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
         <div className="flex justify-center pt-4">
           <button
             onClick={handleContinue}
-            disabled={!!validationError || !startDate || !endDate}
-            className={`px-8 py-4 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] text-base lg:text-lg rounded-lg flex items-center justify-center transition-all duration-300 backdrop-blur-sm shadow-lg min-w-[200px] ${
-              validationError || !startDate || !endDate 
-                ? 'opacity-50 cursor-not-allowed' 
-                : 'hover:from-cyan-400 hover:to-white hover:shadow-cyan-500/20 hover:scale-105 transform cursor-pointer'
-            } ${isAnimating ? 'scale-95' : ''}`}
+            disabled={!!validationError || !!maxDurationWarning || !startDate || !endDate}
+            className={`px-8 py-4 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] text-base lg:text-lg rounded-lg flex items-center justify-center transition-all duration-500 ease-out backdrop-blur-sm shadow-lg min-w-[200px] transform ${
+              validationError || maxDurationWarning || !startDate || !endDate 
+                ? 'opacity-50 cursor-not-allowed scale-95' 
+                : 'hover:from-cyan-400 hover:to-white hover:shadow-cyan-500/30 hover:scale-105 cursor-pointer'
+            } ${isAnimating ? 'scale-110 shadow-cyan-500/40' : 'scale-100'}`}
           >
             <span className="flex items-center">
               {t('continueToLocation')}
@@ -264,6 +354,19 @@ const BookingCalendar = ({ car = { name: 'Mercedes-Benz S-Class', price: 250 }, 
       </div>
     </div>
   );
+};
+
+// PropTypes validation
+BookingCalendar.propTypes = {
+  car: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    pricePerDay: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  }).isRequired,
+  onDateSelection: PropTypes.func,
+};
+
+BookingCalendar.defaultProps = {
+  onDateSelection: () => {},
 };
 
 export default BookingCalendar;

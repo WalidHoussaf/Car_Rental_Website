@@ -502,7 +502,11 @@ export const translations = {
     totalAmount: "Total Amount",
     confirmAndBook: "Confirm & Book Now",
     perDay: "per day",
-   
+    maxRentalDurationWarning: "Maximum rental duration is 90 days",
+    approachingMaxDuration: "Rental duration is 80% of the maximum allowed duration",
+    totalCost: "Total Cost",
+    validationErrors: "Return date must be after pickup date",
+
     // Contact
     getInTouch: "Get In Touch",
     fullName: "Full Name",
@@ -1159,6 +1163,7 @@ export const translations = {
     adminCarsNoImagesReturned: "Aucune image retournée du serveur",
     adminCarsFailedToUploadImages: "Échec du téléchargement des images",
     adminCarsFailedToDeleteCar: "Échec de la suppression de la voiture",
+
     // Car Categories
     luxury: "Luxe",
     economy: "Économique", 
@@ -1334,6 +1339,10 @@ export const translations = {
     totalAmount: "Montant Total",
     confirmAndBook: "Confirmer et Réserver",
     perDay: "par jour",
+    totalCost: "Coût Total",
+    approachingMaxDuration: "Durée de location est 80% de la durée maximale autorisée",
+    maxRentalDurationWarning: "Durée de location maximale autorisée est de 90 jours",
+    validationErrors: "Date de retour doit être après la date de prise en charge",
 
     // Privacy Page
     privacyPolicy: "Politique de confidentialité",
