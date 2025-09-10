@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, X, Maximize, ZoomIn, ZoomOut, Download, Heart, Share2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Maximize, ZoomIn, ZoomOut, Download, Heart, Share2, Play, Pause } from 'lucide-react';
 import { useLanguage } from '../../../../hooks/useLanguage';
 import { useTranslations } from '../../../../translations';
 import { resolveImagePath } from '../../../../utils/imageResolver';
@@ -112,12 +112,17 @@ const GalleryTab = ({ car }) => {
     }
   }, [favorites, car?.id]);
 
-  // Auto-rotate images every 5 seconds (only when modal is closed and autoplay is on)
+  // Auto-rotate images every 5 seconds (only when modal is open and autoplay is on)
   useEffect(() => {
-    if (allImages.length <= 1 || isModalOpen || !isAutoplayOn) return;
+    if (allImages.length <= 1 || !isModalOpen || !isAutoplayOn) return;
     
     const interval = setInterval(() => {
-      setSelectedImage((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+      // Match the same transition sequence as manual navigation
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setSelectedImage((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+        setTimeout(() => setIsTransitioning(false), 40);
+      }, 80);
     }, 5000);
     
     return () => clearInterval(interval);
@@ -136,14 +141,13 @@ const GalleryTab = ({ car }) => {
     setIsTransitioning(true);
     setTimeout(() => {
       setSelectedImage(index);
-      setTimeout(() => setIsTransitioning(false), 50);
-    }, 150);
+      setTimeout(() => setIsTransitioning(false), 40);
+    }, 80);
   }, [selectedImage]);
 
   // Function to open modal with full-size image
   const openModal = useCallback(() => {
     setIsModalOpen(true);
-    setIsAutoplayOn(false); 
   }, []);
 
   // Function to close modal
@@ -151,7 +155,6 @@ const GalleryTab = ({ car }) => {
     setIsModalOpen(false);
     setZoomLevel(1);
     setImagePosition({ x: 0, y: 0 });
-    setIsAutoplayOn(true); 
   }, []);
 
   // Navigation functions with animation
@@ -159,16 +162,16 @@ const GalleryTab = ({ car }) => {
     setIsTransitioning(true);
     setTimeout(() => {
       setSelectedImage((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
-      setTimeout(() => setIsTransitioning(false), 50);
-    }, 150);
+      setTimeout(() => setIsTransitioning(false), 40);
+    }, 80);
   }, [allImages.length]);
 
   const goToNext = useCallback(() => {
     setIsTransitioning(true);
     setTimeout(() => {
       setSelectedImage((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
-      setTimeout(() => setIsTransitioning(false), 50);
-    }, 150);
+      setTimeout(() => setIsTransitioning(false), 40);
+    }, 80);
   }, [allImages.length]);
 
   // Zoom functions
@@ -301,6 +304,8 @@ const GalleryTab = ({ car }) => {
   // Function to handle featured image click
   const handleFeatureClick = useCallback((e) => {
     e.stopPropagation();
+    // Ensure the modal opens with the first (featured) image
+    setSelectedImage(0);
     openModal();
   }, [openModal]);
 
@@ -318,8 +323,8 @@ const GalleryTab = ({ car }) => {
       setTimeout(() => {
         setIsTransitioning(false);
         openModal();
-      }, 50);
-    }, 150);
+      }, 40);
+    }, 80);
   }, [selectedImage, openModal]);
 
   return (
@@ -384,7 +389,7 @@ const GalleryTab = ({ car }) => {
                 <img
                   src={allImages[0].path}
                   alt={allImages[0].alt}
-                  className={`w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 ${
+                  className={`w-full h-full object-cover transition-all duration-300 ease-in-out group-hover:scale-105 ${
                     isTransitioning ? 'opacity-0' : 'opacity-100'
                   }`}
                 />
@@ -438,7 +443,7 @@ const GalleryTab = ({ car }) => {
               <img
                 src={image.path}
                 alt={image.alt}
-                className={`w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 ${
+                className={`w-full h-full object-cover transition-all duration-300 ease-in-out group-hover:scale-105 ${
                   isTransitioning ? 'opacity-0' : 'opacity-100'
                 }`}
               />
@@ -513,7 +518,7 @@ const GalleryTab = ({ car }) => {
                 <img
                   src={allImages[selectedImage].path}
                   alt={allImages[selectedImage].alt}
-                  className={`max-w-full max-h-[70vh] object-contain transition-opacity duration-300 ${
+                  className={`max-w-full max-h-[70vh] object-contain transition-opacity duration-200 ${
                     isTransitioning ? 'opacity-0' : 'opacity-100'
                   }`}
                   draggable="false"
@@ -594,6 +599,20 @@ const GalleryTab = ({ car }) => {
                 type="button"
               >
                 <Maximize size={16} className={zoomLevel === 1 ? 'opacity-50' : ''} />
+              </button>
+
+              {/* Play/Pause Autoplay */}
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsAutoplayOn(prev => !prev);
+                }}
+                className="bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 cursor-pointer"
+                type="button"
+                title={isAutoplayOn ? 'Pause' : 'Play'}
+                aria-label={isAutoplayOn ? 'Pause autoplay' : 'Play autoplay'}
+              >
+                {isAutoplayOn ? <Pause size={16} /> : <Play size={16} />}
               </button>
               
               {/* Separator */}
