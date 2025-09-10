@@ -391,7 +391,6 @@ const CarsPage = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent"></div>
                   <div className="w-20 h-20 relative">
                     <div className="w-full h-full border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin"></div>
-                    <div className="absolute inset-0 border-4 border-transparent border-l-cyan-400/50 rounded-full animate-spin-slow"></div>
                   </div>
                   <div className="mt-6 px-4 py-2 bg-black/50 backdrop-blur-sm rounded-full">
                     <p className="text-cyan-300 font-['Orbitron'] relative">

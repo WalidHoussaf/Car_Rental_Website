@@ -15,6 +15,7 @@ const GalleryTab = ({ car }) => {
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [isAutoplayOn, setIsAutoplayOn] = useState(true);
   const [favorites, setFavorites] = useState([]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   // Check if car has gallery property and that it contains valid images
   const hasGallery = car && car.gallery && Array.isArray(car.gallery) && car.gallery.length > 0;
@@ -128,10 +129,16 @@ const GalleryTab = ({ car }) => {
     setImagePosition({ x: 0, y: 0 });
   }, [selectedImage]);
 
-  // Function to handle thumbnail click
+  // Function to handle thumbnail click with animation
   const handleThumbnailClick = useCallback((index) => {
-    setSelectedImage(index);
-  }, []);
+    if (index === selectedImage) return;
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedImage(index);
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 150);
+  }, [selectedImage]);
 
   // Function to open modal with full-size image
   const openModal = useCallback(() => {
@@ -147,13 +154,21 @@ const GalleryTab = ({ car }) => {
     setIsAutoplayOn(true); 
   }, []);
 
-  // Navigation functions
+  // Navigation functions with animation
   const goToPrevious = useCallback(() => {
-    setSelectedImage((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedImage((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 150);
   }, [allImages.length]);
 
   const goToNext = useCallback(() => {
-    setSelectedImage((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedImage((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 150);
   }, [allImages.length]);
 
   // Zoom functions
@@ -289,12 +304,23 @@ const GalleryTab = ({ car }) => {
     openModal();
   }, [openModal]);
 
-  // Function to handle thumbanil image click
+  // Function to handle thumbnail image click with animation
   const handleThumbImageClick = useCallback((index, e) => {
     e.stopPropagation();
-    setSelectedImage(index);
-    openModal();
-  }, [openModal]);
+    if (index === selectedImage) {
+      openModal();
+      return;
+    }
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedImage(index);
+      setTimeout(() => {
+        setIsTransitioning(false);
+        openModal();
+      }, 50);
+    }, 150);
+  }, [selectedImage, openModal]);
 
   return (
     <div className="transition-all duration-500 relative overflow-hidden rounded-xl p-8">
@@ -358,13 +384,15 @@ const GalleryTab = ({ car }) => {
                 <img
                   src={allImages[0].path}
                   alt={allImages[0].alt}
-                  className="w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105"
+                  className={`w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 ${
+                    isTransitioning ? 'opacity-0' : 'opacity-100'
+                  }`}
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent backdrop-blur-sm text-white p-2 font-['Orbitron'] text-xl">
                   {car.name || "Featured"}
                 </div>
                 <button 
-                  className="absolute right-2 top-2 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black p-1 rounded-full transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-blue-500/30 text-center cursor-pointer"
+                  className="absolute right-2 top-2 bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-cyan-500/30 text-center cursor-pointer"
                   onClick={handleFeatureClick}
                   type="button"
                 >
@@ -374,7 +402,7 @@ const GalleryTab = ({ car }) => {
                 {/* Favorite Button */}
                 <button 
                   onClick={(e) => toggleFavorite(0, e)}
-                  className="absolute left-2 top-2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 cursor-pointer"
+                  className="absolute left-2 top-2 bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 cursor-pointer"
                   type="button"
                 >
                   <Heart size={16} className={favorites.includes(0) ? 'fill-red-500 text-red-500' : ''} />
@@ -410,13 +438,15 @@ const GalleryTab = ({ car }) => {
               <img
                 src={image.path}
                 alt={image.alt}
-                className="w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105"
+                className={`w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-105 ${
+                  isTransitioning ? 'opacity-0' : 'opacity-100'
+                }`}
               />
               
               {/* Favorite Button */}
               <button 
                 onClick={(e) => toggleFavorite(index + 1, e)}
-                className="absolute left-2 top-2 bg-black/50 hover:bg-black/70 text-white p-1 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 cursor-pointer"
+                className="absolute left-2 top-2 bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 cursor-pointer"
                 type="button"
               >
                 <Heart size={16} className={favorites.includes(index + 1) ? 'fill-red-500 text-red-500' : ''} />
@@ -483,7 +513,9 @@ const GalleryTab = ({ car }) => {
                 <img
                   src={allImages[selectedImage].path}
                   alt={allImages[selectedImage].alt}
-                  className="max-w-full max-h-[70vh] object-contain"
+                  className={`max-w-full max-h-[70vh] object-contain transition-opacity duration-300 ${
+                    isTransitioning ? 'opacity-0' : 'opacity-100'
+                  }`}
                   draggable="false"
                 />
               </div>
@@ -495,7 +527,7 @@ const GalleryTab = ({ car }) => {
                 e.stopPropagation();
                 closeModal();
               }}
-              className="absolute top-3 right-3 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black p-2 rounded-full transition-all duration-300 shadow-lg hover:shadow-blue-500/30 cursor-pointer"
+              className="absolute top-3 right-3 bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-2 rounded-full transition-all duration-300 shadow-lg hover:shadow-cyan-500/30 cursor-pointer"
               type="button"
             >
               <X size={16} />
@@ -509,7 +541,7 @@ const GalleryTab = ({ car }) => {
                     e.stopPropagation();
                     goToPrevious();
                   }}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-md hover:bg-gradient-to-r hover:from-white hover:to-cyan-400 text-white p-2 rounded-full transition-all duration-300 cursor-pointer"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-2 rounded-full transition-all duration-300 cursor-pointer"
                   type="button"
                 >
                   <ChevronLeft size={20} />
@@ -519,7 +551,7 @@ const GalleryTab = ({ car }) => {
                     e.stopPropagation();
                     goToNext();
                   }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-md hover:bg-gradient-to-r hover:from-white hover:to-cyan-400 text-white p-2 rounded-full transition-all duration-300 cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-2 rounded-full transition-all duration-300 cursor-pointer"
                   type="button"
                 >
                   <ChevronRight size={20} />
@@ -535,7 +567,7 @@ const GalleryTab = ({ car }) => {
                   e.stopPropagation();
                   handleZoomIn();
                 }}
-                className="bg-black/60 hover:bg-gradient-to-r hover:from-white hover:to-cyan-400 text-white p-1 rounded-full transition-all duration-300 cursor-pointer"
+                className="bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={zoomLevel >= 3}
                 type="button"
               >
@@ -546,7 +578,7 @@ const GalleryTab = ({ car }) => {
                   e.stopPropagation();
                   handleZoomOut();
                 }}
-                className="bg-black/60 hover:bg-gradient-to-r hover:from-white hover:to-cyan-400 text-white p-1 rounded-full transition-all duration-300 cursor-pointer" 
+                className="bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" 
                 disabled={zoomLevel <= 1}
                 type="button"
               >
@@ -557,7 +589,7 @@ const GalleryTab = ({ car }) => {
                   e.stopPropagation();
                   resetZoom();
                 }}
-                className="bg-black/60 hover:bg-gradient-to-r hover:from-white hover:to-cyan-400 text-white p-1 rounded-full transition-all duration-300 cursor-pointer"
+                className="bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={zoomLevel === 1}
                 type="button"
               >
@@ -569,14 +601,14 @@ const GalleryTab = ({ car }) => {
     
               <button 
                 onClick={(e) => handleDownload(e)}
-                className="bg-black/60 hover:bg-gradient-to-r hover:from-white hover:to-cyan-400 text-white p-1 rounded-full transition-all duration-300 cursor-pointer"
+                className="bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 cursor-pointer"
                 type="button"
               >
                 <Download size={16} />
               </button>
               <button 
                 onClick={(e) => handleShare(e)}
-                className="bg-black/60 hover:bg-gradient-to-r hover:from-white hover:to-cyan-400 text-white p-1 rounded-full transition-all duration-300 cursor-pointer"
+                className="bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 cursor-pointer"
                 type="button"
               >
                 <Share2 size={16} />
@@ -586,7 +618,7 @@ const GalleryTab = ({ car }) => {
                   e.stopPropagation();
                   toggleFavorite(selectedImage);
                 }}
-                className="bg-black/60 hover:bg-gradient-to-r hover:from-white hover:to-cyan-400 text-white p-1 rounded-full transition-all duration-300 cursor-pointer"
+                className="bg-black/80 backdrop-blur-sm border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 hover:text-cyan-400 p-1 rounded-full transition-all duration-300 cursor-pointer"
                 type="button"
               >
                 <Heart size={16} className={favorites.includes(selectedImage) ? 'fill-red-500 text-red-500' : ''} />
@@ -594,8 +626,8 @@ const GalleryTab = ({ car }) => {
             </div>
             
             {/* Image Counter Indicator */}
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-white to-cyan-400/80 px-2 py-1 rounded-full">
-              <span className="text-black font-bold text-xs font-['Orbitron']">
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-sm border border-cyan-500/30 px-3 py-1.5 rounded-full flex items-center justify-center">
+              <span className="text-cyan-300 font-bold text-xs font-['Orbitron'] leading-none">
                 {selectedImage + 1} / {allImages.length}
               </span>
             </div>
