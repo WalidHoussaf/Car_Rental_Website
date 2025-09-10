@@ -502,10 +502,10 @@ export const translations = {
     totalAmount: "Total Amount",
     confirmAndBook: "Confirm & Book Now",
     perDay: "per day",
-    maxRentalDurationWarning: "Maximum rental duration is 90 days",
-    approachingMaxDuration: "Rental duration is 80% of the maximum allowed duration",
+    maxRentalDurationWarning: "Maximum rental duration is 90 days.",
+    approachingMaxDuration: "Rental duration is 80% of the maximum allowed duration.",
     totalCost: "Total Cost",
-    validationErrors: "Return date must be after pickup date",
+    validationErrors: "Return date must be after pickup date.",
 
     // Contact
     getInTouch: "Get In Touch",
@@ -690,6 +690,9 @@ export const translations = {
     branchOpeningHours: "Open 8:00 AM - 10:00 PM",
     backToDates: "Back to Dates",
     continueToOptions: "Continue to Options",
+    searchOrSelectLocation: "Search or select location...",
+    noLocationsFound: "No locations found",
+    dropoffTimeMustBeAfterPickup: "Drop-off time must be after pickup time",
     
     // Specification names
     spec_engine: "Engine",
@@ -1340,9 +1343,9 @@ export const translations = {
     confirmAndBook: "Confirmer et Réserver",
     perDay: "par jour",
     totalCost: "Coût Total",
-    approachingMaxDuration: "Durée de location est 80% de la durée maximale autorisée",
-    maxRentalDurationWarning: "Durée de location maximale autorisée est de 90 jours",
-    validationErrors: "Date de retour doit être après la date de prise en charge",
+    approachingMaxDuration: "Durée de location est 80% de la durée maximale autorisée.",
+    maxRentalDurationWarning: "Durée de location maximale autorisée est de 90 jours.",
+    validationErrors: "Date de retour doit être après la date de prise en charge.",
 
     // Privacy Page
     privacyPolicy: "Politique de confidentialité",

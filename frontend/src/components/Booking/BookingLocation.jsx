@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Select from 'react-select';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 import locationService from '../../services/locationService';
+import { locationSelectStyles, timeSelectStyles } from '../../styles/selectStyles';
+import { generateTimeOptions, validateTimeOrder } from '../../utils/timeUtils';
 import MapMarkerIcon from '../Ui/Icons/MapMarkerIcon';
 import SpinnerIcon from '../Ui/Icons/SpinnerIcon';
 import CheckmarkIcon from '../Ui/Icons/CheckmarkIcon';
@@ -11,49 +13,102 @@ import DestinationIcon from '../Ui/Icons/DestinationIcon';
 import ArrowLeftIcon from '../Ui/Icons/ArrowLeftIcon';
 import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
 
+// Global Leaflet loading cache
+let leafletLoadingPromise = null;
+let leafletLoaded = false;
+
+// Utility function to find the closest location to a given coordinate
+const findClosestLocation = (targetLatLng, locations) => {
+  if (!locations || locations.length === 0) return null;
+  
+  let closestLocation = null;
+  let minDistance = Infinity;
+  
+  locations.forEach(location => {
+    if (location.coordinates) {
+      const distance = Math.sqrt(
+        Math.pow(location.coordinates.lat - targetLatLng.lat, 2) +
+        Math.pow(location.coordinates.lng - targetLatLng.lng, 2)
+      );
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestLocation = location;
+      }
+    }
+  });
+  
+  return closestLocation;
+};
+
 // Interactive map component using OpenStreetMap with Leaflet
-const InteractiveMap = ({ pickup, dropoff, sameLocation, locations }) => {
+const InteractiveMap = ({ pickup, dropoff, sameLocation, locations, onLocationSelect }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(leafletLoaded);
   const [mapError, setMapError] = useState(null);
 
-  // Loading Leaflet resources
+  // Loading Leaflet resources with caching
   useEffect(() => {
     const loadLeafletResources = async () => {
-      if (window.L) {
+      if (leafletLoaded || window.L) {
         setMapLoaded(true);
+        leafletLoaded = true;
         return;
       }
 
-      try {
-        // Load Leaflet CSS
-        const linkElement = document.createElement('link');
-        linkElement.rel = 'stylesheet';
-        linkElement.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        linkElement.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-        linkElement.crossOrigin = '';
-        document.head.appendChild(linkElement);
-
-        // Load Leaflet script
-        const scriptElement = document.createElement('script');
-        scriptElement.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        scriptElement.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-        scriptElement.crossOrigin = '';
-        document.body.appendChild(scriptElement);
-
-        scriptElement.onload = () => {
+      // Use cached promise if already loading
+      if (leafletLoadingPromise) {
+        try {
+          await leafletLoadingPromise;
           setMapLoaded(true);
-        };
-        
-        scriptElement.onerror = () => {
+        } catch (error) {
+          console.error('Error loading Leaflet:', error);
           setMapError('Failed to load map resources');
-        };
+        }
+        return;
+      }
+
+      // Create new loading promise
+      leafletLoadingPromise = new Promise((resolve, reject) => {
+        try {
+          // Load Leaflet CSS
+          const linkElement = document.createElement('link');
+          linkElement.rel = 'stylesheet';
+          linkElement.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+          linkElement.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+          linkElement.crossOrigin = '';
+          document.head.appendChild(linkElement);
+
+          // Load Leaflet script
+          const scriptElement = document.createElement('script');
+          scriptElement.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+          scriptElement.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+          scriptElement.crossOrigin = '';
+          document.body.appendChild(scriptElement);
+
+          scriptElement.onload = () => {
+            leafletLoaded = true;
+            resolve();
+          };
+          
+          scriptElement.onerror = () => {
+            reject(new Error('Failed to load Leaflet script'));
+          };
+        } catch (error) {
+          reject(error);
+        }
+      });
+
+      try {
+        await leafletLoadingPromise;
+        setMapLoaded(true);
       } catch (error) {
         console.error('Error loading Leaflet:', error);
+        setMapError('Failed to load map resources');
       }
     };
 
@@ -111,11 +166,35 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation, locations }) => {
         iconAnchor: [12, 12]
       });
 
-      // Add pickup marker
+      // Add pickup marker with drag and click handlers
       const pickupMarker = window.L.marker([pickupCoords.lat, pickupCoords.lng], { 
         icon: pickupIcon,
-        title: `${pickupLocation.displayName[language] || pickupLocation.name} Branch` 
+        title: `${pickupLocation.displayName[language] || pickupLocation.name} Branch`,
+        draggable: true
       }).addTo(map);
+      
+      // Add click handler for location selection
+      pickupMarker.on('click', () => {
+        if (onLocationSelect) {
+          onLocationSelect(pickup, 'pickup');
+        }
+      });
+      
+      // Add drag handlers for manual positioning
+      pickupMarker.on('dragstart', () => {
+        pickupMarker.setOpacity(0.7);
+      });
+      
+      pickupMarker.on('dragend', (e) => {
+        const newLatLng = e.target.getLatLng();
+        pickupMarker.setOpacity(1);
+        
+        // Find the closest available location to the new position
+        const closestLocation = findClosestLocation(newLatLng, locations);
+        if (closestLocation && onLocationSelect) {
+          onLocationSelect(closestLocation.id, 'pickup');
+        }
+      });
       
       markersRef.current.push(pickupMarker);
 
@@ -142,11 +221,35 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation, locations }) => {
         iconAnchor: [12, 12]
       });
 
-      // Add dropoff marker
+      // Add dropoff marker with drag and click handlers
       const dropoffMarker = window.L.marker([dropoffCoords.lat, dropoffCoords.lng], { 
         icon: dropoffIcon,
-        title: `${dropoffLocation.displayName[language] || dropoffLocation.name} Branch` 
+        title: `${dropoffLocation.displayName[language] || dropoffLocation.name} Branch`,
+        draggable: true
       }).addTo(map);
+      
+      // Add click handler for location selection
+      dropoffMarker.on('click', () => {
+        if (onLocationSelect) {
+          onLocationSelect(dropoff, 'dropoff');
+        }
+      });
+      
+      // Add drag handlers for manual positioning
+      dropoffMarker.on('dragstart', () => {
+        dropoffMarker.setOpacity(0.7);
+      });
+      
+      dropoffMarker.on('dragend', (e) => {
+        const newLatLng = e.target.getLatLng();
+        dropoffMarker.setOpacity(1);
+        
+        // Find the closest available location to the new position
+        const closestLocation = findClosestLocation(newLatLng, locations);
+        if (closestLocation && onLocationSelect) {
+          onLocationSelect(closestLocation.id, 'dropoff');
+        }
+      });
       
       markersRef.current.push(dropoffMarker);
 
@@ -159,7 +262,7 @@ const InteractiveMap = ({ pickup, dropoff, sameLocation, locations }) => {
         map.fitBounds(bounds, { padding: [30, 30] });
       }
     }
-  }, [mapLoaded, pickup, dropoff, sameLocation, locations, language]);
+  }, [mapLoaded, pickup, dropoff, sameLocation, locations, language, onLocationSelect]);
 
   return (
     <div className="relative h-64 bg-black/60 rounded-xl mb-8 overflow-hidden border border-blue-900/20 group-hover:border-blue-900/40 transition-all duration-300">
@@ -203,6 +306,9 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
+  
+  // Memoized time options to prevent re-computation
+  const timeOptions = useMemo(() => generateTimeOptions(), []);
   
   // Load available locations when component mounts
   useEffect(() => {
@@ -256,57 +362,27 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
     }
   }, [sameLocation, pickup]);
   
-  const selectStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      borderColor: state.isFocused ? '#22d3ee' : 'rgba(59, 130, 246, 0.3)',
-      borderRadius: '0.75rem',
-      padding: '0.5rem',
-      fontFamily: 'Orbitron, sans-serif',
-      fontSize: '1.125rem',
-      minHeight: '3.5rem',
-      boxShadow: state.isFocused ? '0 0 0 2px #22d3ee' : 'none',
-      '&:hover': {
-        borderColor: '#22d3ee',
-      },
-      transition: 'all 0.3s ease'
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: 'rgba(0, 0, 0, 0.9)',
-      border: '1px solid rgba(59, 130, 246, 0.3)',
-      borderRadius: '0.75rem',
-      padding: '0.5rem',
-      zIndex: 9999,
-      boxShadow: '0 4px 12px rgba(0, 200, 255, 0.15)',
-      position: 'relative'
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected 
-        ? 'rgba(34, 211, 238, 0.2)' 
-        : state.isFocused 
-          ? 'rgba(34, 211, 238, 0.1)' 
-          : 'transparent',
-      color: state.isSelected ? '#22d3ee' : '#ffffff',
-      fontFamily: 'Orbitron, sans-serif',
-      fontSize: '1rem',
-      cursor: 'pointer',
-      transition: 'all 0.2s ease'
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: '#ffffff',
-      fontFamily: 'Orbitron, sans-serif',
-      fontSize: '1.125rem',
-    }),
-    input: (provided) => ({
-      ...provided,
-      color: '#ffffff',
-      fontFamily: 'Orbitron, sans-serif',
-    }),
-  };
+  // Handle location selection from map
+  const handleLocationSelect = useCallback((locationId, type) => {
+    if (type === 'pickup') {
+      setPickup(locationId);
+      if (sameLocation) {
+        setDropoff(locationId);
+      }
+    } else if (type === 'dropoff' && !sameLocation) {
+      setDropoff(locationId);
+    }
+  }, [sameLocation]);
+  
+  // Time validation
+  const timeValidationError = useMemo(() => {
+    if (bookingDetails.startDate && bookingDetails.endDate && 
+        bookingDetails.startDate === bookingDetails.endDate && 
+        !validateTimeOrder(pickupTime, dropoffTime, bookingDetails.startDate, bookingDetails.endDate)) {
+      return t('dropoffTimeMustBeAfterPickup');
+    }
+    return null;
+  }, [pickupTime, dropoffTime, bookingDetails.startDate, bookingDetails.endDate, t]);
   
   // Validate location availability before continuing
   const validateAndContinue = async () => {
@@ -319,6 +395,12 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
     
     if (!sameLocation && !dropoff) {
       setValidationErrors(prev => ({ ...prev, dropoff: t('pleaseSelectDropoffLocation') }));
+      return;
+    }
+    
+    // Validate time order
+    if (timeValidationError) {
+      setValidationErrors(prev => ({ ...prev, time: timeValidationError }));
       return;
     }
     
@@ -409,15 +491,26 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                     options={availableLocations}
                     value={availableLocations.find(loc => loc.value === pickup)}
                     onChange={(selected) => {
-                      setPickup(selected.value);
+                      setPickup(selected?.value || '');
                       // Clear validation error when user makes a selection
                       if (validationErrors.pickup) {
                         setValidationErrors(prev => ({ ...prev, pickup: null }));
                       }
                     }}
-                    styles={selectStyles}
-                    isSearchable={false}
+                    onInputChange={(inputValue, { action }) => {
+                      // Clear selected value when user starts typing
+                      if (action === 'input-change' && pickup) {
+                        setPickup('');
+                      }
+                    }}
+                    styles={locationSelectStyles}
+                    isSearchable={true}
+                    placeholder={t('searchOrSelectLocation')}
+                    noOptionsMessage={() => t('noLocationsFound')}
                     isDisabled={loading}
+                    isClearable={true}
+                    openMenuOnClick={true}
+                    openMenuOnFocus={true}
                   />
                   {validationErrors.pickup && (
                     <p className="mt-2 text-sm text-red-400 font-['Orbitron']">
@@ -439,30 +532,11 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                       {t('pickupTime')}
                     </label>
                     <Select
-                      options={Array.from({ length: 15 }, (_, i) => {
-                        const hour = 6 + i;
-                        const time24 = `${hour.toString().padStart(2, '0')}:00`;
-                        const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
-                        return { value: time24, label: time12 };
-                      })}
-                      value={Array.from({ length: 15 }, (_, i) => {
-                        const hour = 6 + i;
-                        const time24 = `${hour.toString().padStart(2, '0')}:00`;
-                        const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
-                        return { value: time24, label: time12 };
-                      }).find(option => option.value === pickupTime)}
+                      options={timeOptions}
+                      value={timeOptions.find(option => option.value === pickupTime)}
                       onChange={(selected) => setPickupTime(selected.value)}
-                      styles={{
-                        ...selectStyles,
-                        control: (provided, state) => ({
-                          ...selectStyles.control(provided, state),
-                          borderColor: state.isFocused ? '#22d3ee' : 'rgba(59, 130, 246, 0.3)',
-                          boxShadow: state.isFocused ? '0 0 0 2px #22d3ee' : 'none',
-                        }),
-                        menuPortal: (provided) => ({ ...provided, zIndex: 9999 })
-                      }}
+                      styles={timeSelectStyles('#22d3ee')}
                       isSearchable={false}
-                      menuPortalTarget={document.body}
                     />
                   </div>
                 )}
@@ -499,15 +573,26 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                       options={availableLocations}
                       value={availableLocations.find(loc => loc.value === dropoff)}
                       onChange={(selected) => {
-                        setDropoff(selected.value);
+                        setDropoff(selected?.value || '');
                         // Clear validation error when user makes a selection
                         if (validationErrors.dropoff) {
                           setValidationErrors(prev => ({ ...prev, dropoff: null }));
                         }
                       }}
-                      styles={selectStyles}
-                      isSearchable={false}
+                      onInputChange={(inputValue, { action }) => {
+                        // Clear selected value when user starts typing
+                        if (action === 'input-change' && dropoff) {
+                          setDropoff('');
+                        }
+                      }}
+                      styles={locationSelectStyles}
+                      isSearchable={true}
+                      placeholder={t('searchOrSelectLocation')}
+                      noOptionsMessage={() => t('noLocationsFound')}
                       isDisabled={loading}
+                      isClearable={true}
+                      openMenuOnClick={true}
+                      openMenuOnFocus={true}
                     />
                     {validationErrors.dropoff && (
                       <p className="mt-2 text-sm text-red-400 font-['Orbitron']">
@@ -525,31 +610,17 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                       {t('dropoffTime')}
                     </label>
                     <Select
-                      options={Array.from({ length: 15 }, (_, i) => {
-                        const hour = 6 + i;
-                        const time24 = `${hour.toString().padStart(2, '0')}:00`;
-                        const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
-                        return { value: time24, label: time12 };
-                      })}
-                      value={Array.from({ length: 15 }, (_, i) => {
-                        const hour = 6 + i;
-                        const time24 = `${hour.toString().padStart(2, '0')}:00`;
-                        const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
-                        return { value: time24, label: time12 };
-                      }).find(option => option.value === dropoffTime)}
+                      options={timeOptions}
+                      value={timeOptions.find(option => option.value === dropoffTime)}
                       onChange={(selected) => setDropoffTime(selected.value)}
-                      styles={{
-                        ...selectStyles,
-                        control: (provided, state) => ({
-                          ...selectStyles.control(provided, state),
-                          borderColor: state.isFocused ? '#a855f7' : 'rgba(59, 130, 246, 0.3)',
-                          boxShadow: state.isFocused ? '0 0 0 2px #a855f7' : 'none',
-                        }),
-                        menuPortal: (provided) => ({ ...provided, zIndex: 9999 })
-                      }}
+                      styles={timeSelectStyles('#a855f7')}
                       isSearchable={false}
-                      menuPortalTarget={document.body}
                     />
+                    {timeValidationError && (
+                      <p className="mt-2 text-sm text-red-400 font-['Orbitron']">
+                        {timeValidationError}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
@@ -571,6 +642,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                 dropoff={dropoff} 
                 sameLocation={sameLocation}
                 locations={locations}
+                onLocationSelect={handleLocationSelect}
               />
               
               <div className="space-y-6">
@@ -656,7 +728,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
           
           <button
             onClick={validateAndContinue}
-            disabled={loading || !pickup || (!sameLocation && !dropoff)}
+            disabled={loading || !pickup || (!sameLocation && !dropoff) || timeValidationError}
             className="px-8 py-4 bg-gradient-to-r from-white to-cyan-400 text-black font-semibold font-['Orbitron'] text-lg rounded-lg flex items-center justify-center hover:from-cyan-400 hover:to-white transition-all duration-300 backdrop-blur-sm shadow-lg hover:shadow-cyan-500/20 hover:scale-105 transform cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {loading ? (
