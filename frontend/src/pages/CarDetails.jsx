@@ -57,7 +57,14 @@ const CarDetailPage = () => {
   };
   
   // Find the Car by ID from context
-  const car = cars.find(car => car._id === id || car.id === parseInt(id));
+  const car = cars.find(car => 
+    car._id === id || 
+    car.id === parseInt(id) || 
+    car._id === parseInt(id) || 
+    car.id === id ||
+    String(car._id) === id ||
+    String(car.id) === id
+  );
   
   // If Car is not Found, Show the Error UI
   if (!car) {
@@ -72,9 +79,9 @@ const CarDetailPage = () => {
             <path d="M4 11H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
           <h2 className="text-2xl font-bold mb-4 font-['Orbitron']">{t('vehicleNotFound')}</h2>
-          <p className="text-gray-400 mb-8">{t('vehicleNotFoundDesc')}</p>
+          <p className="text-gray-400 mb-8 font-['Orbitron']">{t('vehicleNotFoundDesc')}</p>
           <button 
-            className="px-6 py-3 bg-gradient-to-r from-cyan-400 to-white hover:from-white hover:to-cyan-400 text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 rounded-md"
+            className="px-6 py-3 bg-gradient-to-r from-cyan-400 to-white hover:from-white hover:to-cyan-400 text-black font-['Orbitron'] transition-all duration-300 shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 rounded-md cursor-pointer"
             onClick={() => navigateWithScroll('/cars')}
           >
             {t('backToVehicles')}

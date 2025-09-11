@@ -64,10 +64,11 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
   
   // Configuration
   const MAX_RENTAL_DAYS = 90; // Maximum rental duration
+  const MIN_RENTAL_DAYS = 3; // Minimum rental duration
   
-  // Get tomorrow's date for min start date
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  // Get today's date for min start date (allow same-day bookings)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
   // Calculate total days for preview
   const calculateDays = () => {
@@ -91,10 +92,27 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
 
   const totalCost = calculateTotalCost();
   
-  // Validation with max duration checking
+  // Validation with max duration checking, past date validation, and minimum duration
   useEffect(() => {
     if (!startDate || !endDate) {
       setValidationError('');
+      setMaxDurationWarning('');
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of today for accurate comparison
+
+    // Check if start date is in the past
+    if (startDate < today) {
+      setValidationError('Pickup date cannot be in the past. Please select today or a future date.');
+      setMaxDurationWarning('');
+      return;
+    }
+
+    // Check if end date is in the past
+    if (endDate < today) {
+      setValidationError('Return date cannot be in the past. Please select today or a future date.');
       setMaxDurationWarning('');
       return;
     }
@@ -106,8 +124,16 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
       return;
     }
 
-    // Check max rental duration
     const daysDifference = differenceInDays(endDate, startDate);
+    
+    // Check minimum rental duration (uniform 3-day minimum)
+    if (daysDifference < MIN_RENTAL_DAYS) {
+      setValidationError(`Minimum rental duration is ${MIN_RENTAL_DAYS} days. Please extend your rental period.`);
+      setMaxDurationWarning('');
+      return;
+    }
+
+    // Check max rental duration
     if (daysDifference > MAX_RENTAL_DAYS) {
       setValidationError('');
       setMaxDurationWarning(t('maxRentalDurationWarning') || `Maximum rental duration is ${MAX_RENTAL_DAYS} days`);
@@ -119,13 +145,13 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
       setValidationError('');
       setMaxDurationWarning('');
     }
-  }, [startDate, endDate, t, MAX_RENTAL_DAYS]);
+  }, [startDate, endDate, t, MAX_RENTAL_DAYS, MIN_RENTAL_DAYS]);
   
   // Quick select handlers
   const handleQuickSelect = (days) => {
     setIsAnimating(true);
-    const newStartDate = new Date(tomorrow);
-    const newEndDate = new Date(tomorrow);
+    const newStartDate = new Date(today);
+    const newEndDate = new Date(today);
     newEndDate.setDate(newEndDate.getDate() + days);
     
     setStartDate(newStartDate);
@@ -188,9 +214,8 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
               <h4 className="text-sm font-medium text-gray-400 font-['Orbitron'] uppercase tracking-wider">
                 {t('quickSelect')}
               </h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {[
-                  { days: 2, label: t('weekend') },
                   { days: 7, label: t('week') },
                   { days: 14, label: `${14} ${t('days')}` },
                   { days: 30, label: t('month') }
@@ -226,7 +251,7 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
                         setEndDate(newEndDate);
                       }
                     }}
-                    minDate={tomorrow}
+                    minDate={today}
                     className="w-full px-4 py-4 bg-black/80 border border-blue-500/30 rounded-lg text-white font-['Orbitron'] text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500/50 transition-all duration-300 hover:border-cyan-500/50"
                   />
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-colors duration-300 group-hover:text-cyan-400 pointer-events-none">
@@ -245,7 +270,7 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
                     ref={endDateRef}
                     selected={endDate}
                     onChange={(date) => setEndDate(date)}
-                    minDate={startDate ? new Date(startDate.getTime() + 86400000) : tomorrow}
+                    minDate={startDate ? new Date(startDate.getTime() + 86400000) : today}
                     max={getMaxEndDate() ? format(getMaxEndDate(), 'yyyy-MM-dd') : undefined}
                     className="w-full px-4 py-4 bg-black/80 border border-blue-500/30 rounded-lg text-white font-['Orbitron'] text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500/50 transition-all duration-300 hover:border-cyan-500/50"
                   />

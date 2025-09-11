@@ -38,7 +38,7 @@ const BookingHeader = ({ car, bookingStep }) => {
           <div className="relative z-10">
             <div className="mb-8">
               <Link 
-                to={`/cars/${car?.id}`} 
+                to={`/cars/${car?._id || car?.id}`} 
                 className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center font-['Orbitron'] group transition-all duration-300"
               >
                 <ArrowLeftIcon />

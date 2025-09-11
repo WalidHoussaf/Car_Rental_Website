@@ -307,8 +307,28 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
   
-  // Memoized time options to prevent re-computation
-  const timeOptions = useMemo(() => generateTimeOptions(), []);
+  // Memoized time options based on selected locations
+  const pickupTimeOptions = useMemo(() => {
+    if (!pickup || !bookingDetails.startDate) return generateTimeOptions();
+    
+    const result = locationService.getAvailableTimeSlots(
+      pickup, 
+      bookingDetails.startDate
+    );
+    
+    return result.success ? result.timeSlots : generateTimeOptions();
+  }, [pickup, bookingDetails.startDate]);
+  
+  const dropoffTimeOptions = useMemo(() => {
+    if (!dropoff || !bookingDetails.endDate) return generateTimeOptions();
+    
+    const result = locationService.getAvailableTimeSlots(
+      dropoff, 
+      bookingDetails.endDate
+    );
+    
+    return result.success ? result.timeSlots : generateTimeOptions();
+  }, [dropoff, bookingDetails.endDate]);
   
   // Load available locations when component mounts
   useEffect(() => {
@@ -361,6 +381,79 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       setDropoff(pickup);
     }
   }, [sameLocation, pickup]);
+
+  // Reset pickup time when pickup location changes to ensure it's within operating hours
+  useEffect(() => {
+    if (pickup && bookingDetails.startDate) {
+      const result = locationService.getAvailableTimeSlots(pickup, bookingDetails.startDate);
+      if (result.success && result.timeSlots.length > 0) {
+        // Check if current pickup time is valid for this location
+        const isCurrentTimeValid = result.timeSlots.some(slot => slot.value === pickupTime);
+        if (!isCurrentTimeValid) {
+          // Set to the first available time slot (opening time or next available for today)
+          setPickupTime(result.timeSlots[0].value);
+        }
+      }
+    }
+  }, [pickup, bookingDetails.startDate, pickupTime]);
+
+  // Refresh time options every minute for today's bookings to handle real-time updates
+  useEffect(() => {
+    if (!pickup || !bookingDetails.startDate) return;
+
+    const targetDate = new Date(bookingDetails.startDate);
+    const isToday = targetDate.toDateString() === new Date().toDateString();
+    
+    if (!isToday) return;
+
+    const interval = setInterval(() => {
+      const result = locationService.getAvailableTimeSlots(pickup, bookingDetails.startDate);
+      if (result.success && result.timeSlots.length > 0) {
+        // Check if current pickup time is still valid
+        const isCurrentTimeValid = result.timeSlots.some(slot => slot.value === pickupTime);
+        if (!isCurrentTimeValid) {
+          // Auto-update to next available time
+          setPickupTime(result.timeSlots[0].value);
+        }
+      }
+    }, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, [pickup, bookingDetails.startDate, pickupTime]);
+
+  // Reset dropoff time when dropoff location changes to ensure it's within operating hours
+  useEffect(() => {
+    if (dropoff && bookingDetails.endDate && !sameLocation) {
+      const result = locationService.getAvailableTimeSlots(dropoff, bookingDetails.endDate);
+      if (result.success && result.timeSlots.length > 0) {
+        // Check if current dropoff time is valid for this location
+        const isCurrentTimeValid = result.timeSlots.some(slot => slot.value === dropoffTime);
+        if (!isCurrentTimeValid) {
+          // Set to a reasonable default time (6 PM or last available slot if earlier)
+          const preferredTime = '18:00';
+          const preferredSlot = result.timeSlots.find(slot => slot.value === preferredTime);
+          setDropoffTime(preferredSlot ? preferredTime : result.timeSlots[result.timeSlots.length - 1].value);
+        }
+      }
+    }
+  }, [dropoff, bookingDetails.endDate, sameLocation, dropoffTime]);
+
+  // Sync dropoff time with pickup location when same location is selected
+  useEffect(() => {
+    if (sameLocation && pickup && bookingDetails.endDate) {
+      const result = locationService.getAvailableTimeSlots(pickup, bookingDetails.endDate);
+      if (result.success && result.timeSlots.length > 0) {
+        // Check if current dropoff time is valid for the pickup location
+        const isCurrentTimeValid = result.timeSlots.some(slot => slot.value === dropoffTime);
+        if (!isCurrentTimeValid) {
+          // Set to a reasonable default time (6 PM or last available slot if earlier)
+          const preferredTime = '18:00';
+          const preferredSlot = result.timeSlots.find(slot => slot.value === preferredTime);
+          setDropoffTime(preferredSlot ? preferredTime : result.timeSlots[result.timeSlots.length - 1].value);
+        }
+      }
+    }
+  }, [sameLocation, pickup, bookingDetails.endDate, dropoffTime]);
   
   // Handle location selection from map
   const handleLocationSelect = useCallback((locationId, type) => {
@@ -425,9 +518,19 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       );
       
       if (!pickupValidation.success || !pickupValidation.available) {
+        let errorMsg = pickupValidation.error || t('locationNotAvailable');
+        if (pickupValidation.hoursValidation && !pickupValidation.hoursValidation.pickupValid) {
+          const pickupLocation = locations.find(loc => loc.id === pickup);
+          if (pickupLocation) {
+            const date = new Date(bookingDetails.startDate);
+            const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+            const hours = isWeekend ? pickupLocation.operatingHours.weekends : pickupLocation.operatingHours.weekdays;
+            errorMsg = `Pickup time ${pickupTime} is outside operating hours (${hours.open} - ${hours.close})`;
+          }
+        }
         setValidationErrors(prev => ({ 
           ...prev, 
-          pickup: pickupValidation.error || t('locationNotAvailable') 
+          pickup: errorMsg
         }));
         return;
       }
@@ -442,9 +545,19 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
         );
         
         if (!dropoffValidation.success || !dropoffValidation.available) {
+          let errorMsg = dropoffValidation.error || t('locationNotAvailable');
+          if (dropoffValidation.hoursValidation && !dropoffValidation.hoursValidation.dropoffValid) {
+            const dropoffLocation = locations.find(loc => loc.id === dropoff);
+            if (dropoffLocation) {
+              const date = new Date(bookingDetails.endDate);
+              const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+              const hours = isWeekend ? dropoffLocation.operatingHours.weekends : dropoffLocation.operatingHours.weekdays;
+              errorMsg = `Dropoff time ${dropoffTime} is outside operating hours (${hours.open} - ${hours.close})`;
+            }
+          }
           setValidationErrors(prev => ({ 
             ...prev, 
-            dropoff: dropoffValidation.error || t('locationNotAvailable') 
+            dropoff: errorMsg
           }));
           return;
         }
@@ -532,12 +645,30 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                       {t('pickupTime')}
                     </label>
                     <Select
-                      options={timeOptions}
-                      value={timeOptions.find(option => option.value === pickupTime)}
+                      options={pickupTimeOptions}
+                      value={pickupTimeOptions.find(option => option.value === pickupTime)}
                       onChange={(selected) => setPickupTime(selected.value)}
                       styles={timeSelectStyles('#22d3ee')}
                       isSearchable={false}
+                      placeholder="Select pickup time"
+                      noOptionsMessage={() => {
+                        const targetDate = new Date(bookingDetails.startDate);
+                        const isToday = targetDate.toDateString() === new Date().toDateString();
+                        return isToday ? "No more available times today" : "No available times";
+                      }}
                     />
+                    {(() => {
+                      const targetDate = new Date(bookingDetails.startDate);
+                      const isToday = targetDate.toDateString() === new Date().toDateString();
+                      if (isToday && pickupTimeOptions.length > 0) {
+                        return (
+                          <p className="mt-2 text-xs text-yellow-400 font-['Orbitron']">
+                            ⚠️ Times shown are available from now + 30min buffer
+                          </p>
+                        );
+                      }
+                      return null;
+                    })()}
                   </div>
                 )}
               </div>
@@ -600,28 +731,48 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                       </p>
                     )}
                   </div>
-                  
-                  {/* Dropoff Time Selection */}
-                  <div className="mt-4">
-                    <label className="text-sm font-medium text-gray-400 mb-2 font-['Orbitron'] flex items-center">
-                      <svg className="w-4 h-4 mr-2 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                      </svg>
-                      {t('dropoffTime')}
-                    </label>
-                    <Select
-                      options={timeOptions}
-                      value={timeOptions.find(option => option.value === dropoffTime)}
-                      onChange={(selected) => setDropoffTime(selected.value)}
-                      styles={timeSelectStyles('#a855f7')}
-                      isSearchable={false}
-                    />
-                    {timeValidationError && (
-                      <p className="mt-2 text-sm text-red-400 font-['Orbitron']">
-                        {timeValidationError}
-                      </p>
-                    )}
-                  </div>
+                </div>
+              )}
+              
+              {/* Dropoff Time Selection - Always show when pickup location is selected */}
+              {pickup && (
+                <div className="mt-4">
+                  <label className="text-sm font-medium text-gray-400 mb-2 font-['Orbitron'] flex items-center">
+                    <svg className="w-4 h-4 mr-2 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                    {t('dropoffTime')}
+                  </label>
+                  <Select
+                    options={dropoffTimeOptions}
+                    value={dropoffTimeOptions.find(option => option.value === dropoffTime)}
+                    onChange={(selected) => setDropoffTime(selected.value)}
+                    styles={timeSelectStyles('#a855f7')}
+                    isSearchable={false}
+                    placeholder="Select dropoff time"
+                    noOptionsMessage={() => {
+                      const targetDate = new Date(bookingDetails.endDate);
+                      const isToday = targetDate.toDateString() === new Date().toDateString();
+                      return isToday ? "No more available times today" : "No available times";
+                    }}
+                  />
+                  {(() => {
+                    const targetDate = new Date(bookingDetails.endDate);
+                    const isToday = targetDate.toDateString() === new Date().toDateString();
+                    if (isToday && dropoffTimeOptions.length > 0) {
+                      return (
+                        <p className="mt-2 text-xs text-yellow-400 font-['Orbitron']">
+                          ⚠️ Times shown are available from now + 30min buffer
+                        </p>
+                      );
+                    }
+                    return null;
+                  })()}
+                  {timeValidationError && (
+                    <p className="mt-2 text-sm text-red-400 font-['Orbitron']">
+                      {timeValidationError}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -667,7 +818,16 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                         })()}
                       </p>
                       <p className="text-sm text-cyan-400 font-['Orbitron']">
-                        {t('branchOpeningHours')}
+                        {(() => {
+                          const pickupLocation = locations.find(loc => loc.id === pickup);
+                          if (pickupLocation && bookingDetails.startDate) {
+                            const date = new Date(bookingDetails.startDate);
+                            const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                            const hours = isWeekend ? pickupLocation.operatingHours.weekends : pickupLocation.operatingHours.weekdays;
+                            return `${t('openingHours')}: ${hours.open} - ${hours.close} ${isWeekend ? '(Weekend)' : '(Weekday)'}`;
+                          }
+                          return t('branchOpeningHours');
+                        })()} 
                       </p>
                     </div>
                   </div>
@@ -694,7 +854,16 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                         })()}
                       </p>
                       <p className="text-sm text-purple-400 font-['Orbitron']">
-                        {t('branchOpeningHours')}
+                        {(() => {
+                          const dropoffLocation = locations.find(loc => loc.id === dropoff);
+                          if (dropoffLocation && bookingDetails.endDate) {
+                            const date = new Date(bookingDetails.endDate);
+                            const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                            const hours = isWeekend ? dropoffLocation.operatingHours.weekends : dropoffLocation.operatingHours.weekdays;
+                            return `${t('openingHours')}: ${hours.open} - ${hours.close} ${isWeekend ? '(Weekend)' : '(Weekday)'}`;
+                          }
+                          return t('branchOpeningHours');
+                        })()} 
                       </p>
                     </div>
                   </div>

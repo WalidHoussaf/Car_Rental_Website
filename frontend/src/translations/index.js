@@ -128,7 +128,10 @@ export const translations = {
     exploreVehicles: "Discover similar vehicles that match your selected category and preferences.",
     viewDetails: "View Details",
     backToVehicles: "Back to Vehicles",
-    
+    vehicleNotFound: "Vehicle not found",
+    vehicleNotFoundDesc: "The vehicle you are looking for is not available at the moment. Please try again later.",
+    openingHours: "Opening Hours",
+
     // Overview Tab
     experienceThe: "EXPERIENCE THE",
     poweredBy: "Powered by a",
@@ -966,6 +969,9 @@ export const translations = {
     exploreVehicles: "Découvrez des véhicules similaires qui correspondent à votre catégorie et vos préférences.",
     viewDetails: "Voir les Détails",
     backToVehicles: "Retour aux Véhicules",
+    vehicleNotFound: "Véhicule non trouvé",
+    vehicleNotFoundDesc: "Le véhicule que vous cherchez n'est pas disponible pour le moment. Veuillez réessayer plus tard.",
+    openingHours: "Heures d'ouverture",
     
     // Overview Tab
     experienceThe: "DÉCOUVREZ LE",

@@ -1,6 +1,6 @@
 // import { api } from '../config/api'; // Will be used when implementing real API calls
 
-// Enhanced location data structure with comprehensive information
+// Location data structure with comprehensive information
 const LOCATION_DATA = {
   casablanca: {
     id: 'casablanca',
@@ -305,12 +305,20 @@ class LocationService {
       }
 
       // Check if dates are within operating hours
-      const isWithinOperatingHours = this.isWithinOperatingHours(location, startDate, endDate);
-      if (!isWithinOperatingHours) {
+      const hoursValidation = this.isWithinOperatingHours(location, startDate, endDate);
+      if (!hoursValidation.isValid) {
+        let errorMessage = 'Requested time is outside operating hours. ';
+        if (!hoursValidation.pickupValid) {
+          errorMessage += `Pickup time must be between ${hoursValidation.pickupHours}. `;
+        }
+        if (!hoursValidation.dropoffValid) {
+          errorMessage += `Dropoff time must be between ${hoursValidation.dropoffHours}.`;
+        }
         return {
           success: false,
-          error: 'Requested time is outside operating hours',
-          available: false
+          error: errorMessage.trim(),
+          available: false,
+          hoursValidation
         };
       }
 
@@ -399,36 +407,15 @@ class LocationService {
 
   // Check if requested time is within operating hours
   isWithinOperatingHours(location, startDate, endDate) {
-    // Check if pickup and dropoff times are within operating hours
-    // Users can make reservations anytime, but pickup/dropoff must be during business hours
     const start = new Date(startDate);
     const end = new Date(endDate);
     
-    // If the time is very early (before 6 AM) or very late (after 10 PM), 
-    // assume it's a date-only selection and use default business hours
-    const startHour = start.getHours();
-    const endHour = end.getHours();
+    const pickupHour = start.getHours();
+    const pickupMinutes = start.getMinutes();
+    const dropoffHour = end.getHours();
+    const dropoffMinutes = end.getMinutes();
     
-    // Default to 9 AM for pickup and 6 PM for dropoff if times seem unreasonable
-    let pickupHour, pickupMinutes, dropoffHour, dropoffMinutes;
-    
-    if (startHour < 6 || startHour > 22) {
-      // Use default pickup time of 9:00 AM
-      pickupHour = 9;
-      pickupMinutes = 0;
-    } else {
-      pickupHour = startHour;
-      pickupMinutes = start.getMinutes();
-    }
-    
-    if (endHour < 6 || endHour > 22) {
-      // Use default dropoff time of 6:00 PM
-      dropoffHour = 18;
-      dropoffMinutes = 0;
-    } else {
-      dropoffHour = endHour;
-      dropoffMinutes = end.getMinutes();
-    }
+    // Check pickup time
     const isPickupWeekend = start.getDay() === 0 || start.getDay() === 6;
     const pickupHours = isPickupWeekend ? location.operatingHours.weekends : location.operatingHours.weekdays;
     
@@ -463,7 +450,79 @@ class LocationService {
     
     const isDropoffValid = dropoffTimeInMinutes >= dropoffOpenInMinutes && dropoffTimeInMinutes <= dropoffCloseInMinutes;
     
-    return isPickupValid && isDropoffValid;
+    return {
+      isValid: isPickupValid && isDropoffValid,
+      pickupValid: isPickupValid,
+      dropoffValid: isDropoffValid,
+      pickupHours: `${pickupHours.open} - ${pickupHours.close}`,
+      dropoffHours: `${dropoffHours.open} - ${dropoffHours.close}`
+    };
+  }
+
+  // Get available time slots for a specific location and date
+  getAvailableTimeSlots(locationId, date, isWeekend = null) {
+    const location = LOCATION_DATA[locationId];
+    if (!location) return { success: false, error: 'Location not found' };
+
+    const targetDate = new Date(date);
+    const dayIsWeekend = isWeekend !== null ? isWeekend : (targetDate.getDay() === 0 || targetDate.getDay() === 6);
+    const hours = dayIsWeekend ? location.operatingHours.weekends : location.operatingHours.weekdays;
+    
+    const openTime = hours.open.split(':');
+    const closeTime = hours.close.split(':');
+    let openHour = parseInt(openTime[0]);
+    let openMinutes = parseInt(openTime[1]);
+    const closeHour = parseInt(closeTime[0]);
+    const closeMinutes = parseInt(closeTime[1]);
+    
+    // Check if the selected date is today
+    const now = new Date();
+    const isToday = targetDate.toDateString() === now.toDateString();
+    
+    if (isToday) {
+      // If it's today, ensure we don't show past times
+      // Add buffer time (e.g., 30 minutes) to allow for booking processing
+      const bufferMinutes = 30;
+      const minBookingTime = new Date(now.getTime() + bufferMinutes * 60000);
+      const minHour = minBookingTime.getHours();
+      const minMinutes = minBookingTime.getMinutes();
+      
+      // Adjust opening time to be at least the minimum booking time
+      if (openHour < minHour || (openHour === minHour && openMinutes < minMinutes)) {
+        openHour = minHour;
+        // Round up to next 30-minute slot
+        openMinutes = minMinutes <= 30 ? 30 : 0;
+        if (openMinutes === 0 && minMinutes > 30) {
+          openHour++;
+        }
+      }
+    }
+    
+    const timeSlots = [];
+    let currentHour = openHour;
+    let currentMinutes = openMinutes;
+    
+    while (currentHour < closeHour || (currentHour === closeHour && currentMinutes <= closeMinutes)) {
+      const timeString = `${currentHour.toString().padStart(2, '0')}:${currentMinutes.toString().padStart(2, '0')}`;
+      timeSlots.push({
+        value: timeString,
+        label: timeString
+      });
+      
+      // Increment by 30 minutes
+      currentMinutes += 30;
+      if (currentMinutes >= 60) {
+        currentMinutes = 0;
+        currentHour++;
+      }
+    }
+    
+    return {
+      success: true,
+      timeSlots,
+      operatingHours: hours,
+      isToday
+    };
   }
 
   // Utility methods

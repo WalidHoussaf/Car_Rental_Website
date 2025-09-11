@@ -71,7 +71,14 @@ const Booking = () => {
         return;
       }
       
-      const foundCar = cars.find(c => (c._id || c.id) === id);
+      const foundCar = cars.find(c => 
+        c._id === id || 
+        c.id === parseInt(id) || 
+        c._id === parseInt(id) || 
+        c.id === id ||
+        String(c._id) === id ||
+        String(c.id) === id
+      );
       
       if (foundCar) {
         // Clone the object to avoid reference issues
