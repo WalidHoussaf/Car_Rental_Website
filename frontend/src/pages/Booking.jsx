@@ -56,6 +56,8 @@ const Booking = () => {
     endDate: null,
     pickupLocation: '',
     dropoffLocation: '',
+    pickupTime: null,
+    dropoffTime: null,
     options: [],
     totalDays: 0,
     totalPrice: 0
@@ -125,11 +127,13 @@ const Booking = () => {
     setBookingStep(2);
   };
   
-  const handleLocationSelection = (pickup, dropoff) => {
+  const handleLocationSelection = (pickup, dropoff, pickupTime, dropoffTime) => {
     setBookingDetails(prev => ({
       ...prev,
       pickupLocation: pickup,
-      dropoffLocation: dropoff
+      dropoffLocation: dropoff,
+      pickupTime: pickupTime || prev.pickupTime,
+      dropoffTime: dropoffTime || prev.dropoffTime
     }));
     
     setBookingStep(3);

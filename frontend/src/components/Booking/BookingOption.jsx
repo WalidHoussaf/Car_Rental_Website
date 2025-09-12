@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 import InsuranceIcon from '../Ui/Icons/InsuranceIcon';
@@ -27,7 +27,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
   const t = useTranslations(language);
   
   // Available options with pricing
-  const availableOptions = [
+  const availableOptions = useMemo(() => ([
     { 
       id: 'insurance', 
       name: t('option_insurance'), 
@@ -70,22 +70,31 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
       price: 30,
       icon: 'additional_driver'
     }
-  ];
+  ]), [t]);
+
+  // O(1) lookup map for options
+  const optionsById = useMemo(() => {
+    const dict = {};
+    for (const option of availableOptions) {
+      dict[option.id] = option;
+    }
+    return dict;
+  }, [availableOptions]);
   
   // State for selected options
   const [selectedOptions, setSelectedOptions] = useState([]);
   
   // Calculate additional price
-  const calculateAdditionalPrice = () => {
+  const additionalPrice = useMemo(() => {
+    const days = bookingDetails.totalDays || 1;
     return selectedOptions.reduce((total, optionId) => {
-      const option = availableOptions.find(opt => opt.id === optionId);
-      return total + (option ? option.price : 0);
+      const option = optionsById[optionId];
+      return total + (option ? option.price * days : 0);
     }, 0);
-  };
+  }, [selectedOptions, bookingDetails.totalDays, optionsById]);
   
   // Base price calculation
   const basePrice = car ? calcBasePrice(car, bookingDetails.totalDays) : 0;
-  const additionalPrice = calculateAdditionalPrice();
   const totalPrice = basePrice + additionalPrice;
   
   // Toggle option selection
@@ -121,8 +130,8 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
         </div>
         
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <OptionsIcon className="text-cyan-400 mr-2" />
+          <div className="flex items-center justify-center mb-4 gap-3">
+            <OptionsIcon className="text-cyan-400" />
             <span className="text-lg md:text-xl text-cyan-400 font-['Orbitron'] font-medium">
               {t('availableAddOns')}
             </span>
@@ -134,17 +143,25 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
         
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
           {availableOptions.map((option) => (
-            <div 
+            <label 
               key={option.id}
-              onClick={() => toggleOption(option.id)}
+              htmlFor={`addon-${option.id}`}
               className={`
-                p-4 backdrop-blur-sm border rounded-xl cursor-pointer transition-all duration-300 relative overflow-hidden group
+                p-4 backdrop-blur-sm border rounded-xl cursor-pointer transition-all duration-300 relative overflow-hidden group block focus-within:ring-2 focus-within:ring-cyan-500/50
                 ${selectedOptions.includes(option.id) 
                   ? 'border-cyan-500/60 bg-gradient-to-br from-cyan-900/20 to-blue-900/20 hover:shadow-lg hover:shadow-cyan-500/20 scale-105' 
                   : 'border-blue-900/20 bg-black/40 hover:border-cyan-500/30 hover:bg-black/50'}
                 transform hover:scale-105 hover:-translate-y-1
               `}
             >
+              <input
+                id={`addon-${option.id}`}
+                type="checkbox"
+                className="sr-only"
+                checked={selectedOptions.includes(option.id)}
+                onChange={() => toggleOption(option.id)}
+                aria-label={option.name}
+              />
               {/* Glow effect for selected items */}
               {selectedOptions.includes(option.id) && (
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-cyan-500/20 blur-sm rounded-xl opacity-75"></div>
@@ -201,7 +218,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
                   </div>
                 </div>
               </div>
-            </div>
+            </label>
           ))}
         </div>
         
@@ -226,14 +243,16 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
                   <div className="h-px bg-gradient-to-r from-transparent via-blue-900/50 to-transparent w-full"></div>
                   
                   {selectedOptions.map(optionId => {
-                    const option = availableOptions.find(opt => opt.id === optionId);
+                    const option = optionsById[optionId];
+                    const days = bookingDetails.totalDays || 1;
+                    const lineTotal = option.price * days;
                     return (
                       <div key={optionId} className="flex justify-between items-center py-2">
                         <span className="text-gray-400 font-['Orbitron'] text-base flex items-center">
                           <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full mr-3 opacity-60"></span>
-                          {option.name}
+                          {option.name} <span className="ml-2 text-xs text-gray-500">(${option.price} x {days} {t('days')})</span>
                         </span>
-                        <span className="text-white font-['Orbitron'] text-base font-medium">${option.price}</span>
+                        <span className="text-white font-['Orbitron'] text-base font-medium">${lineTotal}</span>
                       </div>
                     );
                   })}

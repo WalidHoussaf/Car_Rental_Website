@@ -564,8 +564,8 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       }
     }
     
-    // All validations passed, proceed
-    onLocationSelection(pickup, dropoff);
+    // All validations passed, proceed (include selected times)
+    onLocationSelection(pickup, dropoff, pickupTime, dropoffTime);
   };
   
   return (
