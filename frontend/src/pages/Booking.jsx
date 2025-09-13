@@ -8,6 +8,7 @@ import BookingOption from '../components/Booking/BookingOption';
 import BookingSummary from '../components/Booking/BookingSummary';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
+import { useAuth } from '../hooks/useAuth';
 import CarContext from '../context/CarContext';
 import { calcBasePrice } from '../utils/price';
 
@@ -19,6 +20,7 @@ const Booking = () => {
   const [bookingStep, setBookingStep] = useState(1); 
   const { language } = useLanguage();
   const t = useTranslations(language);
+  const { isAuthenticated, loading: authLoading } = useAuth();
   
   // Use CarContext for data management
   const { cars } = useContext(CarContext);
@@ -63,8 +65,22 @@ const Booking = () => {
     totalPrice: 0
   });
   
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      // Store the intended booking URL to redirect back after login
+      localStorage.setItem('redirectAfterLogin', `/booking/${id}`);
+      navigate('/login');
+    }
+  }, [isAuthenticated, authLoading, navigate, id]);
+
   // Load car data on component mount
   useEffect(() => {
+    // Don't load car data if user is not authenticated
+    if (!isAuthenticated && !authLoading) {
+      return;
+    }
+    
     setLoading(true);
     
     setTimeout(() => {
@@ -104,7 +120,7 @@ const Booking = () => {
       }
       setLoading(false);
     }, 800);
-  }, [id, cars]);
+  }, [id, cars, isAuthenticated, authLoading]);
   
   const handleDateSelection = (startDate, endDate) => {
     // Calculate total days using inclusive date range
@@ -179,7 +195,16 @@ const Booking = () => {
     setBookingStep(prev => Math.max(prev - 1, 1));
   };
   
-  if (loading) {
+  if (loading || authLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // Show loading while checking authentication
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>

@@ -96,7 +96,14 @@ const LoginPage = () => {
       
       // Give a brief moment to show success message
       setTimeout(() => {
-        if (role === 'admin') {
+        // Check if there's a redirect URL stored
+        const redirectUrl = localStorage.getItem('redirectAfterLogin');
+        
+        if (redirectUrl) {
+          // Clear the stored redirect URL
+          localStorage.removeItem('redirectAfterLogin');
+          navigate(redirectUrl);
+        } else if (role === 'admin') {
           navigate('/dashboard');
         } else {
           navigate('/');

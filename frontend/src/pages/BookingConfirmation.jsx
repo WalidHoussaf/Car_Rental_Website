@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useBooking } from '../hooks/useBooking';
 import { useNotification } from '../context/notificationUtils';
+import { useAuth } from '../hooks/useAuth';
 import { assets } from '../assets/assets';
 import { resolveImagePath } from '../utils/images';
 import { useLanguage } from '../hooks/useLanguage';
@@ -20,6 +21,7 @@ import { getLocationById, formatLocationAddress } from '../config/officeLocation
 const BookingConfirmation = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const detailsSectionRef = useRef(null);
 
   const formatDate = (date) => {
@@ -54,6 +56,13 @@ const BookingConfirmation = () => {
   const [carImage, setCarImage] = useState(null);
   const [isBookingCreated, setIsBookingCreated] = useState(false);
   const [locationAddresses, setLocationAddresses] = useState({});
+
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   // Get Booking Data from Location State
   const bookingData = location.state || {};
@@ -208,6 +217,20 @@ const BookingConfirmation = () => {
 
     await receiptGenerator.generateReceipt(bookingData, bookingId, onSuccess, onError);
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-black text-white pt-20 font-['Orbitron'] relative">
