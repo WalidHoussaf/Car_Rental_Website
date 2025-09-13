@@ -177,7 +177,10 @@ export const validateBooking = [
     .isISO8601()
     .withMessage('Please provide a valid start date')
     .custom((value) => {
-      if (new Date(value) < new Date()) {
+      const startDate = new Date(value);
+      const now = new Date();
+      // Allow bookings for today and future dates
+      if (startDate.toDateString() < now.toDateString()) {
         throw new Error('Start date cannot be in the past');
       }
       return true;
@@ -198,10 +201,20 @@ export const validateBooking = [
     .notEmpty()
     .withMessage('Pickup branch is required'),
   
+  body('pickupLocation.address')
+    .optional()
+    .isString()
+    .withMessage('Pickup address must be a string'),
+  
   body('dropoffLocation.branch')
     .trim()
     .notEmpty()
     .withMessage('Dropoff branch is required'),
+  
+  body('dropoffLocation.address')
+    .optional()
+    .isString()
+    .withMessage('Dropoff address must be a string'),
   
   body('paymentMethod')
     .isIn(['credit_card', 'debit_card', 'paypal', 'cash'])

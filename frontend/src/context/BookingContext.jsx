@@ -26,10 +26,13 @@ export const BookingProvider = ({ children }) => {
         
         return { success: true, booking: newBooking };
       } else {
+        console.error('Booking creation failed:', response);
+        console.error('Validation errors:', response.errors);
         setError(response.message || 'Failed to create booking');
-        return { success: false, message: response.message };
+        return { success: false, message: response.message, errors: response.errors };
       }
     } catch (err) {
+      console.error('Booking creation error:', err);
       const errorMessage = err.message || 'Failed to create booking';
       setError(errorMessage);
       return { success: false, message: errorMessage };

@@ -36,6 +36,7 @@ const createApiRequest = async (endpoint, options = {}) => {
     const data = await response.json();
 
     if (!response.ok) {
+      console.error('API Error Details:', data);
       throw new Error(data.message || `HTTP error! status: ${response.status}`);
     }
 

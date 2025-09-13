@@ -9,12 +9,13 @@ import StarIcon from '../Ui/Icons/StarIcon';
 import CheckmarkIcon from '../Ui/Icons/CheckmarkIcon';
 import { calcBasePrice } from '../../utils/price';
 import { resolveImagePath } from '../../utils/images';
+import { getLocationById, formatLocationAddress } from '../../config/officeLocations';
 
 const PayPalIcon = React.memo(() => (
   <img src={assets.paypal} alt="PayPal" className="h-12 w-12 object-contain align-middle" />
 ));
 
-// Optimized Radio Button Component - same style, better performance
+// Radio Button Component
 const CustomRadio = React.memo(({ id, name, value, checked, onChange, children }) => (
   <label htmlFor={id} className="flex items-center cursor-pointer w-full">
     <div className="relative flex items-center justify-center w-5 h-5 mr-4">
@@ -54,6 +55,7 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [carImage, setCarImage] = useState(null);
+  const [locationAddresses, setLocationAddresses] = useState({});
   
   // Only resolve image once and cache it properly
   const resolvedCarImage = useMemo(() => {
@@ -78,6 +80,27 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
   useEffect(() => {
     setCarImage(resolvedCarImage);
   }, [resolvedCarImage]);
+
+  // Get structured office location addresses
+  useEffect(() => {
+    const addresses = {};
+    
+    if (bookingDetails.pickupLocation) {
+      const pickupOffice = getLocationById(bookingDetails.pickupLocation);
+      if (pickupOffice) {
+        addresses[bookingDetails.pickupLocation] = formatLocationAddress(pickupOffice, language);
+      }
+    }
+    
+    if (bookingDetails.dropoffLocation && bookingDetails.dropoffLocation !== bookingDetails.pickupLocation) {
+      const dropoffOffice = getLocationById(bookingDetails.dropoffLocation);
+      if (dropoffOffice) {
+        addresses[bookingDetails.dropoffLocation] = formatLocationAddress(dropoffOffice, language);
+      }
+    }
+    
+    setLocationAddresses(addresses);
+  }, [bookingDetails.pickupLocation, bookingDetails.dropoffLocation, language]);
   
   
   // Memory leak in setTimeout
@@ -96,11 +119,11 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
     }
     
     timeoutRef.current = setTimeout(() => {
-      onSubmit();
+      onSubmit(paymentMethod);
       setIsSubmitting(false);
       timeoutRef.current = null;
     }, 1500);
-  }, [termsAccepted, onSubmit]);
+  }, [termsAccepted, onSubmit, paymentMethod]);
 
   // Add cleanup for timeout
   useEffect(() => {
@@ -251,7 +274,7 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
                       <div className="text-cyan-300 font-bold text-lg mb-1">
                         {calculations.formattedStartDate} - {calculations.formattedEndDate}
                       </div>
-                      <div className="text-cyan-400/80 text-sm">{bookingDetails.totalDays} {t('days')}</div>
+                      <div className="text-cyan-400/80 text-sm">{bookingDetails.totalDays || 1} {t('days')}</div>
                     </div>
                     <div className="text-white font-['Orbitron'] font-bold text-lg">
                       ${calculations.basePrice}
@@ -283,7 +306,10 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
                     <div>
                       <div className="text-xs text-cyan-400/70 font-['Orbitron']">{t('pickupLabel')}</div>
                       <div className="text-white font-['Orbitron'] font-medium">
-                        {bookingDetails.pickupLocation?.charAt(0).toUpperCase() + bookingDetails.pickupLocation?.slice(1)}
+                        {locationAddresses[bookingDetails.pickupLocation] || 
+                         (typeof bookingDetails.pickupLocation === 'string' && bookingDetails.pickupLocation ? 
+                          bookingDetails.pickupLocation.charAt(0).toUpperCase() + bookingDetails.pickupLocation.slice(1) : 
+                          'Not selected')}
                       </div>
                       {bookingDetails.pickupTime && (
                         <div className="text-xs text-cyan-300 font-['Orbitron'] mt-0.5">
@@ -300,7 +326,10 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
                     <div>
                       <div className="text-xs text-purple-400/70 font-['Orbitron']">{t('returnLabel')}</div>
                       <div className="text-white font-['Orbitron'] font-medium">
-                        {bookingDetails.dropoffLocation?.charAt(0).toUpperCase() + bookingDetails.dropoffLocation?.slice(1)}
+                        {locationAddresses[bookingDetails.dropoffLocation] || 
+                         (typeof bookingDetails.dropoffLocation === 'string' && bookingDetails.dropoffLocation ? 
+                          bookingDetails.dropoffLocation.charAt(0).toUpperCase() + bookingDetails.dropoffLocation.slice(1) : 
+                          'Not selected')}
                       </div>
                       {bookingDetails.dropoffTime && (
                         <div className="text-xs text-purple-300 font-['Orbitron'] mt-0.5">

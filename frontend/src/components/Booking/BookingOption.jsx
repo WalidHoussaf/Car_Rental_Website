@@ -123,7 +123,7 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
       
       <div className="z-10 w-full space-y-8 md:space-y-10 lg:space-y-12 relative">
         <div className="text-center space-y-2">
-        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl leading-relaxed md:leading-[1.25] lg:leading-[1.2] tracking-wide font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] drop-shadow-[0_2px_6px_rgba(34,211,238,0.25)]">
             {t('enhanceExperience')}
           </h2>
           <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto opacity-60"></div>

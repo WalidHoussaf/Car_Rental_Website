@@ -270,7 +270,7 @@ const GalleryTab = ({ car }) => {
         text: `Check out this ${car?.name || 'amazing vehicle'}!`,
         url: window.location.href,
       })
-      .catch(error => console.log('Error sharing', error));
+      .catch(() => {});
     } else {
       // Fallback - copy URL to clipboard
       navigator.clipboard.writeText(window.location.href)

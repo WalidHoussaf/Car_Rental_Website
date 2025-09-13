@@ -3,8 +3,10 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useBooking } from '../hooks/useBooking';
 import { useNotification } from '../context/notificationUtils';
 import { assets } from '../assets/assets';
+import { resolveImagePath } from '../utils/images';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
+import { getNumericPrice } from '../utils/price';
 import GlowingGrid from '../components/Ui/GlowingGrid';
 import SuccessIcon from '../components/Ui/Icons/SuccessIcon';
 import CalendarIcon from '../components/Ui/Icons/CalendarIcon';
@@ -13,6 +15,7 @@ import PriceIcon from '../components/Ui/Icons/PriceIcon';
 import DownloadIcon from '../components/Ui/Icons/DownloadIcon';
 import LocationIcon from '../components/Ui/Icons/LocationIcon';
 import ReceiptGenerator from '../components/ReceiptGenerator';
+import { getLocationById, formatLocationAddress } from '../config/officeLocations';
 
 const BookingConfirmation = () => {
   const { language } = useLanguage();
@@ -36,6 +39,10 @@ const BookingConfirmation = () => {
     { id: 'child_seat', name: t('option_child_seat'), price: 25 },
     { id: 'additional_driver', name: t('option_additional_driver'), price: 30 }
   ];
+  const availableOptionsById = availableOptions.reduce((acc, opt) => {
+    acc[opt.id] = opt;
+    return acc;
+  }, {});
     const navigate = useNavigate();
   const location = useLocation();
   const { showSuccess } = useNotification();
@@ -45,6 +52,8 @@ const BookingConfirmation = () => {
   const { createBooking } = useBooking();
   const [bookingId, setBookingId] = useState(null);
   const [carImage, setCarImage] = useState(null);
+  const [isBookingCreated, setIsBookingCreated] = useState(false);
+  const [locationAddresses, setLocationAddresses] = useState({});
 
   // Get Booking Data from Location State
   const bookingData = location.state || {};
@@ -54,17 +63,7 @@ const BookingConfirmation = () => {
   useEffect(() => {
     if (!carDetails) return;
     
-    let image = null;
-    
-    // Try using car.image as asset reference
-    if (carDetails.image && typeof carDetails.image === 'string' && carDetails.image.includes('.')) {
-      const parts = carDetails.image.split('.');
-      if (parts.length === 2) {
-        const category = parts[0];
-        const key = parts[1];
-        image = assets[category] && assets[category][key];
-      }
-    }
+    let image = resolveImagePath(carDetails.image);
     
     // Try using car ID
     if (!image && carDetails.id && assets.cars[`car${carDetails.id}`]) {
@@ -86,30 +85,110 @@ const BookingConfirmation = () => {
     setCarImage(image);
   }, [carDetails]);
 
+  // Get structured office location addresses
+  useEffect(() => {
+    const addresses = {};
+    
+    if (bookingDetails?.pickupLocation) {
+      const pickupOffice = getLocationById(bookingDetails.pickupLocation);
+      if (pickupOffice) {
+        addresses[bookingDetails.pickupLocation] = formatLocationAddress(pickupOffice, language);
+      }
+    }
+    
+    if (bookingDetails?.dropoffLocation && bookingDetails.dropoffLocation !== bookingDetails.pickupLocation) {
+      const dropoffOffice = getLocationById(bookingDetails.dropoffLocation);
+      if (dropoffOffice) {
+        addresses[bookingDetails.dropoffLocation] = formatLocationAddress(dropoffOffice, language);
+      }
+    }
+    
+    setLocationAddresses(addresses);
+  }, [bookingDetails?.pickupLocation, bookingDetails?.dropoffLocation, language]);
+
   // Create booking on component mount
   useEffect(() => {
+    // Prevent multiple booking creation attempts
+    if (bookingId || isBookingCreated) return;
+    
     const createNewBooking = async () => {
+      setIsBookingCreated(true);
       if (!bookingDetails || !carDetails) {
+        console.warn('Missing booking or car details, redirecting to cars page');
         navigate('/cars');
         return;
       }
       try {
-        const result = await createBooking({
-          car: carDetails,
-          ...bookingDetails,
+        // Transform frontend data to match backend expectations
+        const transformedBookingData = {
+          car: carDetails._id || carDetails.id, // Send car ID, not full object
+          startDate: new Date(bookingDetails.startDate).toISOString(),
+          endDate: new Date(bookingDetails.endDate).toISOString(),
+          pickupLocation: {
+            branch: bookingDetails.pickupLocation || 'main',
+            address: getLocationAddress(bookingDetails.pickupLocation)
+          },
+          dropoffLocation: {
+            branch: bookingDetails.dropoffLocation || 'main',
+            address: getLocationAddress(bookingDetails.dropoffLocation)
+          },
+          extras: transformOptionsToExtras(bookingDetails.options || []),
+          insurance: { type: 'basic', price: 0 },
+          paymentMethod: transformPaymentMethod(bookingDetails.paymentMethod || 'creditCard'),
           confirmationDate: new Date().toISOString()
-        });
+        };
+
+        const result = await createBooking(transformedBookingData);
         if (result.success) {
-          setBookingId(result.booking.id);
+          setBookingId(result.booking.id || result.booking._id);
           showSuccess(t('bookingConfirmed'));
+        } else {
+          console.error('Booking failed:', result.message);
+          // Don't navigate away on failure, show error to user
+          alert(`Booking failed: ${result.message}`);
         }
       } catch (error) {
         console.error('Error creating booking:', error);
+        // Don't navigate away on error, show error to user
+        alert(`Booking error: ${error.message}`);
       }
+    };
+
+    // Helper function to get location address
+    const getLocationAddress = (location) => {
+      // Use dynamic address if available, otherwise fallback
+      if (locationAddresses[location]) {
+        return locationAddresses[location];
+      }
+      // Fallback to formatted location name while API call is in progress
+      return location ? `${location.charAt(0).toUpperCase() + location.slice(1)}, Morocco` : 'Main Branch, Mohammedia';
+    };
+
+    // Helper function to transform options to extras
+    const transformOptionsToExtras = (options) => {
+      return options.map(optionId => {
+        const option = availableOptionsById[optionId];
+        return option ? {
+          name: option.name,
+          price: option.price,
+          quantity: 1
+        } : null;
+      }).filter(Boolean);
+    };
+
+    // Helper function to transform payment method
+    const transformPaymentMethod = (method) => {
+      const methodMap = {
+        'creditCard': 'credit_card',
+        'paypal': 'paypal',
+        'debitCard': 'debit_card',
+        'cash': 'cash'
+      };
+      return methodMap[method] || 'credit_card';
     };
     
     createNewBooking();
-  }, [bookingDetails, carDetails, createBooking, navigate, showSuccess, t]);
+  }, [bookingDetails, carDetails, createBooking, navigate, showSuccess, t, availableOptionsById, bookingId, isBookingCreated, locationAddresses]);
 
   const handleDownloadReceipt = async () => {
     if (!bookingData || !bookingId) {
@@ -133,7 +212,13 @@ const BookingConfirmation = () => {
   return (
     <div className="min-h-screen bg-black text-white pt-20 font-['Orbitron'] relative">
       {/* Hero Section */}
-      <div className="w-full pt-5 pb-20 relative overflow-hidden">
+      <div className="w-full pt-28 pb-20 relative overflow-hidden -mt-20">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/70 to-black z-0"></div>
+        {/* Border Elements */}
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-40 z-10"></div>
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-40 z-10"></div>
+        
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r from-green-500/20 to-cyan-500/20 text-cyan-400 mb-6 relative overflow-hidden group animate-pulse-slow">
@@ -141,14 +226,14 @@ const BookingConfirmation = () => {
               <SuccessIcon />
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white mb-4 relative leading-[1.2]">
+            <h1 className="text-3xl md:text-5xl leading-relaxed md:leading-[1.25] lg:leading-[1.2] tracking-wide font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-400 to-white mb-4 relative drop-shadow-[0_2px_6px_rgba(34,211,238,0.25)]">
               {t('bookingConfirmed')}
               <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0"></div>
             </h1>
             <br></br>
             <p className="text-cyan-300 text-lg mb-2 relative">
               {t('thankYouForBooking')}
-              <div className="absolute -z-10 inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent blur-xl"></div>
+              <span className="absolute -z-10 inset-0 bg-gradient-to-r from-transparent via-cyan-900/5 to-transparent blur-xl block"></span>
             </p>
             <p className="text-gray-400 max-w-2xl mx-auto mb-8">
               {t('bookingSuccessDescription')}
@@ -194,7 +279,7 @@ const BookingConfirmation = () => {
           <div className="text-center mb-12">
             <div className="relative">
               <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-cyan-500/10 blur-3xl"></div>
-              <h2 className="text-4xl font-semibold text-transparent uppercase bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-4">
+              <h2 className="text-3xl md:text-4xl leading-relaxed md:leading-[1.25] lg:leading-[1.2] tracking-wide font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 mb-4 drop-shadow-[0_2px_6px_rgba(34,211,238,0.25)]">
                 {t('bookingDetails')}
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-500 to-cyan-500/0 mx-auto mb-4"></div>
@@ -259,17 +344,33 @@ const BookingConfirmation = () => {
                   
                   {/* Locations */}
                   <div className="flex items-start group">
-                    <div className="w-10 h-10 rounded-full bg-purple-900/20 flex items-center justify-center text-purple-400 mr-4 mt-1 transition-all duration-300 group-hover:bg-purple-900/40">
+                    <div className="w-10 h-10 rounded-full bg-purple-900/20 flex items-center justify-center text-purple-400 mr-4 mt-1 transition-all duration-300 group-hover:bg-purple-900/40 flex-shrink-0">
                       <LocationIcon />
                     </div>
                     <div>
                       <h3 className="text-purple-400 text-sm mb-1 group-hover:text-purple-300 transition-colors duration-300">{t('locationsTitle')}</h3>
                       <p className="text-white font-medium">
-                        {t('pickupLabel')}: {bookingDetails.pickupLocation?.charAt(0).toUpperCase() + bookingDetails.pickupLocation?.slice(1)}
+                        {t('pickupLabel')}: {locationAddresses[bookingDetails.pickupLocation] || 
+                         (bookingDetails.pickupLocation ? 
+                          bookingDetails.pickupLocation.charAt(0).toUpperCase() + bookingDetails.pickupLocation.slice(1) : 
+                          'Not selected')}
                       </p>
+                      {bookingDetails.pickupTime && (
+                        <p className="text-purple-300 text-sm">
+                          {(t('pickupTime') || 'Pickup time')}: <span className="text-purple-200">{bookingDetails.pickupTime}</span>
+                        </p>
+                      )}
                       <p className="text-white font-medium">
-                        {t('returnLabel')}: {bookingDetails.dropoffLocation?.charAt(0).toUpperCase() + bookingDetails.dropoffLocation?.slice(1)}
+                        {t('returnLabel')}: {locationAddresses[bookingDetails.dropoffLocation] || 
+                         (bookingDetails.dropoffLocation ? 
+                          bookingDetails.dropoffLocation.charAt(0).toUpperCase() + bookingDetails.dropoffLocation.slice(1) : 
+                          'Not selected')}
                       </p>
+                      {bookingDetails.dropoffTime && (
+                        <p className="text-purple-300 text-sm">
+                          {(t('dropoffTime') || 'Dropoff time')}: <span className="text-purple-200">{bookingDetails.dropoffTime}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -293,13 +394,16 @@ const BookingConfirmation = () => {
               <div className="space-y-4">
                 {bookingDetails.options && bookingDetails.options.length > 0 ? (
                   bookingDetails.options.map(optionId => {
-                    const option = availableOptions.find(opt => opt.id === optionId);
-                    return option ? (
+                    const option = availableOptionsById[optionId];
+                    if (!option) return null;
+                    const days = bookingDetails.totalDays || 1;
+                    const lineTotal = option.price * days;
+                    return (
                       <div key={optionId} className="flex justify-between items-center border-b border-blue-900/30 pb-3 group/item hover:border-blue-500/50 transition-colors duration-300">
-                        <span className="text-white group-hover/item:text-cyan-100 transition-colors duration-300">{option.name}</span>
-                        <span className="text-cyan-400 font-medium group-hover/item:text-cyan-300 transition-colors duration-300">${option.price}</span>
+                        <span className="text-white group-hover/item:text-cyan-100 transition-colors duration-300">{option.name} <span className="ml-2 text-xs text-gray-400">(${option.price} × {days})</span></span>
+                        <span className="text-cyan-400 font-medium group-hover/item:text-cyan-300 transition-colors duration-300">${lineTotal}</span>
                       </div>
-                    ) : null;
+                    );
                   })
                 ) : (
                   <div className="flex items-center justify-center h-32 border border-dashed border-blue-900/40 rounded-lg">
@@ -322,29 +426,41 @@ const BookingConfirmation = () => {
               </div>
               
               <div className="space-y-4">
-                <div className="flex justify-between items-center border-b border-blue-900/30 pb-3 group/item hover:border-green-500/50 transition-colors duration-300">
-                  <span className="text-white group-hover/item:text-green-100 transition-colors duration-300">{t('vehicleRental')}</span>
-                  <span className="text-cyan-400 font-medium group-hover/item:text-green-300 transition-colors duration-300">
-                    ${carDetails.pricePerDay || carDetails.price || 0} × {bookingDetails.totalDays} {t('days')}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-center border-b border-blue-900/30 pb-3 group/item hover:border-green-500/50 transition-colors duration-300">
-                  <span className="text-white group-hover/item:text-green-100 transition-colors duration-300">{t('subtotal')}</span>
-                  <span className="text-cyan-400 font-medium group-hover/item:text-green-300 transition-colors duration-300">
-                    ${carDetails.price * bookingDetails.totalDays}
-                  </span>
-                </div>
-                
-                {/* Calculate option cost */}
-                {bookingDetails.options && bookingDetails.options.length > 0 && (
-                  <div className="flex justify-between items-center border-b border-blue-900/30 pb-3 group/item hover:border-green-500/50 transition-colors duration-300">
-                    <span className="text-white group-hover/item:text-green-100 transition-colors duration-300">{t('additionalOptions')}</span>
-                    <span className="text-cyan-400 font-medium group-hover/item:text-green-300 transition-colors duration-300">
-                      ${bookingDetails.totalPrice - (carDetails.price * bookingDetails.totalDays)}
-                    </span>
-                  </div>
-                )}
+                {(() => {
+                  const days = bookingDetails.totalDays || 1;
+                  const daily = getNumericPrice(carDetails);
+                  const baseSubtotal = daily * days;
+                  const optionsTotal = (bookingDetails.options || []).reduce((sum, id) => {
+                    const opt = availableOptionsById[id];
+                    return sum + (opt ? opt.price * days : 0);
+                  }, 0);
+                  return (
+                    <>
+                      <div className="flex justify-between items-center border-b border-blue-900/30 pb-3 group/item hover:border-green-500/50 transition-colors duration-300">
+                        <span className="text-white group-hover/item:text-green-100 transition-colors duration-300">{t('vehicleRental')}</span>
+                        <span className="text-cyan-400 font-medium group-hover/item:text-green-300 transition-colors duration-300">
+                          ${daily} × {days} {t('days')}
+                        </span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center border-b border-blue-900/30 pb-3 group/item hover:border-green-500/50 transition-colors duration-300">
+                        <span className="text-white group-hover/item:text-green-100 transition-colors duration-300">{t('subtotal')}</span>
+                        <span className="text-cyan-400 font-medium group-hover/item:text-green-300 transition-colors duration-300">
+                          ${baseSubtotal}
+                        </span>
+                      </div>
+                      
+                      {optionsTotal > 0 && (
+                        <div className="flex justify-between items-center border-b border-blue-900/30 pb-3 group/item hover:border-green-500/50 transition-colors duration-300">
+                          <span className="text-white group-hover/item:text-green-100 transition-colors duration-300">{t('additionalOptions')}</span>
+                          <span className="text-cyan-400 font-medium group-hover/item:text-green-300 transition-colors duration-300">
+                            ${optionsTotal}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
                 
                 <div className="flex justify-between items-center pt-3 bg-gradient-to-r from-transparent via-green-900/10 to-transparent p-3 rounded-lg">
                   <span className="text-white text-lg">{t('total')}</span>

@@ -131,6 +131,8 @@ export const translations = {
     vehicleNotFound: "Vehicle not found",
     vehicleNotFoundDesc: "The vehicle you are looking for is not available at the moment. Please try again later.",
     openingHours: "Opening Hours",
+    dropoffSameAsPickup: "Dropoff location is the same as pickup location !",
+    availableServices: "Available Services",
 
     // Overview Tab
     experienceThe: "EXPERIENCE THE",
@@ -972,6 +974,8 @@ export const translations = {
     vehicleNotFound: "Véhicule non trouvé",
     vehicleNotFoundDesc: "Le véhicule que vous cherchez n'est pas disponible pour le moment. Veuillez réessayer plus tard.",
     openingHours: "Heures d'ouverture",
+    dropoffSameAsPickup: "L'emplacement de retour est le même que l'emplacement de prise en charge !",
+    availableServices: "Services Disponibles",
     
     // Overview Tab
     experienceThe: "DÉCOUVREZ LE",

@@ -107,31 +107,37 @@ const Booking = () => {
   }, [id, cars]);
   
   const handleDateSelection = (startDate, endDate) => {
-    // Calculate total days
+    // Calculate total days using inclusive date range
     const start = new Date(startDate);
     const end = new Date(endDate);
+    
+    // For inclusive date ranges, we need to add 1 to the difference
     const differenceInTime = end.getTime() - start.getTime();
-    const totalDays = Math.ceil(differenceInTime / (1000 * 3600 * 24)) || 1;
+    const daysDifference = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+    const totalDays = daysDifference + 1; // Add 1 for inclusive range
+    
+    // Ensure minimum of 1 day for same-day rentals
+    const finalTotalDays = Math.max(totalDays, 1);
     
     // Calculate base price
-    const basePrice = car ? calcBasePrice(car, totalDays) : 0;
+    const basePrice = car ? calcBasePrice(car, finalTotalDays) : 0;
     
     setBookingDetails(prev => ({
       ...prev,
       startDate,
       endDate,
-      totalDays,
+      totalDays: finalTotalDays,
       totalPrice: basePrice
     }));
     
     setBookingStep(2);
   };
   
-  const handleLocationSelection = (pickup, dropoff, pickupTime, dropoffTime) => {
+  const handleLocationSelection = ({ pickupLocation, dropoffLocation, pickupTime, dropoffTime }) => {
     setBookingDetails(prev => ({
       ...prev,
-      pickupLocation: pickup,
-      dropoffLocation: dropoff,
+      pickupLocation,
+      dropoffLocation,
       pickupTime: pickupTime || prev.pickupTime,
       dropoffTime: dropoffTime || prev.dropoffTime
     }));
@@ -151,11 +157,14 @@ const Booking = () => {
     setBookingStep(4);
   };
   
-  const handleBookingSubmit = () => {
-    // Navigate to confirmation page with booking data
+  const handleBookingSubmit = (paymentMethod = 'creditCard') => {
+    // Navigate to confirmation page with booking data including payment method
     navigate('/booking-confirmation', { 
       state: { 
-        bookingDetails,
+        bookingDetails: {
+          ...bookingDetails,
+          paymentMethod
+        },
         carDetails: car
       } 
     });

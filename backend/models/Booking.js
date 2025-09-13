@@ -121,7 +121,10 @@ bookingSchema.pre('save', function(next) {
     return next(new Error('End date must be after start date'));
   }
   
-  if (this.startDate < new Date()) {
+  // Allow bookings for today and future dates
+  const startDate = new Date(this.startDate);
+  const today = new Date();
+  if (startDate.toDateString() < today.toDateString()) {
     return next(new Error('Start date cannot be in the past'));
   }
   

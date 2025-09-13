@@ -189,14 +189,25 @@ router.post('/', authenticateToken, validateBooking, handleValidationErrors, asy
     const extrasTotal = extras.reduce((sum, extra) => sum + (extra.price * (extra.quantity || 1)), 0);
     const totalAmount = (car.pricePerDay * totalDays) + extrasTotal + insurance.price;
 
+    // Ensure location objects have required address field
+    const processedPickupLocation = {
+      branch: pickupLocation.branch,
+      address: pickupLocation.address || `${pickupLocation.branch} Branch, Main Location`
+    };
+    
+    const processedDropoffLocation = {
+      branch: dropoffLocation.branch,
+      address: dropoffLocation.address || `${dropoffLocation.branch} Branch, Main Location`
+    };
+
     // Create booking
     const booking = new Booking({
       user: req.user._id,
       car: carId,
       startDate,
       endDate,
-      pickupLocation,
-      dropoffLocation,
+      pickupLocation: processedPickupLocation,
+      dropoffLocation: processedDropoffLocation,
       totalDays,
       pricePerDay: car.pricePerDay,
       totalAmount,

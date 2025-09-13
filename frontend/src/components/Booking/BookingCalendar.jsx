@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect, forwardRef } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { format, differenceInDays } from 'date-fns';
+import { format } from 'date-fns';
+import { calculateInclusiveDays } from '../../utils/dateCalculation';
 import { useTranslations } from '../../translations';
 import { useLanguage } from '../../hooks/useLanguage';
 import CalendarDateIcon from '../Ui/Icons/CalendarDateIcon';
@@ -70,12 +71,10 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // Calculate total days for preview
-  const calculateDays = () => {
-    if (!startDate || !endDate) return 0;
-    const differenceInTime = endDate.getTime() - startDate.getTime();
-    return Math.ceil(differenceInTime / (1000 * 3600 * 24)) || 1;
-  };
+  // Calculate total days for preview (inclusive date range)
+  const calculateDays = useCallback(() => {
+    return calculateInclusiveDays(startDate, endDate);
+  }, [startDate, endDate]);
 
   const totalDays = calculateDays();
   
@@ -87,7 +86,9 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
     
     const days = calculateDays();
     const numericPrice = getNumericPrice(car);
-    return days * numericPrice;
+    const cost = days * numericPrice;
+    // Prevent negative cost from showing
+    return Math.max(cost, 0);
   };
 
   const totalCost = calculateTotalCost();
@@ -124,7 +125,7 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
       return;
     }
 
-    const daysDifference = differenceInDays(endDate, startDate);
+    const daysDifference = calculateDays();
     
     // Check minimum rental duration (uniform 3-day minimum)
     if (daysDifference < MIN_RENTAL_DAYS) {
@@ -145,7 +146,7 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
       setValidationError('');
       setMaxDurationWarning('');
     }
-  }, [startDate, endDate, t, MAX_RENTAL_DAYS, MIN_RENTAL_DAYS]);
+  }, [startDate, endDate, t, MAX_RENTAL_DAYS, MIN_RENTAL_DAYS, calculateDays]);
   
   // Quick select handlers
   const handleQuickSelect = (days) => {
@@ -191,7 +192,7 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
       <div className="z-10 w-full space-y-8 md:space-y-10 lg:space-y-12 relative">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron']">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl leading-relaxed md:leading-[1.25] lg:leading-[1.2] tracking-wide font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-['Orbitron'] drop-shadow-[0_2px_6px_rgba(34,211,238,0.25)]">
             {t('selectRentalDates')}
           </h2>
           <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto opacity-60"></div>
