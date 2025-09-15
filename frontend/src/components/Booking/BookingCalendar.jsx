@@ -8,7 +8,6 @@ import CalendarDateIcon from '../Ui/Icons/CalendarDateIcon';
 import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
 import { getNumericPrice } from '../../utils/price';
 
-
 const DatePicker = forwardRef(({ 
   selected, 
   onChange, 
@@ -153,7 +152,8 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
     setIsAnimating(true);
     const newStartDate = new Date(today);
     const newEndDate = new Date(today);
-    newEndDate.setDate(newEndDate.getDate() + days);
+    // Subtract 1 from days since calculateInclusiveDays includes both start and end dates
+    newEndDate.setDate(newEndDate.getDate() + days - 1);
     
     setStartDate(newStartDate);
     setEndDate(newEndDate);

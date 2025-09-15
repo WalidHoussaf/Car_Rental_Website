@@ -128,6 +128,8 @@ export const api = {
       return createApiRequest(`/bookings/my-bookings${queryString ? `?${queryString}` : ''}`);
     },
     
+    getStats: () => createApiRequest('/bookings/stats'),
+    
     getAll: (params = {}) => {
       // Clean params to avoid sending undefined/null/empty values (e.g., status=undefined)
       const cleanParams = {};
@@ -155,6 +157,20 @@ export const api = {
     cancel: (id, cancellationReason) => createApiRequest(`/bookings/${id}/cancel`, {
       method: 'PATCH',
       body: JSON.stringify({ cancellationReason }),
+    }),
+    
+    update: (id, bookingData) => createApiRequest(`/bookings/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(bookingData),
+    }),
+    
+    delete: (id) => createApiRequest(`/bookings/${id}`, {
+      method: 'DELETE',
+    }),
+    
+    bulkDelete: (bookingIds) => createApiRequest('/bookings/bulk/delete', {
+      method: 'DELETE',
+      body: JSON.stringify({ bookingIds }),
     }),
   },
 

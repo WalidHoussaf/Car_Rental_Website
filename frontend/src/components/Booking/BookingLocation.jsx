@@ -18,7 +18,7 @@ import InteractiveMap from '../Ui/InteractiveMap';
 const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousStep }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
-  const [pickup, setPickup] = useState(bookingDetails.pickupLocation || '');
+  const [pickup, setPickup] = useState('');
   const [pickupTime, setPickupTime] = useState(bookingDetails.pickupTime || '09:00');
   const [dropoffTime, setDropoffTime] = useState(bookingDetails.dropoffTime || '18:00');
   const [locations, setLocations] = useState([]);
@@ -218,9 +218,6 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       
       startDateTime.setHours(pickupHour, pickupMinute, 0, 0);
       endDateTime.setHours(dropoffHour, dropoffMinute, 0, 0);
-      
-      // For now, skip location availability check as checkLocationAvailability is not implemented
-      // TODO: Implement location availability checking if needed
     }
     
     // All validations passed, proceed with booking
@@ -388,23 +385,23 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
             </div>
           </div>
           
-          {/* Map Preview */}
-          <div className="backdrop-blur-sm bg-black/50 p-8 rounded-xl border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group h-fit">
-                        
-            <div className="relative">
-              <h3 className="text-xl md:text-2xl text-cyan-400 font-['Orbitron'] mb-8 flex items-center justify-center lg:justify-start">
-                <span className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></span>
-                {t('locationDetails')}
-              </h3>
+          {/* Map Preview - Only show when location is selected */}
+          {pickup && (
+            <div className="backdrop-blur-sm bg-black/50 p-8 rounded-xl border border-blue-900/30 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 relative overflow-hidden group h-fit">
+              <div className="relative">
+                <h3 className="text-xl md:text-2xl text-cyan-400 font-['Orbitron'] mb-8 flex items-center justify-center lg:justify-start">
+                  <span className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></span>
+                  {t('locationDetails')}
+                </h3>
+                
+                <InteractiveMap 
+                  pickup={pickup} 
+                  locations={locations}
+                  onLocationSelect={handleLocationSelect}
+                />
               
-              <InteractiveMap 
-                pickup={pickup} 
-                locations={locations}
-                onLocationSelect={handleLocationSelect}
-              />
-              
-              <div className="space-y-6">
-                {pickup && (
+                <div className="space-y-6">
+                  {/* Pickup location info */}
                   <div className="flex items-start p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-cyan-500/30 group">
                     <div className="w-10 h-10 flex-shrink-0 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 mt-1 transition-all duration-300 group-hover:bg-cyan-500/30">
                       <LocationPinIcon />
@@ -507,10 +504,8 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                       })()}
                     </div>
                   </div>
-                )}
-                
-                {/* Dropoff location info - same as pickup */}
-                {pickup && (
+                  
+                  {/* Dropoff location info - same as pickup */}
                   <div className="flex items-start p-4 bg-black/40 rounded-xl border border-blue-900/20 transition-all duration-300 hover:border-purple-500/30 group">
                     <div className="w-10 h-10 flex-shrink-0 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mt-1 transition-all duration-300 group-hover:bg-purple-500/30">
                       <DestinationIcon />
@@ -569,10 +564,10 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
         
         {/* Error Display */}

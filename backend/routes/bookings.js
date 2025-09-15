@@ -48,6 +48,52 @@ router.get('/my-bookings', authenticateToken, async (req, res) => {
   }
 });
 
+// Get booking stats (Admin only)
+router.get('/stats', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const stats = await Booking.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Convert to object with default values
+    const statusCounts = {
+      pending: 0,
+      confirmed: 0,
+      active: 0,
+      completed: 0,
+      cancelled: 0
+    };
+
+    stats.forEach(stat => {
+      if (statusCounts.hasOwnProperty(stat._id)) {
+        statusCounts[stat._id] = stat.count;
+      }
+    });
+
+    const totalBookings = Object.values(statusCounts).reduce((sum, count) => sum + count, 0);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        statusCounts,
+        totalBookings
+      }
+    });
+  } catch (error) {
+    console.error('Get booking stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch booking stats',
+      error: error.message
+    });
+  }
+});
+
 // Get all bookings (Admin only)
 router.get('/all', authenticateToken, requireAdmin, async (req, res) => {
   try {
@@ -61,7 +107,7 @@ router.get('/all', authenticateToken, requireAdmin, async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const bookings = await Booking.find(filter)
-      .populate('user', 'firstName lastName email phone')
+      .populate('user', 'firstName lastName email phone address')
       .populate('car', 'make model year location')
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -96,7 +142,7 @@ router.get('/all', authenticateToken, requireAdmin, async (req, res) => {
 router.get('/:id', authenticateToken, validateObjectId, handleValidationErrors, async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
-      .populate('user', 'firstName lastName email phone')
+      .populate('user', 'firstName lastName email phone address')
       .populate('car')
       .populate('driverInfo.primaryDriver', 'firstName lastName email')
       .populate('driverInfo.additionalDrivers', 'firstName lastName email');
@@ -181,12 +227,18 @@ router.post('/', authenticateToken, validateBooking, handleValidationErrors, asy
       });
     }
 
-    // Calculate total amount
+    // Calculate total amount using inclusive date calculation 
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     
-    const extrasTotal = extras.reduce((sum, extra) => sum + (extra.price * (extra.quantity || 1)), 0);
+    // Set to start of day to ensure accurate calculation
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    
+    const differenceInTime = end.getTime() - start.getTime();
+    const totalDays = Math.floor(differenceInTime / (1000 * 3600 * 24)) + 1; // +1 for inclusive range
+    
+    const extrasTotal = extras.reduce((sum, extra) => sum + (extra.price * (extra.quantity || 1) * totalDays), 0);
     const totalAmount = (car.pricePerDay * totalDays) + extrasTotal + insurance.price;
 
     // Ensure location objects have required address field
@@ -246,7 +298,9 @@ router.patch('/:id/status', authenticateToken, requireAdmin, validateObjectId, h
   try {
     const { status } = req.body;
     
-    if (!['pending', 'confirmed', 'active', 'completed', 'cancelled'].includes(status)) {
+    // Validate status
+    const validStatuses = ['pending', 'confirmed', 'active', 'completed', 'cancelled'];
+    if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid status'
@@ -256,9 +310,9 @@ router.patch('/:id/status', authenticateToken, requireAdmin, validateObjectId, h
     const booking = await Booking.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true, runValidators: true }
-    ).populate('user', 'firstName lastName email')
-     .populate('car', 'make model');
+      { new: true }
+    ).populate('user', 'name email')
+     .populate('car', 'brand model year');
 
     if (!booking) {
       return res.status(404).json({
@@ -270,15 +324,75 @@ router.patch('/:id/status', authenticateToken, requireAdmin, validateObjectId, h
     res.status(200).json({
       success: true,
       message: 'Booking status updated successfully',
-      data: {
-        booking
-      }
+      data: booking
     });
   } catch (error) {
     console.error('Update booking status error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to update booking status',
+      error: error.message
+    });
+  }
+});
+
+// Update booking details (Admin only)
+router.patch('/:id', authenticateToken, requireAdmin, validateObjectId, handleValidationErrors, async (req, res) => {
+  try {
+    const allowedUpdates = ['status', 'startDate', 'endDate', 'pickupLocation', 'dropoffLocation', 'notes'];
+    const updates = {};
+    
+    // Filter only allowed fields
+    Object.keys(req.body).forEach(key => {
+      if (allowedUpdates.includes(key)) {
+        updates[key] = req.body[key];
+      }
+    });
+
+    // Validate dates if provided
+    if (updates.startDate && updates.endDate) {
+      const startDate = new Date(updates.startDate);
+      const endDate = new Date(updates.endDate);
+      
+      if (startDate >= endDate) {
+        return res.status(400).json({
+          success: false,
+          message: 'End date must be after start date'
+        });
+      }
+      
+      if (startDate < new Date()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Start date cannot be in the past'
+        });
+      }
+    }
+
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    ).populate('user', 'name email')
+     .populate('car', 'brand model year');
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Booking updated successfully',
+      data: booking
+    });
+  } catch (error) {
+    console.error('Update booking error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update booking',
       error: error.message
     });
   }
@@ -314,7 +428,7 @@ router.patch('/:id/cancel', authenticateToken, validateObjectId, handleValidatio
       });
     }
 
-    // Calculate refund amount (simple logic - can be enhanced)
+    // Calculate refund amount (simple logic)
     const now = new Date();
     const startDate = new Date(booking.startDate);
     const daysUntilStart = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
@@ -349,6 +463,88 @@ router.patch('/:id/cancel', authenticateToken, validateObjectId, handleValidatio
     res.status(500).json({
       success: false,
       message: 'Failed to cancel booking',
+      error: error.message
+    });
+  }
+});
+
+// Delete booking (Admin only)
+router.delete('/:id', authenticateToken, requireAdmin, validateObjectId, handleValidationErrors, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    await Booking.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Booking deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete booking error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete booking',
+      error: error.message
+    });
+  }
+});
+
+// Bulk delete bookings (Admin only)
+router.delete('/bulk/delete', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { bookingIds } = req.body;
+    
+    if (!bookingIds || !Array.isArray(bookingIds) || bookingIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid booking IDs provided'
+      });
+    }
+
+    // Validate all booking IDs are valid ObjectIds
+    const mongoose = await import('mongoose');
+    const invalidIds = bookingIds.filter(id => !mongoose.default.Types.ObjectId.isValid(id));
+    if (invalidIds.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid booking ID format',
+        invalidIds
+      });
+    }
+
+    // Check if bookings exist
+    const existingBookings = await Booking.find({ _id: { $in: bookingIds } });
+    const existingIds = existingBookings.map(booking => booking._id.toString());
+    const notFoundIds = bookingIds.filter(id => !existingIds.includes(id));
+    
+    if (notFoundIds.length > 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Some bookings not found',
+        notFoundIds
+      });
+    }
+
+    // Delete all bookings
+    const deleteResult = await Booking.deleteMany({ _id: { $in: bookingIds } });
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully deleted ${deleteResult.deletedCount} booking(s)`,
+      deletedCount: deleteResult.deletedCount
+    });
+  } catch (error) {
+    console.error('Bulk delete bookings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete bookings',
       error: error.message
     });
   }
