@@ -130,9 +130,23 @@ const BookingConfirmation = () => {
       try {
         // Transform frontend data to match backend expectations
         const transformedBookingData = {
-          car: carDetails._id || carDetails.id, // Send car ID, not full object
-          startDate: new Date(bookingDetails.startDate).toISOString(),
-          endDate: new Date(bookingDetails.endDate).toISOString(),
+          car: carDetails._id || carDetails.id, // Send car ID
+          startDate: (() => {
+            const startDateTime = new Date(bookingDetails.startDate);
+            if (bookingDetails.pickupTime) {
+              const [hour, minute] = bookingDetails.pickupTime.split(':').map(Number);
+              startDateTime.setHours(hour, minute, 0, 0);
+            }
+            return startDateTime.toISOString();
+          })(),
+          endDate: (() => {
+            const endDateTime = new Date(bookingDetails.endDate);
+            if (bookingDetails.dropoffTime) {
+              const [hour, minute] = bookingDetails.dropoffTime.split(':').map(Number);
+              endDateTime.setHours(hour, minute, 0, 0);
+            }
+            return endDateTime.toISOString();
+          })(),
           pickupLocation: {
             branch: bookingDetails.pickupLocation || 'main',
             address: getLocationAddress(bookingDetails.pickupLocation)

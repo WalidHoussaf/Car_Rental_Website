@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getLocationById } from '../../config/officeLocations';
 import api from '../../config/api';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -10,26 +10,32 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
   const t = useTranslations(language);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [editForm, setEditForm] = useState({
-    status: booking?.status || '',
-    startDate: booking?.startDate ? new Date(booking.startDate).toISOString().split('T')[0] : '',
-    endDate: booking?.endDate ? new Date(booking.endDate).toISOString().split('T')[0] : '',
-    pickupLocation: booking?.pickupLocation?.branch || '',
-    dropoffLocation: booking?.dropoffLocation?.branch || '',
-    notes: booking?.notes || ''
-  });
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const statusDropdownRef = useRef(null);
+  const [editStatus, setEditStatus] = useState(booking?.status || '');
 
-  // Update form when booking changes
+  // Close status dropdown on outside click or Esc
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(e.target)) {
+        setIsStatusDropdownOpen(false);
+      }
+    };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setIsStatusDropdownOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
+
+  // Update status when booking changes
   useEffect(() => {
     if (booking) {
-      setEditForm({
-        status: booking.status || '',
-        startDate: booking.startDate ? new Date(booking.startDate).toISOString().split('T')[0] : '',
-        endDate: booking.endDate ? new Date(booking.endDate).toISOString().split('T')[0] : '',
-        pickupLocation: booking.pickupLocation?.branch || '',
-        dropoffLocation: booking.dropoffLocation?.branch || '',
-        notes: booking.notes || ''
-      });
+      setEditStatus(booking.status || '');
     }
   }, [booking]);
 
@@ -71,14 +77,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
   };
 
   const handleEdit = () => {
-    setEditForm({
-      status: booking.status,
-      startDate: new Date(booking.startDate).toISOString().split('T')[0],
-      endDate: new Date(booking.endDate).toISOString().split('T')[0],
-      pickupLocation: booking.pickupLocation?.branch || '',
-      dropoffLocation: booking.dropoffLocation?.branch || '',
-      notes: booking.notes || ''
-    });
+    setEditStatus(booking.status);
     setIsEditing(true);
   };
 
@@ -86,12 +85,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
     setLoading(true);
     try {
       const updateData = {
-        status: editForm.status,
-        startDate: editForm.startDate,
-        endDate: editForm.endDate,
-        pickupLocation: { branch: editForm.pickupLocation },
-        dropoffLocation: { branch: editForm.dropoffLocation },
-        notes: editForm.notes
+        status: editStatus
       };
 
       const response = await api.bookings.update(booking._id, updateData);
@@ -99,14 +93,14 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating booking:', error);
-      alert('Failed to update booking: ' + error.message);
+      alert(`${t('failedToLoadBookings')}: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this booking? This action cannot be undone.')) {
+    if (!window.confirm(`${t('bulkDeleteWarning')} ${t('booking').toLowerCase()}? ${t('actionCannotBeUndone')}`)) {
       return;
     }
 
@@ -151,7 +145,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
           <div className="flex items-center gap-3">
             <div className="w-1 h-6 bg-gradient-to-b from-cyan-400 to-cyan-600 rounded-full"></div>
             <h3 className="text-cyan-300 font-['Orbitron'] text-xl font-semibold tracking-wide">
-{t('bookingDetails') || 'Booking Details'} - #{booking._id.slice(-8)}
+{t('bookingDetailsModal')} - #{booking._id.slice(-8)}
             </h3>
           </div>
           <button
@@ -173,24 +167,65 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 {isEditing ? (
-                  <select
-                    value={editForm.status}
-                    onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                    className="bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 font-['Orbitron'] rounded-xl py-2 px-4 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 transition-all duration-300"
-                  >
-                    <option value="pending">{t('pending') || 'Pending'}</option>
-                    <option value="confirmed">{t('confirmed') || 'Confirmed'}</option>
-                    <option value="active">{t('active') || 'Active'}</option>
-                    <option value="completed">{t('completed') || 'Completed'}</option>
-                    <option value="cancelled">{t('cancelled') || 'Cancelled'}</option>
-                  </select>
+                  <div className="relative" ref={statusDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+                      className="w-48 text-left font-['Orbitron'] bg-black/40 border border-cyan-900/30 rounded-md py-2 pl-3 pr-9 focus:ring-2 focus:ring-cyan-500 focus:outline-none text-gray-200 hover:border-cyan-600/40 transition-colors cursor-pointer"
+                    >
+                      {t(editStatus)}
+                    </button>
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-cyan-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={`h-4 w-4 transition-transform ${isStatusDropdownOpen ? 'rotate-180' : ''}`}>
+                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.17l3.71-2.94a.75.75 0 11.94 1.16l-4.18 3.31a.75.75 0 01-.94 0L5.21 8.39a.75.75 0 01.02-1.18z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                    
+                    {/* Dropdown Menu */}
+                    <div
+                      className={`absolute left-0 mt-2 w-48 rounded-lg overflow-hidden border border-gray-800 bg-black backdrop-blur-xl shadow-lg transition-all duration-200 z-50 ${isStatusDropdownOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+                    >
+                      <div className="py-2 font-['Orbitron']">
+                        <button
+                          onClick={() => { setEditStatus('pending'); setIsStatusDropdownOpen(false); }}
+                          className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                          {t('pending')}
+                        </button>
+                        <button
+                          onClick={() => { setEditStatus('confirmed'); setIsStatusDropdownOpen(false); }}
+                          className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                          {t('confirmed')}
+                        </button>
+                        <button
+                          onClick={() => { setEditStatus('active'); setIsStatusDropdownOpen(false); }}
+                          className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                          {t('active')}
+                        </button>
+                        <button
+                          onClick={() => { setEditStatus('completed'); setIsStatusDropdownOpen(false); }}
+                          className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                          {t('completed')}
+                        </button>
+                        <button
+                          onClick={() => { setEditStatus('cancelled'); setIsStatusDropdownOpen(false); }}
+                          className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                          {t('cancelled')}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <span className={`${getStatusColor(booking.status)} font-['Orbitron'] font-medium`}>
-{t(booking.status) || booking.status}
+{t(booking.status)}
                   </span>
                 )}
                 <span className="text-sm text-gray-400 font-['Orbitron']">
-                  {t('created') || 'Created'}: {formatDate(booking.createdAt)}
+                  {t('created')}: {formatDate(booking.createdAt)}
                 </span>
               </div>
 
@@ -202,13 +237,13 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
                       disabled={loading}
                       className="px-4 py-2 bg-blue-600/20 text-white border border-blue-600/30 rounded hover:bg-blue-600/30 hover:border-blue-500 transition-all duration-300 font-['Orbitron'] text-sm font-semibold cursor-pointer transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
-                      {loading ? (t('saving') || 'Saving...') : (t('save') || 'Save')}
+                      {loading ? t('saving') : t('save')}
                     </button>
                     <button
                       onClick={() => setIsEditing(false)}
                       className="px-4 py-2 bg-transparent border border-cyan-500/30 text-cyan-400 font-['Orbitron'] text-sm font-semibold rounded-md hover:bg-cyan-900/10 hover:border-cyan-400 transition-all duration-300 cursor-pointer transform hover:scale-105"
                     >
-                      {t('cancel') || 'Cancel'}
+                      {t('cancel')}
                     </button>
                   </>
                 ) : (
@@ -217,13 +252,13 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
                       onClick={handleEdit}
                       className="px-4 py-2 bg-blue-600/20 text-white border border-blue-600/30 rounded hover:bg-blue-600/30 hover:border-blue-500 transition-all duration-300 font-['Orbitron'] text-sm font-semibold cursor-pointer transform hover:scale-105"
                     >
-                      {t('edit') || 'Edit'}
+                      {t('edit')}
                     </button>
                     <button
                       onClick={handleDelete}
                       className="px-4 py-2 bg-red-600/50 text-white border border-red-500/30 rounded hover:bg-red-700/50 transition-all duration-300 text-sm font-['Orbitron'] font-semibold  cursor-pointer transform hover:scale-105"
                     >
-                      {t('deleteBooking') || 'Delete'}
+                      {t('deleteBooking')}
                     </button>
                     {booking.status !== 'cancelled' && (
                       <button
@@ -231,7 +266,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
                         disabled={loading}
                         className="px-4 py-2 bg-orange-600/20 text-white border border-orange-600/30 rounded hover:bg-amber-600/30 transition-all duration-300 font-['Orbitron'] text-sm font-semibold cursor-pointer transform hover:scale-105"
                       >
-                        {t('cancelBooking') || 'Cancel Booking'}
+                        {t('cancelBooking')}
                       </button>
                     )}
                   </>
@@ -245,14 +280,14 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
             <div className="flex items-center gap-4 mb-6">
               <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
               <h4 className="text-base uppercase tracking-[0.2em] font-['Orbitron'] font-semibold text-transparent bg-gradient-to-r from-cyan-300 to-cyan-500 bg-clip-text flex-shrink-0">
-                {t('customerInformation') || 'Customer Information'}
+                {t('customerInformation')}
               </h4>
               <div className="flex-1 h-px bg-gradient-to-r from-cyan-600/50 via-cyan-800/30 to-transparent"></div>
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('fullName') || 'Full Name'}</p>
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('fullName')}</p>
                   <p className="text-gray-200 font-medium">
                     {booking.user?.firstName && booking.user?.lastName 
                       ? `${booking.user.firstName} ${booking.user.lastName}` 
@@ -260,17 +295,17 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('phoneNumber') || 'Phone Number'}</p>
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('phoneNumber')}</p>
                   <p className="text-gray-200 font-medium">{booking.user?.phone || 'N/A'}</p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('emailAddress') || 'Email Address'}</p>
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('emailAddress')}</p>
                   <p className="text-gray-200 font-medium">{booking.user?.email || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('address') || 'Address'}</p>
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('address')}</p>
                   <p className="text-gray-200 font-medium leading-relaxed">
                     {booking.user?.address ? (
                       [
@@ -292,21 +327,21 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
             <div className="flex items-center gap-4 mb-6">
               <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
               <h4 className="text-base uppercase tracking-[0.2em] font-['Orbitron'] font-semibold text-transparent bg-gradient-to-r from-cyan-300 to-cyan-500 bg-clip-text flex-shrink-0">
-                {t('vehicleInformation') || 'Vehicle Information'}
+                {t('vehicleInformation')}
               </h4>
               <div className="flex-1 h-px bg-gradient-to-r from-cyan-600/50 via-cyan-800/30 to-transparent"></div>
             </div>
             <div className="grid grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('brand') || 'Brand'}</p>
+                <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('brand')}</p>
                 <p className="text-gray-200 font-medium">{booking.car?.make || booking.car?.brand || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('model') || 'Model'}</p>
+                <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('model')}</p>
                 <p className="text-gray-200 font-medium">{booking.car?.model || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('year') || 'Year'}</p>
+                <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('year')}</p>
                 <p className="text-gray-200 font-medium">{booking.car?.year || 'N/A'}</p>
               </div>
             </div>
@@ -317,85 +352,49 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
             <div className="flex items-center gap-4 mb-6">
               <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
               <h4 className="text-base uppercase tracking-[0.2em] font-['Orbitron'] font-semibold text-transparent bg-gradient-to-r from-cyan-300 to-cyan-500 bg-clip-text flex-shrink-0">
-                {t('bookingInformation') || 'Booking Details'}
+                {t('bookingInformation')}
               </h4>
               <div className="flex-1 h-px bg-gradient-to-r from-cyan-600/50 via-cyan-800/30 to-transparent"></div>
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('startDate') || 'Start Date'}</p>
-                  {isEditing ? (
-                    <input
-                      type="date"
-                      value={editForm.startDate}
-                      onChange={(e) => setEditForm({ ...editForm, startDate: e.target.value })}
-                      className="bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 font-['Orbitron'] rounded-xl py-3 px-4 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 transition-all duration-300 w-full"
-                    />
-                  ) : (
-                    <p className="text-gray-200 font-medium">{formatDate(booking.startDate)}</p>
-                  )}
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('startDate')}</p>
+                  <p className="text-gray-200 font-medium">{formatDate(booking.startDate)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('pickupTime') || 'Pickup Time'}</p>
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('pickupTime')}</p>
                   <p className="text-gray-200 font-medium">{formatTime(booking.startDate)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('pickupLocation') || 'Pickup Location'}</p>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editForm.pickupLocation}
-                      onChange={(e) => setEditForm({ ...editForm, pickupLocation: e.target.value })}
-                      className="bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 font-['Orbitron'] rounded-xl py-3 px-4 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 transition-all duration-300 w-full"
-                    />
-                  ) : (
-                    <p className="text-gray-200 font-medium">
-                      {(() => {
-                        if (!booking.pickupLocation?.branch) return 'N/A';
-                        const office = getLocationById(booking.pickupLocation.branch.toLowerCase());
-                        return office ? office.address.en : booking.pickupLocation.branch;
-                      })()}
-                    </p>
-                  )}
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('pickupLocation')}</p>
+                  <p className="text-gray-200 font-medium">
+                    {(() => {
+                      if (!booking.pickupLocation?.branch) return 'N/A';
+                      const office = getLocationById(booking.pickupLocation.branch.toLowerCase());
+                      return office ? office.address.en : booking.pickupLocation.branch;
+                    })()}
+                  </p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('endDate') || 'End Date'}</p>
-                  {isEditing ? (
-                    <input
-                      type="date"
-                      value={editForm.endDate}
-                      onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
-                      className="bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 font-['Orbitron'] rounded-xl py-3 px-4 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 transition-all duration-300 w-full"
-                    />
-                  ) : (
-                    <p className="text-gray-200 font-medium">{formatDate(booking.endDate)}</p>
-                  )}
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('endDate')}</p>
+                  <p className="text-gray-200 font-medium">{formatDate(booking.endDate)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('dropoffTime') || 'Dropoff Time'}</p>
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('dropoffTime')}</p>
                   <p className="text-gray-200 font-medium">{formatTime(booking.endDate)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('dropoffLocation') || 'Drop-off Location'}</p>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editForm.dropoffLocation}
-                      onChange={(e) => setEditForm({ ...editForm, dropoffLocation: e.target.value })}
-                      className="bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 font-['Orbitron'] rounded-xl py-3 px-4 text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 transition-all duration-300 w-full"
-                    />
-                  ) : (
-                    <p className="text-gray-200 font-medium">
-                      {(() => {
-                        if (!booking.dropoffLocation?.branch) return 'N/A';
-                        const office = getLocationById(booking.dropoffLocation.branch.toLowerCase());
-                        return office ? office.address.en : booking.dropoffLocation.branch;
-                      })()}
-                    </p>
-                  )}
+                  <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide mb-2">{t('dropoffLocation')}</p>
+                  <p className="text-gray-200 font-medium">
+                    {(() => {
+                      if (!booking.dropoffLocation?.branch) return 'N/A';
+                      const office = getLocationById(booking.dropoffLocation.branch.toLowerCase());
+                      return office ? office.address.en : booking.dropoffLocation.branch;
+                    })()}
+                  </p>
                 </div>
               </div>
             </div>
@@ -407,7 +406,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
             <div className="flex items-center gap-4 mb-6">
               <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
               <h4 className="text-base uppercase tracking-[0.2em] font-['Orbitron'] font-semibold text-transparent bg-gradient-to-r from-cyan-300 to-cyan-500 bg-clip-text flex-shrink-0">
-                {t('pricingDetails') || 'Pricing Details'}
+                {t('pricingDetails')}
               </h4>
               <div className="flex-1 h-px bg-gradient-to-r from-cyan-600/50 via-cyan-800/30 to-transparent"></div>
             </div>
@@ -417,14 +416,14 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
               <div className="flex justify-between items-center py-3 px-4 bg-gradient-to-r from-cyan-500/10 to-transparent rounded-lg border border-cyan-500/20 transition-all duration-300">
                 <span className="text-white font-['Orbitron'] flex items-center">
                   <span className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></span>
-                  {t('basePrice') || 'Base Price'} 
+                  {t('basePrice')} 
                   <span className="ml-2 text-xs text-gray-400">
                     {(() => {
                       const startDate = new Date(booking.startDate);
                       const endDate = new Date(booking.endDate);
                       const days = calculateInclusiveDays(startDate, endDate);
                       const pricePerDay = booking.pricePerDay || (booking.car?.pricePerDay) || 0;
-                      return `(${formatCurrency(pricePerDay)} x ${days} ${days === 1 ? (t('day') || 'day') : (t('days') || 'days')})`;
+                      return `(${formatCurrency(pricePerDay)} x ${days} ${days === 1 ? t('day') : t('days')})`;
                     })()}
                   </span>
                 </span>
@@ -458,7 +457,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
                         <div key={index} className="flex justify-between items-center py-3 px-4 bg-gradient-to-r from-green-500/10 to-transparent rounded-lg border border-green-500/20 transition-all duration-300">
                           <span className="text-white font-['Orbitron'] flex items-center">
                             <span className="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
-                            {extra.name} <span className="ml-2 text-xs text-gray-400">(${extra.price}{(extra.quantity && extra.quantity > 1) ? ` x ${extra.quantity}` : ''} x {days} {days === 1 ? (t('day') || 'day') : (t('days') || 'days')})</span>
+                            {extra.name} <span className="ml-2 text-xs text-gray-400">(${extra.price}{(extra.quantity && extra.quantity > 1) ? ` x ${extra.quantity}` : ''} x {days} {days === 1 ? t('day') : t('days')})</span>
                           </span>
                           <span className="text-green-400 font-['Orbitron'] font-bold">${totalPrice}</span>
                         </div>
@@ -470,13 +469,13 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
 
               {/* Total Amount */}
               <div className="flex justify-between items-center py-3 border-t border-cyan-500/30 bg-gradient-to-r from-cyan-900/10 to-transparent rounded-lg px-4">
-                <p className="text-cyan-300 font-['Orbitron'] font-semibold text-lg">{t('totalAmount') || 'Total Amount'}</p>
+                <p className="text-cyan-300 font-['Orbitron'] font-semibold text-lg">{t('totalAmount')}</p>
                 <p className="text-cyan-300 font-['Orbitron'] font-bold text-xl">{formatCurrency(booking.totalAmount)}</p>
               </div>
 
               {/* Payment Method */}
               <div className="flex justify-between items-center pt-4">
-                <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide">{t('paymentMethod') || 'Payment Method'}</p>
+                <p className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide">{t('paymentMethod')}</p>
                 <p className="text-gray-200 font-medium capitalize">{booking.paymentMethod?.replace('_', ' ') || 'N/A'}</p>
               </div>
             </div>

@@ -17,6 +17,13 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [stats, setStats] = useState({
+    pending: 0,
+    confirmed: 0,
+    active: 0,
+    completed: 0,
+    cancelled: 0
+  });
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -24,6 +31,28 @@ const MyBookings = () => {
   const [status, setStatus] = useState('');
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const statusDropdownRef = useRef(null);
+  const [confirmingBookingId, setConfirmingBookingId] = useState(null);
+  const [cancellingBookingId, setCancellingBookingId] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(null);
+
+  const fetchStats = async () => {
+    try {
+      const res = await api.bookings.getMyBookings({ limit: 1000 }); // Get all bookings for stats
+      if (res?.success) {
+        const allBookings = res.data.bookings || [];
+        setStats({
+          pending: allBookings.filter(b => b.status === 'pending').length,
+          confirmed: allBookings.filter(b => b.status === 'confirmed').length,
+          active: allBookings.filter(b => b.status === 'active').length,
+          completed: allBookings.filter(b => b.status === 'completed').length,
+          cancelled: allBookings.filter(b => b.status === 'cancelled').length
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
 
   const fetchBookings = async (opts = {}) => {
     const { page: p = page, status: s = status } = opts;
@@ -48,9 +77,56 @@ const MyBookings = () => {
     }
   };
 
+  const handleConfirmBooking = async (bookingId) => {
+    setActionLoading(true);
+    try {
+      const response = await api.bookings.update(bookingId, { status: 'confirmed' });
+      if (response?.success) {
+        // Update local bookings state
+        setBookings(prev => prev.map(booking => 
+          booking._id === bookingId ? { ...booking, status: 'confirmed' } : booking
+        ));
+        // Refresh stats
+        fetchStats();
+        setConfirmingBookingId(null);
+      } else {
+        throw new Error(response?.message || 'Failed to confirm booking');
+      }
+    } catch (error) {
+      const msg = error?.message || 'Failed to confirm booking';
+      showError(msg);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    setActionLoading(true);
+    try {
+      const response = await api.bookings.update(bookingId, { status: 'cancelled' });
+      if (response?.success) {
+        // Update local bookings state
+        setBookings(prev => prev.map(booking => 
+          booking._id === bookingId ? { ...booking, status: 'cancelled' } : booking
+        ));
+        // Refresh stats
+        fetchStats();
+        setCancellingBookingId(null);
+      } else {
+        throw new Error(response?.message || 'Failed to cancel booking');
+      }
+    } catch (error) {
+      const msg = error?.message || 'Failed to cancel booking';
+      showError(msg);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchBookings({ page: 1 });
+      fetchStats();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
@@ -143,7 +219,7 @@ const MyBookings = () => {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-white">{bookings.filter(b => b.status === 'pending').length}</div>
+                    <div className="text-xl font-bold text-white">{stats.pending}</div>
                     <div className="text-sm text-gray-400">{t('pending') || 'Pending'}</div>
                   </div>
                 </div>
@@ -156,7 +232,7 @@ const MyBookings = () => {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-white">{bookings.filter(b => b.status === 'confirmed').length}</div>
+                    <div className="text-xl font-bold text-white">{stats.confirmed}</div>
                     <div className="text-sm text-gray-400">{t('confirmed') || 'Confirmed'}</div>
                   </div>
                 </div>
@@ -169,7 +245,7 @@ const MyBookings = () => {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-white">{bookings.filter(b => b.status === 'active').length}</div>
+                    <div className="text-xl font-bold text-white">{stats.active}</div>
                     <div className="text-sm text-gray-400">{t('active') || 'Active'}</div>
                   </div>
                 </div>
@@ -182,7 +258,7 @@ const MyBookings = () => {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-white">{bookings.filter(b => b.status === 'completed').length}</div>
+                    <div className="text-xl font-bold text-white">{stats.completed}</div>
                     <div className="text-sm text-gray-400">{t('completed') || 'Completed'}</div>
                   </div>
                 </div>
@@ -259,17 +335,19 @@ const MyBookings = () => {
                     <th className="py-4 px-4 font-medium">{t('booking') || 'Booking'}</th>
                     <th className="py-4 px-4 font-medium">{t('car') || 'Car'}</th>
                     <th className="py-4 px-4 font-medium">{t('dates') || 'Dates'}</th>
+                    <th className="py-4 px-4 font-medium">{t('bookingLocations') || 'Locations'}</th>
                     <th className="py-4 px-4 font-medium">{t('status') || 'Status'}</th>
                     <th className="py-4 px-4 font-medium">{t('total') || 'Total'}</th>
+                    <th className="py-4 px-4 font-medium">{t('bookingActions') || 'Actions'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-cyan-900/30">
                   {loading ? (
-                    <tr><td className="py-6 text-center text-gray-400" colSpan={5}>{t('loading') || 'Loading...'}</td></tr>
+                    <tr><td className="py-6 text-center text-gray-400" colSpan={7}>{t('loading') || 'Loading...'}</td></tr>
                   ) : error ? (
-                    <tr><td className="py-6 text-center text-red-300" colSpan={5}>{error}</td></tr>
+                    <tr><td className="py-6 text-center text-red-300" colSpan={7}>{error}</td></tr>
                   ) : bookings.length === 0 ? (
-                    <tr><td className="py-6 text-center text-gray-400" colSpan={5}>{t('noBookingsFound') || 'No bookings found'}</td></tr>
+                    <tr><td className="py-6 text-center text-gray-400" colSpan={7}>{t('noBookingsFound') || 'No bookings found'}</td></tr>
                   ) : (
                     bookings.map(booking => (
                       <tr key={booking._id} className="border-b border-cyan-900/20 hover:bg-white/5 transition-colors">
@@ -293,9 +371,77 @@ const MyBookings = () => {
                             <div className="text-gray-500 text-xs">{t('to') || 'to'} {new Date(booking.endDate).toLocaleDateString()}</div>
                           </div>
                         </td>
+                        <td className="py-4 px-4">
+                          <div>
+                            <div className="text-gray-300 text-xs">
+                              <span className="text-cyan-300">{t('pickup') || 'Pickup'}:</span> {booking.pickupLocation?.branch ? booking.pickupLocation.branch.charAt(0).toUpperCase() + booking.pickupLocation.branch.slice(1).toLowerCase() : 'N/A'}
+                            </div>
+                            <div className="text-gray-500 text-xs mt-1">
+                              <span className="text-cyan-300">{t('dropoff') || 'Drop-off'}:</span> {booking.dropoffLocation?.branch ? booking.dropoffLocation.branch.charAt(0).toUpperCase() + booking.dropoffLocation.branch.slice(1).toLowerCase() : 'N/A'}
+                            </div>
+                          </div>
+                        </td>
                         <td className="py-4 px-4 uppercase"><StatusBadge status={booking.status} /></td>
                         <td className="py-4 px-4">
                           <div className="text-white font-medium">${booking.totalAmount}</div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-2">
+                            {booking.status === 'pending' && (
+                              <>
+                                <button
+                                  onClick={() => setConfirmingBookingId(booking._id)}
+                                  disabled={actionLoading}
+                                  className="px-3 py-1.5 bg-blue-600/20 border border-blue-500/30 text-blue-300 rounded-md hover:bg-blue-600/30 transition-colors font-['Orbitron'] text-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                >
+                                  {t('confirm') || 'Confirm'}
+                                </button>
+                                <button
+                                  onClick={() => setCancellingBookingId(booking._id)}
+                                  disabled={actionLoading}
+                                  className="px-3 py-1.5 bg-red-600/20 border border-red-500/30 text-red-300 rounded-md hover:bg-red-600/30 transition-colors font-['Orbitron'] text-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                >
+                                  {t('cancel') || 'Cancel'}
+                                </button>
+                              </>
+                            )}
+                            {booking.status === 'active' && (
+                              <button
+                                onClick={() => setCancellingBookingId(booking._id)}
+                                disabled={actionLoading}
+                                className="px-3 py-1.5 bg-red-600/20 border border-red-500/30 text-red-300 rounded-md hover:bg-red-600/30 transition-colors font-['Orbitron'] text-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              >
+                                {t('cancel') || 'Cancel'}
+                              </button>
+                            )}
+                            {booking.status === 'confirmed' && (
+                              <div className="relative">
+                                <span 
+                                  className="text-yellow-400 text-xs font-['Orbitron'] cursor-help"
+                                  onMouseEnter={() => setShowTooltip(booking._id)}
+                                  onMouseLeave={() => setShowTooltip(null)}
+                                >
+                                  {t('contactTeam') || 'Contact team for any changes !'}
+                                </span>
+                                {showTooltip === booking._id && (
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 border border-cyan-900/30 rounded-lg shadow-lg backdrop-blur-sm z-50">
+                                    <div className="text-cyan-300 text-xs font-['Orbitron'] whitespace-nowrap flex items-center gap-2">
+                                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-3 w-3">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C9.716 21 3 14.716 3 6V5z" />
+                                      </svg>
+                                      +212 5 22 12 34 56
+                                    </div>
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-cyan-900/30"></div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            {(booking.status === 'completed' || booking.status === 'cancelled') && (
+                              <span className="text-gray-500 text-xs font-['Orbitron']">
+                                {t('noActions') || 'No actions'}
+                              </span>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -338,6 +484,87 @@ const MyBookings = () => {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modals */}
+      {confirmingBookingId && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-900 border border-cyan-900/30 rounded-xl p-6 max-w-md mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                  <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-white font-['Orbitron']">{t('confirmBooking') || 'Confirm Booking'}</h3>
+            </div>
+            <p className="text-gray-300 mb-6 font-['Orbitron']">
+              {t('confirmBookingMessage') || 'Are you sure you want to confirm this booking? This will notify the admin that you accept the reservation.'}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmingBookingId(null)}
+                disabled={actionLoading}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors font-['Orbitron'] disabled:opacity-50 cursor-pointer"
+              >
+                {t('cancel') || 'Cancel'}
+              </button>
+              <button
+                onClick={() => handleConfirmBooking(confirmingBookingId)}
+                disabled={actionLoading}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors font-['Orbitron'] disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+              >
+                {actionLoading && (
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
+                )}
+                {t('confirm') || 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cancellingBookingId && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-900 border border-red-900/30 rounded-xl p-6 max-w-md mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-lg bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-300">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                  <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-white font-['Orbitron']">{t('cancelBooking') || 'Cancel Booking'}</h3>
+            </div>
+            <p className="text-gray-300 mb-6 font-['Orbitron']">
+              {t('cancelBookingMessage') || 'Are you sure you want to cancel this booking? This action cannot be undone and will notify the admin.'}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setCancellingBookingId(null)}
+                disabled={actionLoading}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors font-['Orbitron'] disabled:opacity-50 cursor-pointer"
+              >
+                {t('keepBooking') || 'Keep Booking'}
+              </button>
+              <button
+                onClick={() => handleCancelBooking(cancellingBookingId)}
+                disabled={actionLoading}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors font-['Orbitron'] disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+              >
+                {actionLoading && (
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
+                )}
+                {t('cancelBooking') || 'Cancel Booking'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Border Glow */}
       <div className="relative h-px w-full overflow-hidden">

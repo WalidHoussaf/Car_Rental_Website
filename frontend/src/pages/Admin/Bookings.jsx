@@ -174,7 +174,7 @@ const AdminBookings = () => {
         setShowBulkActions(false);
         setShowBulkDeleteModal(false);
         fetchStats(); // Refresh stats after bulk delete
-        showError(`Successfully deleted ${selectedBookings.length} booking(s)`, 'success');
+        showError(`${t('successfullyDeleted')} ${selectedBookings.length} ${selectedBookings.length === 1 ? t('bookingSelected') : t('bookingsSelected')}`, 'success');
       } else {
         showError(response?.message || 'Failed to delete selected bookings');
       }
@@ -426,25 +426,31 @@ const AdminBookings = () => {
 
             {/* Bulk Actions Toolbar */}
             {showBulkActions && (
-              <div className="mb-4 p-4 bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-500/30 rounded-lg">
+              <div className="mb-6 p-6 bg-gradient-to-br from-black/40 via-black/20 to-black/40 border border-cyan-900/30 rounded-xl backdrop-blur-sm">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <span className="text-cyan-300 font-medium">
-                      {selectedBookings.length} booking{selectedBookings.length !== 1 ? 's' : ''} selected
-                    </span>
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                      <span className="text-cyan-300 font-['Orbitron'] font-semibold text-lg tracking-wide">
+                        {selectedBookings.length} {selectedBookings.length === 1 ? t('bookingSelected') : t('bookingsSelected')}
+                      </span>
+                    </div>
                     <button
                       onClick={handleClearSelection}
-                      className="text-gray-400 hover:text-white transition-colors text-sm"
+                      className="px-4 py-2 bg-transparent border border-gray-600/30 text-gray-400 font-['Orbitron'] text-sm font-medium rounded-lg hover:bg-gray-600/10 hover:border-gray-500/50 hover:text-white transition-all duration-300 cursor-pointer transform hover:scale-105"
                     >
-                      Clear selection
+                      {t('clearSelection')}
                     </button>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => setShowBulkDeleteModal(true)}
-                      className="px-4 py-2 bg-red-600/20 text-red-300 border border-red-600/30 rounded hover:bg-red-600/30 transition-colors text-sm font-medium"
+                      className="px-6 py-3 bg-red-600/50 text-white border border-red-500/30 rounded-xl hover:bg-red-700/50 hover:border-red-400 transition-all duration-300 font-['Orbitron'] text-sm font-semibold cursor-pointer transform hover:scale-105 flex items-center gap-2 shadow-lg shadow-red-500/10"
                     >
-                      Delete Selected
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      {t('deleteSelected')}
                     </button>
                   </div>
                 </div>
@@ -532,7 +538,7 @@ const AdminBookings = () => {
                               onClick={() => handleViewBooking(booking)}
                               className="px-3 py-1 bg-blue-600/20 text-blue-300 border border-blue-600/30 rounded hover:bg-blue-600/30 transition-colors text-xs cursor-pointer"
                             >
-                              View
+                              {t('view')}
                             </button>
                           </div>
                         </td>
@@ -594,62 +600,121 @@ const AdminBookings = () => {
 
       {/* Bulk Delete Confirmation Modal */}
       {showBulkDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-gray-900 border border-cyan-500/30 rounded-lg p-6 max-w-md w-full mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-red-600/20 rounded-full">
-                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-20">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowBulkDeleteModal(false)} />
+
+          {/* Modal Container */}
+          <div className="relative w-full max-w-2xl bg-gradient-to-br from-[#0b0f19] via-[#0f1419] to-[#0b0f19] border border-cyan-900/40 rounded-2xl shadow-2xl shadow-cyan-500/10 overflow-hidden backdrop-blur-md">
+            {/* Header */}
+            <div className="flex items-center justify-between px-8 py-6 border-b border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-red-600 rounded-full"></div>
+                <h3 className="text-red-300 font-['Orbitron'] text-xl font-semibold tracking-wide">
+                  {t('confirmBulkDelete')}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowBulkDeleteModal(false)}
+                disabled={bulkDeleteLoading}
+                className="text-gray-400 hover:text-white w-12 h-12 flex items-center justify-center rounded-lg border border-transparent hover:border-cyan-600/40 hover:bg-cyan-600/10 transition-all duration-200 text-xl group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Close"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6 group-hover:rotate-90 transition-transform duration-200">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="px-8 py-6 space-y-6">
+              {/* Warning Section */}
+              <div className="bg-gradient-to-br from-red-500/10 via-red-600/5 to-transparent border border-red-500/20 rounded-xl p-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-red-300 font-['Orbitron'] font-semibold mb-2">
+                      {t('dangerousAction')}
+                    </h4>
+                    <p className="text-gray-300 font-['Orbitron'] leading-relaxed">
+                      {t('bulkDeleteWarning')} <span className="text-red-400 font-bold">{selectedBookings.length}</span> {selectedBookings.length === 1 ? t('bookingSelected') : t('bookingsSelected')}? 
+                      <span className="block mt-2 text-red-400 font-medium">{t('actionCannotBeUndone')}</span>
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white font-['Orbitron']">Confirm Bulk Delete</h3>
-                <p className="text-gray-400 text-sm">This action cannot be undone</p>
+
+              {/* Selected Bookings List */}
+              <div className="bg-gradient-to-br from-black/40 via-black/20 to-black/40 border border-cyan-900/30 rounded-xl p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                  <h4 className="text-base uppercase tracking-[0.2em] font-['Orbitron'] font-semibold text-transparent bg-gradient-to-r from-cyan-300 to-cyan-500 bg-clip-text flex-shrink-0">
+                    {t('selectedBookings')}
+                  </h4>
+                  <div className="flex-1 h-px bg-gradient-to-r from-cyan-600/50 via-cyan-800/30 to-transparent"></div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-black/50 to-black/30 border border-cyan-900/30 rounded-xl p-4 max-h-48 overflow-y-auto">
+                  <div className="space-y-3">
+                    {bookings
+                      .filter(booking => selectedBookings.includes(booking._id))
+                      .map(booking => (
+                        <div key={booking._id} className="flex items-center justify-between py-3 px-4 bg-gradient-to-r from-red-500/10 to-transparent rounded-lg border border-red-500/20 transition-all duration-300">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-500/30 flex items-center justify-center text-red-300 font-['Orbitron'] font-bold text-xs">
+                              {booking.user?.firstName?.[0]?.toUpperCase()}{booking.user?.lastName?.[0]?.toUpperCase()}
+                            </div>
+                            <div>
+                              <div className="text-white font-['Orbitron'] font-medium text-sm">#{booking._id.slice(-8)}</div>
+                              <div className="text-gray-400 text-xs font-['Orbitron']">{booking.user?.firstName} {booking.user?.lastName}</div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-gray-300 font-['Orbitron'] text-sm">{booking.car?.make} {booking.car?.model}</div>
+                            <div className="text-red-400 font-['Orbitron'] font-bold text-xs">{currencyFormatter.format(Number(booking.totalAmount) || 0)}</div>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div className="mb-6">
-              <p className="text-gray-300 mb-4">
-                Are you sure you want to delete <span className="text-red-400 font-medium">{selectedBookings.length}</span> selected booking(s)?
-              </p>
-              
-              <div className="bg-gray-800/50 rounded-lg p-3 max-h-32 overflow-y-auto">
-                <p className="text-gray-400 text-sm mb-2">Selected bookings:</p>
-                {bookings
-                  .filter(booking => selectedBookings.includes(booking._id))
-                  .map(booking => (
-                    <div key={booking._id} className="flex justify-between items-center py-1 text-sm">
-                      <span className="text-gray-300">#{booking._id.slice(-8)}</span>
-                      <span className="text-gray-400">{booking.user?.firstName} {booking.user?.lastName}</span>
-                    </div>
-                  ))
-                }
-              </div>
-            </div>
-            
-            <div className="flex gap-3 justify-end">
+
+            {/* Footer Actions */}
+            <div className="flex items-center justify-end gap-4 px-8 py-6 border-t border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm">
               <button
                 onClick={() => setShowBulkDeleteModal(false)}
                 disabled={bulkDeleteLoading}
-                className="px-4 py-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                className="px-6 py-3 bg-transparent border border-cyan-500/30 text-cyan-400 font-['Orbitron'] text-sm font-semibold rounded-xl hover:bg-cyan-900/10 hover:border-cyan-400 transition-all duration-300 cursor-pointer transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 onClick={handleBulkDelete}
                 disabled={bulkDeleteLoading}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-6 py-3 bg-red-600/50 text-white border border-red-500/30 rounded-xl hover:bg-red-700/50 hover:border-red-400 transition-all duration-300 font-['Orbitron'] text-sm font-semibold cursor-pointer transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-3"
               >
                 {bulkDeleteLoading ? (
                   <>
-                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                     </svg>
-                    Deleting...
+                    <span>{t('deleting')}</span>
                   </>
                 ) : (
-                  'Delete Bookings'
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>{t('deleteBookings')}</span>
+                  </>
                 )}
               </button>
             </div>
