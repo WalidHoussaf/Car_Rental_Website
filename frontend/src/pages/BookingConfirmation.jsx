@@ -57,6 +57,11 @@ const BookingConfirmation = () => {
   const [isBookingCreated, setIsBookingCreated] = useState(false);
   const [locationAddresses, setLocationAddresses] = useState({});
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Authentication check - redirect to login if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {

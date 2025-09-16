@@ -124,13 +124,21 @@ bookingSchema.pre('save', function(next) {
   // Allow bookings for today and future dates
   const startDate = new Date(this.startDate);
   const today = new Date();
-  if (startDate.toDateString() < today.toDateString()) {
+  
+  // Use UTC dates to avoid timezone issues
+  const startDateUTC = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate()));
+  const todayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+  
+  if (startDateUTC < todayUTC) {
     return next(new Error('Start date cannot be in the past'));
   }
   
-  // Calculate total days
+  // Calculate total days for inclusive date range
   const timeDiff = this.endDate.getTime() - this.startDate.getTime();
-  this.totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  const daysDifference = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  
+  // For inclusive ranges: same day = 1 day, next day = 2 days, etc.
+  this.totalDays = daysDifference === 0 ? 1 : daysDifference;
   
   next();
 });

@@ -127,10 +127,13 @@ const Booking = () => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     
-    // For inclusive date ranges, we need to add 1 to the difference
+    // Calculate days correctly for inclusive range
     const differenceInTime = end.getTime() - start.getTime();
     const daysDifference = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-    const totalDays = daysDifference + 1; // Add 1 for inclusive range
+    
+    // For inclusive ranges: same day = 1 day, next day = 2 days, etc.
+    // The daysDifference already gives us the correct count for inclusive ranges
+    const totalDays = daysDifference === 0 ? 1 : daysDifference;
     
     // Ensure minimum of 1 day for same-day rentals
     const finalTotalDays = Math.max(totalDays, 1);

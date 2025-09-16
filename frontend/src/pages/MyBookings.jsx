@@ -487,39 +487,82 @@ const MyBookings = () => {
 
       {/* Confirmation Modals */}
       {confirmingBookingId && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900 border border-cyan-900/30 rounded-xl p-6 max-w-md mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-300">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-                  <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                </svg>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setConfirmingBookingId(null)} />
+
+          {/* Modal Container */}
+          <div className="relative w-full max-w-lg bg-gradient-to-br from-[#0b0f19] via-[#0f1419] to-[#0b0f19] border border-cyan-900/40 rounded-2xl shadow-2xl shadow-cyan-500/10 overflow-hidden backdrop-blur-md">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-6 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full"></div>
+                <h3 className="text-blue-300 font-['Orbitron'] text-lg font-semibold tracking-wide">{t('confirmBooking') || 'Confirm Booking'}</h3>
               </div>
-              <h3 className="text-lg font-semibold text-white font-['Orbitron']">{t('confirmBooking') || 'Confirm Booking'}</h3>
-            </div>
-            <p className="text-gray-300 mb-6 font-['Orbitron']">
-              {t('confirmBookingMessage') || 'Are you sure you want to confirm this booking? This will notify the admin that you accept the reservation.'}
-            </p>
-            <div className="flex gap-3 justify-end">
               <button
+                type="button"
                 onClick={() => setConfirmingBookingId(null)}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors font-['Orbitron'] disabled:opacity-50 cursor-pointer"
+                className="text-gray-400 hover:text-white w-10 h-10 flex items-center justify-center rounded-lg border border-transparent hover:border-cyan-600/40 hover:bg-cyan-600/10 transition-all duration-200 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Close"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="px-6 py-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500/20 to-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 flex-shrink-0">
+                    <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-white font-medium font-['Orbitron']">{t('confirmBooking') || 'Confirm Booking'}</div>
+                  <div className="text-gray-400 text-sm font-['Rationale']">#{confirmingBookingId?.slice(-8)}</div>
+                </div>
+              </div>
+              
+              <p className="text-gray-300 font-['Orbitron'] text-sm leading-relaxed text-justify">
+                {t('confirmBookingMessage') || 'Are you sure you want to confirm this booking? This will notify the admin that you accept the reservation.'}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 bg-black/30 border-t border-cyan-900/30">
+              <button
+                type="button"
+                onClick={() => setConfirmingBookingId(null)}
+                disabled={actionLoading}
+                className="px-4 py-2 text-sm font-['Orbitron'] text-gray-300 border border-gray-600/40 rounded-lg hover:bg-gray-600/10 hover:border-gray-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {t('cancel') || 'Cancel'}
               </button>
               <button
+                type="button"
                 onClick={() => handleConfirmBooking(confirmingBookingId)}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors font-['Orbitron'] disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2 text-sm font-['Orbitron'] text-white bg-gradient-to-r from-blue-600/80 to-blue-700/80 border border-blue-500/50 rounded-lg hover:from-blue-500/90 hover:to-blue-600/90 hover:border-blue-400/60 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
               >
-                {actionLoading && (
-                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                  </svg>
+                {actionLoading ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                    {t('confirming') || 'Confirming...'}
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 flex-shrink-0">
+                      <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+                    </svg>
+                    {t('confirm') || 'Confirm'}
+                  </>
                 )}
-                {t('confirm') || 'Confirm'}
               </button>
             </div>
           </div>
@@ -527,39 +570,82 @@ const MyBookings = () => {
       )}
 
       {cancellingBookingId && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900 border border-red-900/30 rounded-xl p-6 max-w-md mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-lg bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-300">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-                  <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clipRule="evenodd" />
-                </svg>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setCancellingBookingId(null)} />
+
+          {/* Modal Container */}
+          <div className="relative w-full max-w-lg bg-gradient-to-br from-[#0b0f19] via-[#0f1419] to-[#0b0f19] border border-cyan-900/40 rounded-2xl shadow-2xl shadow-cyan-500/10 overflow-hidden backdrop-blur-md">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-red-600 rounded-full"></div>
+                <h3 className="text-red-300 font-['Orbitron'] text-lg font-semibold tracking-wide">{t('cancelBooking') || 'Cancel Booking'}</h3>
               </div>
-              <h3 className="text-lg font-semibold text-white font-['Orbitron']">{t('cancelBooking') || 'Cancel Booking'}</h3>
-            </div>
-            <p className="text-gray-300 mb-6 font-['Orbitron']">
-              {t('cancelBookingMessage') || 'Are you sure you want to cancel this booking? This action cannot be undone and will notify the admin.'}
-            </p>
-            <div className="flex gap-3 justify-end">
               <button
+                type="button"
                 onClick={() => setCancellingBookingId(null)}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors font-['Orbitron'] disabled:opacity-50 cursor-pointer"
+                className="text-gray-400 hover:text-white w-10 h-10 flex items-center justify-center rounded-lg border border-transparent hover:border-cyan-600/40 hover:bg-cyan-600/10 transition-all duration-200 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Close"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="px-6 py-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-500/30 flex items-center justify-center text-red-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 flex-shrink-0">
+                    <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-white font-medium font-['Orbitron']">{t('cancelBooking') || 'Cancel Booking'}</div>
+                  <div className="text-gray-400 text-sm font-['Rationale']">#{cancellingBookingId?.slice(-8)}</div>
+                </div>
+              </div>
+              
+              <p className="text-gray-300 font-['Orbitron'] text-sm leading-relaxed text-justify">
+                {t('cancelBookingMessage') || 'Are you sure you want to cancel this booking? This action cannot be undone and will notify the admin.'}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 bg-black/30 border-t border-cyan-900/30">
+              <button
+                type="button"
+                onClick={() => setCancellingBookingId(null)}
+                disabled={actionLoading}
+                className="px-4 py-2 text-sm font-['Orbitron'] text-gray-300 border border-gray-600/40 rounded-lg hover:bg-gray-600/10 hover:border-gray-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {t('keepBooking') || 'Keep Booking'}
               </button>
               <button
+                type="button"
                 onClick={() => handleCancelBooking(cancellingBookingId)}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors font-['Orbitron'] disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2 text-sm font-['Orbitron'] text-white bg-gradient-to-r from-red-600/80 to-red-700/80 border border-red-500/50 rounded-lg hover:from-red-500/90 hover:to-red-600/90 hover:border-red-400/60 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
               >
-                {actionLoading && (
-                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                  </svg>
+                {actionLoading ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                    {t('cancelling') || 'Cancelling...'}
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 flex-shrink-0">
+                      <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clipRule="evenodd" />
+                    </svg>
+                    {t('cancelBooking') || 'Cancel Booking'}
+                  </>
                 )}
-                {t('cancelBooking') || 'Cancel Booking'}
               </button>
             </div>
           </div>

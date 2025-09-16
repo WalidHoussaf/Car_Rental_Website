@@ -11,6 +11,9 @@ import carRoutes from './routes/cars.js';
 import bookingRoutes from './routes/bookings.js';
 import userRoutes from './routes/users.js';
 
+// Import scheduler
+import BookingScheduler from './utils/scheduler.js';
+
 // Load environment variables
 dotenv.config();
 
@@ -49,6 +52,8 @@ app.use('/uploads', (req, res, next) => {
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/car_rental_db')
   .then(() => {
     console.log('✅ Connected to MongoDB');
+    // Initialize booking scheduler after DB connection
+    BookingScheduler.init();
   })
   .catch((error) => {
     console.error('❌ MongoDB connection error:', error);

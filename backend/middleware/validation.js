@@ -4,8 +4,6 @@ import { body, param, query, validationResult } from 'express-validator';
 export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log('Validation errors:', errors.array());
-    console.log('Request body:', req.body);
     return res.status(400).json({
       success: false,
       message: 'Validation failed',
@@ -179,8 +177,13 @@ export const validateBooking = [
     .custom((value) => {
       const startDate = new Date(value);
       const now = new Date();
+      
+      // Use UTC dates to avoid timezone issues
+      const startDateUTC = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate()));
+      const nowUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+      
       // Allow bookings for today and future dates
-      if (startDate.toDateString() < now.toDateString()) {
+      if (startDateUTC < nowUTC) {
         throw new Error('Start date cannot be in the past');
       }
       return true;

@@ -27,6 +27,18 @@ export const LOCATION_OPERATING_HOURS = {
     weekdays: { open: '08:00', close: '20:00' },
     weekends: { open: '09:00', close: '18:00' }
   },
+  tangier: {
+    weekdays: { open: '08:00', close: '20:00' },
+    weekends: { open: '09:00', close: '18:00' }
+  },
+  marrakesh: {
+    weekdays: { open: '08:00', close: '22:00' },
+    weekends: { open: '09:00', close: '20:00' }
+  },
+  'marrakesh-gueliz': {
+    weekdays: { open: '08:00', close: '22:00' },
+    weekends: { open: '09:00', close: '20:00' }
+  },
   'mohammed-v-airport': {
     weekdays: { open: '06:00', close: '22:00' },
     weekends: { open: '06:00', close: '22:00' }
@@ -39,7 +51,7 @@ export const LOCATION_OPERATING_HOURS = {
 };
 
 // Buffer time in minutes for booking processing
-const BOOKING_BUFFER_MINUTES = 30;
+const BOOKING_BUFFER_MINUTES = 60; // Increased to 1 hour for safer booking window
 
 /**
  * Get available time slots for a location on a specific date
@@ -60,11 +72,41 @@ export const getAvailableTimeSlots = (location, date) => {
     const today = new Date();
     const isToday = selectedDate.toDateString() === today.toDateString();
     
+    
     // Get operating hours for the location
+    
     const locationHours = LOCATION_OPERATING_HOURS[location.toLowerCase()];
     if (!locationHours) {
       // Fallback to default hours if location not found
       const allTimeSlots = generateTimeOptions();
+      
+      // Still apply time filtering for today even with default hours
+      if (isToday) {
+        const now = new Date();
+        const currentTimeWithBuffer = new Date(now.getTime() + BOOKING_BUFFER_MINUTES * 60000);
+        
+        const minutes = currentTimeWithBuffer.getMinutes();
+        const roundedMinutes = Math.ceil(minutes / 30) * 30;
+        
+        if (roundedMinutes >= 60) {
+          currentTimeWithBuffer.setHours(currentTimeWithBuffer.getHours() + 1);
+          currentTimeWithBuffer.setMinutes(0, 0, 0);
+        } else {
+          currentTimeWithBuffer.setMinutes(roundedMinutes, 0, 0);
+        }
+        
+        const minTimeString = currentTimeWithBuffer.toTimeString().slice(0, 5);
+        
+        const filteredSlots = allTimeSlots.filter(slot => slot.value > minTimeString);
+        
+        return {
+          success: true,
+          timeSlots: filteredSlots,
+          isToday,
+          message: `Using default hours for ${location} with time filtering`
+        };
+      }
+      
       return {
         success: true,
         timeSlots: allTimeSlots,
@@ -72,6 +114,7 @@ export const getAvailableTimeSlots = (location, date) => {
         message: `Using default hours for ${location}`
       };
     }
+    
 
     // Determine if it's weekend
     const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
@@ -91,11 +134,23 @@ export const getAvailableTimeSlots = (location, date) => {
       // Round up to next 30-minute slot
       const minutes = currentTimeWithBuffer.getMinutes();
       const roundedMinutes = Math.ceil(minutes / 30) * 30;
-      currentTimeWithBuffer.setMinutes(roundedMinutes, 0, 0);
+      
+      // Handle hour overflow when rounding minutes
+      if (roundedMinutes >= 60) {
+        currentTimeWithBuffer.setHours(currentTimeWithBuffer.getHours() + 1);
+        currentTimeWithBuffer.setMinutes(0, 0, 0);
+      } else {
+        currentTimeWithBuffer.setMinutes(roundedMinutes, 0, 0);
+      }
       
       const minTimeString = currentTimeWithBuffer.toTimeString().slice(0, 5);
       
-      availableSlots = availableSlots.filter(slot => slot.value >= minTimeString);
+      
+      availableSlots = availableSlots.filter(slot => {
+        const isAvailable = slot.value > minTimeString;
+        return isAvailable;
+      });
+      
       
       // If no slots available, return empty with message
       if (availableSlots.length === 0) {

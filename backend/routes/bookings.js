@@ -4,11 +4,13 @@ import Car from '../models/Car.js';
 import User from '../models/User.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 import { validateBooking, validateObjectId, handleValidationErrors } from '../middleware/validation.js';
+import { updateBookingStatuses, updateSingleBookingStatus } from '../middleware/bookingStatusMiddleware.js';
+import BookingStatusService from '../services/bookingStatusService.js';
 
 const router = express.Router();
 
 // Get user's bookings
-router.get('/my-bookings', authenticateToken, async (req, res) => {
+router.get('/my-bookings', authenticateToken, updateBookingStatuses, async (req, res) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
     
@@ -95,7 +97,7 @@ router.get('/stats', authenticateToken, requireAdmin, async (req, res) => {
 });
 
 // Get all bookings (Admin only)
-router.get('/all', authenticateToken, requireAdmin, async (req, res) => {
+router.get('/all', authenticateToken, requireAdmin, updateBookingStatuses, async (req, res) => {
   try {
     const { page = 1, limit = 20, status, userId, carId } = req.query;
     
@@ -108,7 +110,7 @@ router.get('/all', authenticateToken, requireAdmin, async (req, res) => {
 
     const bookings = await Booking.find(filter)
       .populate('user', 'firstName lastName email phone address')
-      .populate('car', 'make model year location')
+      .populate('car', 'name make model year location')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -139,7 +141,7 @@ router.get('/all', authenticateToken, requireAdmin, async (req, res) => {
 });
 
 // Get single booking
-router.get('/:id', authenticateToken, validateObjectId, handleValidationErrors, async (req, res) => {
+router.get('/:id', authenticateToken, validateObjectId, handleValidationErrors, updateSingleBookingStatus, async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
       .populate('user', 'firstName lastName email phone address')
@@ -545,6 +547,45 @@ router.delete('/bulk/delete', authenticateToken, requireAdmin, async (req, res) 
     res.status(500).json({
       success: false,
       message: 'Failed to delete bookings',
+      error: error.message
+    });
+  }
+});
+
+// Manual status update endpoint (Admin only)
+router.post('/update-statuses', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const result = await BookingStatusService.updateBookingStatuses();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Booking statuses updated successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Manual status update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update booking statuses',
+      error: error.message
+    });
+  }
+});
+
+// Get bookings needing status updates (Admin only - for monitoring)
+router.get('/status-check', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const bookingsNeedingUpdate = await BookingStatusService.getBookingsNeedingUpdate();
+    
+    res.status(200).json({
+      success: true,
+      data: bookingsNeedingUpdate
+    });
+  } catch (error) {
+    console.error('Status check error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check booking statuses',
       error: error.message
     });
   }

@@ -863,7 +863,7 @@ export const translations = {
     // Booking Confirmation
     bookingConfirmed: "Booking Confirmed",
     thankYouForBooking: "Thank you for your booking!",
-    bookingSuccessDescription: "Your booking has been successfully confirmed. Here are all the details of your reservation.",
+    bookingSuccessDescription: "Your booking is now pending. Please confirm it in your booking page. Here are all the details of your reservation.",
     bookingDetails: "Booking Details",
     carInfoCard: "Car Information",
     rentalPeriodTitle: "Rental Period",
@@ -1748,7 +1748,7 @@ export const translations = {
     // Booking Confirmation
     bookingConfirmed: "Réservation Confirmée",
     thankYouForBooking: "Merci pour votre réservation !",
-    bookingSuccessDescription: "Votre réservation a été confirmée avec succès. Voici tous les détails de votre réservation.",
+    bookingSuccessDescription: "Votre réservation est en attente de confirmation. Veuillez confirmer votre réservation dans votre page de réservation. Voici tous les détails de votre réservation.",
     bookingDetails: "Détails de la Réservation",
     carInfoCard: "Informations sur la Voiture",
     rentalPeriodTitle: "Période de Location",

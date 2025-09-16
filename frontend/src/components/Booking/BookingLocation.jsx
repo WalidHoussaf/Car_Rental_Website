@@ -324,7 +324,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                       if (isToday && pickupTimeOptions.length > 0) {
                         return (
                           <p className="mt-2 text-xs text-yellow-400 font-['Orbitron']">
-                            ⚠️ Times shown are available from now + 30min buffer
+                            ⚠️ Times shown are available from now + 1hr buffer
                           </p>
                         );
                       }
@@ -369,7 +369,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                     if (isToday && dropoffTimeOptions.length > 0) {
                       return (
                         <p className="mt-2 text-xs text-yellow-400 font-['Orbitron']">
-                          ⚠️ Times shown are available from now + 30min buffer
+                          ⚠️ Times shown are available from now + 1hr buffer
                         </p>
                       );
                     }

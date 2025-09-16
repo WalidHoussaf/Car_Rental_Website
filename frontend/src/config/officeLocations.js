@@ -169,6 +169,30 @@ export const OFFICE_LOCATIONS = [
     features: ['Medina Tours', 'Cultural Guides', 'Historic Vehicle Tours', 'Multilingual Audio Guides']
   },
   {
+    id: 'tangier',
+    name: 'Tangier',
+    displayName: {
+      en: 'Tangier Mediterranean Office',
+      fr: 'Bureau Méditerranéen Tanger'
+    },
+    address: {
+      en: 'Boulevard Pasteur, Centre-ville, Tangier 90000',
+      fr: 'Boulevard Pasteur, Centre-ville, Tanger 90000'
+    },
+    coordinates: {
+      lat: 35.7595,
+      lng: -5.8340
+    },
+    operatingHours: {
+      weekdays: { open: '08:00', close: '20:00' },
+      weekends: { open: '09:00', close: '18:00' }
+    },
+    phone: '+212 539-94-5678',
+    email: 'tangier@rentmyride.ma',
+    officeType: 'Mediterranean Branch',
+    features: ['Port Access', 'Ferry Services', 'International Travel', 'Multilingual Staff', 'European Routes', 'Cross-Border Documentation']
+  },
+  {
     id: 'mohammed-v-airport',
     name: 'Mohammed V Airport',
     displayName: {
