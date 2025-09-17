@@ -210,7 +210,7 @@ const MyBookings = () => {
           {/* Card: Stats + Filters + Table */}
           <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
               <div className="bg-black/40 border border-yellow-900/30 rounded-lg p-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-lg bg-yellow-500/15 border border-yellow-500/30 flex items-center justify-center text-yellow-300">
@@ -260,6 +260,19 @@ const MyBookings = () => {
                   <div>
                     <div className="text-xl font-bold text-white">{stats.completed}</div>
                     <div className="text-sm text-gray-400">{t('completed') || 'Completed'}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-black/40 border border-red-900/30 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+                      <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-white">{stats.cancelled}</div>
+                    <div className="text-sm text-gray-400">{t('cancelled') || 'Cancelled'}</div>
                   </div>
                 </div>
               </div>
