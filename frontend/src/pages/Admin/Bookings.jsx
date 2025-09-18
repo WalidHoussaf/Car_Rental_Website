@@ -605,9 +605,9 @@ const AdminBookings = () => {
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowBulkDeleteModal(false)} />
 
           {/* Modal Container */}
-          <div className="relative w-full max-w-2xl bg-gradient-to-br from-[#0b0f19] via-[#0f1419] to-[#0b0f19] border border-cyan-900/40 rounded-2xl shadow-2xl shadow-cyan-500/10 overflow-hidden backdrop-blur-md">
+          <div className="relative w-full max-w-2xl max-h-[85vh] bg-gradient-to-br from-[#0b0f19] via-[#0f1419] to-[#0b0f19] border border-cyan-900/40 rounded-2xl shadow-2xl shadow-cyan-500/10 overflow-hidden flex flex-col backdrop-blur-md">
             {/* Header */}
-            <div className="flex items-center justify-between px-8 py-6 border-b border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm">
+            <div className="flex items-center justify-between px-8 py-6 border-b border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-red-600 rounded-full"></div>
                 <h3 className="text-red-300 font-['Orbitron'] text-xl font-semibold tracking-wide">
@@ -627,8 +627,9 @@ const AdminBookings = () => {
               </button>
             </div>
 
-            {/* Content */}
-            <div className="px-8 py-6 space-y-6">
+            {/* Body - Scrollable Content */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-8 py-6 space-y-6">
               {/* Warning Section */}
               <div className="bg-gradient-to-br from-red-500/10 via-red-600/5 to-transparent border border-red-500/20 rounded-xl p-6">
                 <div className="flex items-start gap-4">
@@ -684,10 +685,11 @@ const AdminBookings = () => {
                   </div>
                 </div>
               </div>
+              </div>
             </div>
 
             {/* Footer Actions */}
-            <div className="flex items-center justify-end gap-4 px-8 py-6 border-t border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm">
+            <div className="flex items-center justify-end gap-4 px-8 py-6 border-t border-cyan-900/30 bg-gradient-to-r from-black/30 via-black/20 to-black/30 backdrop-blur-sm flex-shrink-0">
               <button
                 onClick={() => setShowBulkDeleteModal(false)}
                 disabled={bulkDeleteLoading}

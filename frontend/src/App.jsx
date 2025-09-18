@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
+import Reports from './pages/Reports';
 import AdminUsers from './pages/Admin/Users';
 import AdminBookings from './pages/Admin/Bookings';
 import AdminCars from './pages/Admin/Cars';
@@ -41,6 +42,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/bookings" element={<AdminBookings />} />
           <Route path="/admin/cars" element={<AdminCars />} />
