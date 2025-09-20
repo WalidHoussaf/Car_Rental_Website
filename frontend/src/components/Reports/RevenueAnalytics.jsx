@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { api } from '../../config/api';
-import LineChart from '../Charts/LineChart';
-import BarChart from '../Charts/BarChart';
-import DonutChart from '../Charts/DonutChart';
-import AreaChart from '../Charts/AreaChart';
+import { AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const RevenueAnalytics = () => {
   const { language } = useLanguage();
@@ -164,121 +161,470 @@ const RevenueAnalytics = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6">
-        <h2 className="text-2xl font-bold text-cyan-400 mb-2">
-          {language === 'fr' ? 'Analyse des Revenus' : 'Revenue Analytics'}
-        </h2>
-        <p className="text-gray-400">
-          {language === 'fr' ? 'Analyse détaillée des revenus et tendances financières' : 'Detailed revenue analysis and financial trends'}
-        </p>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-            <div className="text-2xl font-bold text-green-400">{moneyFmt.format(revenueData.totalRevenue)}</div>
-            <div className="text-sm text-gray-400">{language === 'fr' ? 'Revenus Totaux' : 'Total Revenue'}</div>
-          </div>
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-            <div className="text-2xl font-bold text-blue-400">{moneyFmt.format(revenueData.averageBookingValue)}</div>
-            <div className="text-sm text-gray-400">{language === 'fr' ? 'Valeur Moyenne' : 'Average Booking'}</div>
-          </div>
-          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
-            <div className="text-2xl font-bold text-purple-400">{moneyFmt.format(revenueData.projectedRevenue)}</div>
-            <div className="text-sm text-gray-400">{language === 'fr' ? 'Projection Mensuelle' : 'Monthly Projection'}</div>
-          </div>
-          <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4">
-            <div className="text-2xl font-bold text-cyan-400">
-              {revenueData.monthlyRevenue.data && revenueData.monthlyRevenue.data.length > 0
-                ? moneyFmt.format(revenueData.monthlyRevenue.data.reduce((a, b) => a + b, 0) / 12)
-                : '$0'
-              }
+      {/* Top Row - Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Total Revenue */}
+        <div className="bg-gray-900/80 border border-gray-700/50 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span className="text-gray-300 text-sm font-medium">
+                {language === 'fr' ? 'Revenus totaux' : 'Total revenue'}
+              </span>
             </div>
-            <div className="text-sm text-gray-400">{language === 'fr' ? 'Moyenne Mensuelle' : 'Monthly Average'}</div>
+            <div className="text-xs text-gray-500">ALL</div>
+          </div>
+          <div className="text-2xl font-bold text-white mb-1">
+            {moneyFmt.format(revenueData.totalRevenue)}
+          </div>
+          <div className="text-xs text-gray-400">
+            {language === 'fr' ? 'Revenus cumulés' : 'Cumulative revenue'}
+          </div>
+        </div>
+
+        {/* Average Booking Value */}
+        <div className="bg-gray-900/80 border border-gray-700/50 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <span className="text-gray-300 text-sm font-medium">
+                {language === 'fr' ? 'Valeur moyenne' : 'Average booking'}
+              </span>
+            </div>
+            <div className="text-xs text-gray-500">AVG</div>
+          </div>
+          <div className="text-2xl font-bold text-white mb-1">
+            {moneyFmt.format(revenueData.averageBookingValue)}
+          </div>
+          <div className="text-xs text-gray-400">
+            {language === 'fr' ? 'Par réservation' : 'Per booking'}
+          </div>
+        </div>
+
+        {/* Monthly Projection */}
+        <div className="bg-gray-900/80 border border-gray-700/50 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span className="text-gray-300 text-sm font-medium">
+                {language === 'fr' ? 'Projection mensuelle' : 'Monthly projection'}
+              </span>
+            </div>
+            <div className="text-xs text-gray-500">PROJ</div>
+          </div>
+          <div className="text-2xl font-bold text-white mb-1">
+            {moneyFmt.format(revenueData.projectedRevenue)}
+          </div>
+          <div className="text-xs text-gray-400">
+            {language === 'fr' ? 'Estimation' : 'Estimated'}
+          </div>
+        </div>
+
+        {/* Monthly Average */}
+        <div className="bg-gray-900/80 border border-gray-700/50 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+              <span className="text-gray-300 text-sm font-medium">
+                {language === 'fr' ? 'Moyenne mensuelle' : 'Monthly average'}
+              </span>
+            </div>
+            <div className="text-xs text-gray-500">12M</div>
+          </div>
+          <div className="text-2xl font-bold text-white mb-1">
+            {revenueData.monthlyRevenue.data && revenueData.monthlyRevenue.data.length > 0
+              ? moneyFmt.format(revenueData.monthlyRevenue.data.reduce((a, b) => a + b, 0) / 12)
+              : '$0'
+            }
+          </div>
+          <div className="text-xs text-gray-400">
+            {language === 'fr' ? 'Sur 12 mois' : 'Over 12 months'}
           </div>
         </div>
       </div>
 
       {/* Monthly Revenue Trend */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6">
-        <h3 className="text-xl font-semibold text-white mb-4">
-          {language === 'fr' ? 'Tendance Mensuelle des Revenus' : 'Monthly Revenue Trend'}
-        </h3>
-        <div className="h-64">
-          <AreaChart
-            data={revenueData.monthlyRevenue.data || []}
-            labels={revenueData.monthlyRevenue.labels || []}
-            width={800}
-            height={250}
-            color="#10b981"
-            fillColor="rgba(16, 185, 129, 0.2)"
-            className="w-full"
-          />
+      <div className="bg-gray-900/80 border border-gray-700/50 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-white font-semibold text-lg mb-1">
+              {language === 'fr' ? 'Tendance mensuelle des revenus' : 'Monthly revenue trend'}
+            </h3>
+            <p className="text-gray-400 text-sm">
+              {language === 'fr' ? 'Évolution détaillée et croissance des revenus' : 'Detailed evolution and revenue growth'}
+            </p>
+          </div>
+          <div className="text-xs text-gray-500 bg-gray-800/50 px-3 py-1 rounded-full">
+            {revenueData.monthlyRevenue.labels ? revenueData.monthlyRevenue.labels.length : 0} MONTHS
+          </div>
+        </div>
+
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <RechartsAreaChart
+              data={(() => {
+                if (!revenueData.monthlyRevenue.data || !revenueData.monthlyRevenue.labels) return [];
+                
+                return revenueData.monthlyRevenue.labels.map((label, index) => ({
+                  month: label,
+                  revenue: revenueData.monthlyRevenue.data[index] || 0
+                }));
+              })()}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0.05}/>
+                </linearGradient>
+              </defs>
+              
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="#374151" 
+                strokeOpacity={0.3}
+              />
+              
+              <XAxis 
+                dataKey="month" 
+                axisLine={false}
+                tickLine={false}
+                tick={{ 
+                  fontSize: 12, 
+                  fill: '#9CA3AF',
+                  fontWeight: 500
+                }}
+                dy={10}
+              />
+              
+              <YAxis 
+                axisLine={false}
+                tickLine={false}
+                tick={{ 
+                  fontSize: 12, 
+                  fill: '#FFFFFF',
+                  fontWeight: 600
+                }}
+                tickFormatter={(value) => moneyFmt.format(value)}
+                width={80}
+              />
+              
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#1F2937',
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                  color: '#FFFFFF'
+                }}
+                labelStyle={{ 
+                  color: '#10B981',
+                  fontWeight: 600,
+                  marginBottom: '8px'
+                }}
+                formatter={(value) => [
+                  <span style={{ color: '#10B981', fontWeight: 600 }}>
+                    {moneyFmt.format(value)}
+                  </span>,
+                  language === 'fr' ? 'Revenus' : 'Revenue'
+                ]}
+              />
+              
+              <Area
+                type="monotone"
+                dataKey="revenue"
+                stroke="#10b981"
+                strokeWidth={3}
+                fill="url(#revenueGradient)"
+                dot={{
+                  fill: '#10b981',
+                  strokeWidth: 2,
+                  stroke: '#FFFFFF',
+                  r: 4
+                }}
+                activeDot={{
+                  r: 6,
+                  fill: '#10b981',
+                  stroke: '#FFFFFF',
+                  strokeWidth: 2
+                }}
+              />
+            </RechartsAreaChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Revenue by Status and Growth Rate */}
+      {/* Second Row - Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue by Status */}
-        <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6">
-          <h3 className="text-xl font-semibold text-white mb-4">
-            {language === 'fr' ? 'Revenus par Statut' : 'Revenue by Status'}
-          </h3>
+        <div className="bg-gray-900/80 border border-gray-700/50 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-white font-semibold text-base">
+                {language === 'fr' ? 'Revenus par statut' : 'Revenue by status'}
+              </h3>
+              <p className="text-xs text-gray-400 mt-1">
+                {language === 'fr' ? 'Répartition des revenus par statut de réservation' : 'Revenue breakdown by booking status'}
+              </p>
+            </div>
+          </div>
+          
           <div className="flex justify-center">
-            <DonutChart
-              data={revenueData.revenueByStatus.map(item => item.value)}
-              labels={revenueData.revenueByStatus.map(item => item.label)}
-              colors={['#f59e0b', '#06b6d4', '#10b981', '#8b5cf6', '#ef4444']}
-              size={280}
-              strokeWidth={35}
-            />
+            <div className="w-[500px] h-[500px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart margin={{ top: 40, right: 80, bottom: 40, left: 80 }}>
+                  <Pie
+                    data={revenueData.revenueByStatus.filter(item => item.value > 0)}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={140}
+                    innerRadius={0}
+                    dataKey="value"
+                    label={({ value }) => {
+                      // Calculate total and percentage
+                      const total = revenueData.revenueByStatus.reduce((sum, item) => sum + item.value, 0);
+                      if (total === 0 || value === 0) return '0%';
+                      const percentage = (value / total) * 100;
+                      return `${Math.round(percentage)}%`;
+                    }}
+                    labelLine={true}
+                  >
+                    {revenueData.revenueByStatus.filter(item => item.value > 0).map((entry, index) => {
+                      // Map colors to specific status types for consistency
+                      const statusColorMap = {
+                        'Pending': '#8F5300',    // Brown
+                        'Confirmed': '#101D42',  // Dark Blue  
+                        'Active': '#285943',     // Dark Green
+                        'Completed': '#2E1F47',  // Dark Purple
+                        'Cancelled': '#6E0C18'   // Dark Red
+                      };
+                      const color = statusColorMap[entry.label] || '#8F5300';
+                      return (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={color}
+                          stroke="#1F2937"
+                          strokeWidth={1}
+                        />
+                      );
+                    })}
+                  </Pie>
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-gray-800 border border-gray-600 rounded-lg p-3 shadow-lg">
+                            <div className="text-white font-semibold">
+                              {moneyFmt.format(data.value)} {data.label.toLowerCase()}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          
+          {/* Legend below chart */}
+          <div className="mt-6 flex justify-center">
+            <div className="flex flex-wrap items-center gap-6 justify-center">
+              {revenueData.revenueByStatus.filter(item => item.value > 0).map((item, index) => {
+                // Map colors to specific status types for consistency
+                const statusColorMap = {
+                  'Pending': '#8F5300',    // Brown
+                  'Confirmed': '#101D42',  // Dark Blue  
+                  'Active': '#285943',     // Dark Green
+                  'Completed': '#2E1F47',  // Dark Purple
+                  'Cancelled': '#6E0C18'   // Dark Red
+                };
+                const color = statusColorMap[item.label] || '#8F5300';
+                const total = revenueData.revenueByStatus.reduce((sum, status) => sum + status.value, 0);
+                const percentage = total > 0 ? Math.round((item.value / total) * 100) : 0;
+                
+                return (
+                  <div key={index} className="flex items-center gap-3">
+                    <div 
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: color }}
+                    ></div>
+                    <div className="text-center">
+                      <div className="text-white font-medium text-sm">
+                        {item.label}
+                      </div>
+                      <div className="text-gray-400 text-xs">
+                        {moneyFmt.format(item.value)} ({percentage}%)
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Revenue Growth Rate */}
-        <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6">
-          <h3 className="text-xl font-semibold text-white mb-4">
-            {language === 'fr' ? 'Taux de Croissance (%)' : 'Growth Rate (%)'}
-          </h3>
-          <div className="h-64">
-            <LineChart
-              data={revenueData.revenueGrowth.data || []}
-              labels={revenueData.revenueGrowth.labels || []}
-              width={400}
-              height={250}
-              color="#8b5cf6"
-              fillColor="rgba(139, 92, 246, 0.1)"
-              className="w-full"
-            />
+        {/* Revenue Growth Analysis */}
+        <div className="bg-gray-900/80 border border-gray-700/50 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-white font-semibold text-base">
+                {language === 'fr' ? 'Analyse de croissance' : 'Growth analysis'}
+              </h3>
+              <p className="text-xs text-gray-400 mt-1">
+                {language === 'fr' ? 'Taux de croissance mensuel des revenus' : 'Monthly revenue growth rate'}
+              </p>
+            </div>
+          </div>
+
+          {/* Growth Statistics */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+              <div className="text-xs text-gray-400 mb-1">
+                {language === 'fr' ? 'Croissance moy.' : 'Avg Growth'}
+              </div>
+              <div className="text-green-400 font-bold text-lg">
+                {revenueData.revenueGrowth.data && revenueData.revenueGrowth.data.length > 0
+                  ? `${(revenueData.revenueGrowth.data.reduce((a, b) => a + b, 0) / revenueData.revenueGrowth.data.length).toFixed(1)}%`
+                  : '0%'
+                }
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                {language === 'fr' ? 'Par mois' : 'Per month'}
+              </div>
+            </div>
+            
+            <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+              <div className="text-xs text-gray-400 mb-1">
+                {language === 'fr' ? 'Meilleur mois' : 'Best Month'}
+              </div>
+              <div className="text-blue-400 font-bold text-lg">
+                {revenueData.revenueGrowth.data && revenueData.revenueGrowth.data.length > 0
+                  ? `${Math.max(...revenueData.revenueGrowth.data).toFixed(1)}%`
+                  : '0%'
+                }
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                {language === 'fr' ? 'Croissance max' : 'Max growth'}
+              </div>
+            </div>
+          </div>
+
+          {/* Growth Trend Visualization */}
+          <div className="space-y-3">
+            {revenueData.revenueGrowth.data && revenueData.revenueGrowth.labels && 
+             revenueData.revenueGrowth.labels.slice(-6).map((label, index) => {
+               const dataIndex = revenueData.revenueGrowth.data.length - 6 + index;
+               const growthValue = revenueData.revenueGrowth.data[dataIndex] || 0;
+               const isPositive = growthValue >= 0;
+               
+               return (
+                 <div key={index} className="bg-gray-800/30 rounded-lg p-3 border border-gray-700/20">
+                   <div className="flex items-center justify-between">
+                     <div className="text-xs text-gray-400">{label}</div>
+                     <div className={`text-sm font-bold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                       {isPositive ? '+' : ''}{growthValue.toFixed(1)}%
+                     </div>
+                   </div>
+                   
+                   {/* Growth bar */}
+                   <div className="w-full bg-gray-700/50 rounded-full h-2 mt-2">
+                     <div 
+                       className={`h-2 rounded-full transition-all duration-1000 ${
+                         isPositive 
+                           ? 'bg-gradient-to-r from-green-400 to-emerald-500' 
+                           : 'bg-gradient-to-r from-red-400 to-red-500'
+                       }`}
+                       style={{ width: `${Math.min(Math.abs(growthValue) * 2, 100)}%` }}
+                     ></div>
+                   </div>
+                 </div>
+               );
+             })
+            }
           </div>
         </div>
       </div>
 
-      {/* Revenue by Location */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6">
-        <h3 className="text-xl font-semibold text-white mb-4">
-          {language === 'fr' ? 'Revenus par Lieu' : 'Revenue by Location'}
-        </h3>
+      {/* Third Row - Revenue by Location */}
+      <div className="bg-gray-900/80 border border-gray-700/50 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-white font-semibold text-lg mb-1">
+              {language === 'fr' ? 'Revenus par localisation' : 'Revenue by location'}
+            </h3>
+            <p className="text-gray-400 text-sm">
+              {language === 'fr' ? 'Performance des revenus par bureau' : 'Revenue performance by office'}
+            </p>
+          </div>
+          <div className="text-xs text-gray-500 bg-gray-800/50 px-3 py-1 rounded-full">
+            TOP {revenueData.revenueByLocation.length}
+          </div>
+        </div>
+
         <div className="space-y-3">
           {revenueData.revenueByLocation.map((location, index) => {
             const percentage = revenueData.totalRevenue > 0 
               ? (location.value / revenueData.totalRevenue * 100).toFixed(1)
               : 0;
             
+            // Capitalize first letter of location name
+            const capitalizedLocation = location.label.charAt(0).toUpperCase() + location.label.slice(1).toLowerCase();
+            
+            // Generate different colors for each location
+            const locationColors = [
+              'from-emerald-400 to-green-500',
+              'from-blue-400 to-cyan-500', 
+              'from-purple-400 to-violet-500',
+              'from-orange-400 to-amber-500',
+              'from-pink-400 to-rose-500'
+            ];
+            const colorClass = locationColors[index % locationColors.length];
+            
             return (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
-                  <span className="text-white font-medium">{location.label}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-32 bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-green-400 to-emerald-500 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${percentage}%` }}
-                    ></div>
+              <div key={index} className="relative group bg-gray-800/60 rounded-xl p-5 border border-gray-700/40 hover:border-gray-600/60 hover:bg-gray-800/80 transition-all duration-300 hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="flex-shrink-0">
+                      <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${colorClass} shadow-sm`}></div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-semibold text-base mb-1">
+                        {capitalizedLocation}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {percentage}% {language === 'fr' ? 'du total' : 'of total revenue'}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-right min-w-24">
-                    <div className="text-white font-semibold">{moneyFmt.format(location.value)}</div>
-                    <div className="text-xs text-gray-400">{percentage}%</div>
+                  
+                  <div className="flex items-center gap-5">
+                    {/* Enhanced progress bar */}
+                    <div className="w-36 bg-gray-700/60 rounded-full h-2.5 overflow-hidden shadow-inner">
+                      <div 
+                        className={`h-2.5 rounded-full transition-all duration-1000 bg-gradient-to-r ${colorClass} shadow-sm`}
+                        style={{ width: `${Math.min(percentage * 1.5, 100)}%` }}
+                      ></div>
+                    </div>
+                    
+                    {/* Enhanced revenue display */}
+                    <div className="text-right min-w-28">
+                      <div className="text-white font-bold text-base mb-0.5">
+                        {moneyFmt.format(location.value)}
+                      </div>
+                      <div className="text-xs text-gray-400 font-medium">
+                        {percentage}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Rank indicator */}
+                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="text-xs text-gray-500 bg-gray-700/50 px-2 py-1 rounded-full">
+                    #{index + 1}
                   </div>
                 </div>
               </div>
@@ -287,77 +633,209 @@ const RevenueAnalytics = () => {
         </div>
       </div>
 
-      {/* Top Revenue Months */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6">
-        <h3 className="text-xl font-semibold text-white mb-4">
-          {language === 'fr' ? 'Meilleurs Mois par Revenus' : 'Top Revenue Months'}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {revenueData.topRevenueMonths.map((month, index) => (
-            <div key={index} className="bg-gray-800/50 rounded-lg p-4 text-center">
-              <div className="text-lg font-bold text-white mb-1">#{index + 1}</div>
-              <div className="text-sm text-gray-400 mb-2">{month.month}</div>
-              <div className="text-xl font-semibold text-green-400">{moneyFmt.format(month.revenue)}</div>
+      {/* Fourth Row - Top Revenue Months & Insights */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top Revenue Months */}
+        <div className="bg-gray-900/80 border border-gray-700/50 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-white font-semibold text-lg mb-1">
+                {language === 'fr' ? 'Meilleurs mois par revenus' : 'Top revenue months'}
+              </h3>
+              <p className="text-sm text-gray-400">
+                {language === 'fr' ? 'Classement des mois les plus performants' : 'Ranking of best performing months'}
+              </p>
             </div>
-          ))}
+            <div className="text-xs text-gray-500 bg-gray-800/50 px-3 py-1 rounded-full">
+              TOP 5
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {revenueData.topRevenueMonths.slice(0, 5).map((month, index) => {
+              // Enhanced medal system with better colors and effects
+              const getRankStyle = (rank) => {
+                switch(rank) {
+                  case 0: return {
+                    bg: 'bg-gradient-to-br from-yellow-400/20 to-amber-500/20',
+                    border: 'border-yellow-400/40',
+                    text: 'text-yellow-400',
+                    icon: '🥇',
+                    shadow: 'shadow-yellow-400/20'
+                  };
+                  case 1: return {
+                    bg: 'bg-gradient-to-br from-gray-300/20 to-slate-400/20',
+                    border: 'border-gray-300/40',
+                    text: 'text-gray-300',
+                    icon: '🥈',
+                    shadow: 'shadow-gray-300/20'
+                  };
+                  case 2: return {
+                    bg: 'bg-gradient-to-br from-orange-400/20 to-amber-600/20',
+                    border: 'border-orange-400/40',
+                    text: 'text-orange-400',
+                    icon: '🥉',
+                    shadow: 'shadow-orange-400/20'
+                  };
+                  default: return {
+                    bg: 'bg-gray-700/30',
+                    border: 'border-gray-600/40',
+                    text: 'text-gray-400',
+                    icon: '📅',
+                    shadow: 'shadow-gray-600/10'
+                  };
+                }
+              };
+              
+              const rankStyle = getRankStyle(index);
+              
+              return (
+                <div key={index} className={`group ${rankStyle.bg} ${rankStyle.border} border rounded-xl p-4 hover:scale-[1.02] transition-all duration-300 hover:shadow-lg ${rankStyle.shadow}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-shrink-0">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${rankStyle.text} bg-gray-800/50 border ${rankStyle.border}`}>
+                          <span className="text-lg">{rankStyle.icon}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-white font-semibold text-base mb-1">{month.month}</div>
+                        <div className="text-xs text-gray-400">
+                          {language === 'fr' ? 'Revenus du mois' : 'Monthly revenue'}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-right">
+                      <div className="text-green-400 font-bold text-xl mb-1">
+                        {moneyFmt.format(month.revenue)}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        #{index + 1} {language === 'fr' ? 'place' : 'place'}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Progress indicator for visual comparison */}
+                  <div className="mt-3 w-full bg-gray-700/50 rounded-full h-1.5 overflow-hidden">
+                    <div 
+                      className="h-1.5 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-1000"
+                      style={{ 
+                        width: `${revenueData.topRevenueMonths.length > 0 ? (month.revenue / revenueData.topRevenueMonths[0].revenue) * 100 : 0}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* Revenue Insights */}
-      <div className="bg-gray-900/50 backdrop-blur-sm border border-cyan-800/30 rounded-xl p-6">
-        <h3 className="text-xl font-semibold text-white mb-4">
-          {language === 'fr' ? 'Insights Revenus' : 'Revenue Insights'}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <h4 className="font-semibold text-green-400">{language === 'fr' ? 'Croissance' : 'Growth'}</h4>
+        {/* Revenue Insights */}
+        <div className="bg-gray-900/80 border border-gray-700/50 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-white font-semibold text-lg mb-1">
+                {language === 'fr' ? 'Insights revenus' : 'Revenue insights'}
+              </h3>
+              <p className="text-sm text-gray-400">
+                {language === 'fr' ? 'Analyses et recommandations' : 'Analysis and recommendations'}
+              </p>
             </div>
-            <p className="text-sm text-gray-300">
-              {language === 'fr' 
-                ? 'Revenus en croissance constante avec une projection positive pour le mois en cours.'
-                : 'Revenue showing consistent growth with positive projection for current month.'
-              }
-            </p>
+            <div className="text-xs text-gray-500 bg-gray-800/50 px-3 py-1 rounded-full">
+              AI POWERED
+            </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <div className="space-y-4">
+            {/* Growth Insight */}
+            <div className="group bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl p-5 hover:from-green-500/15 hover:to-emerald-500/15 hover:border-green-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/10">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h4 className="font-bold text-green-400 text-base">
+                      {language === 'fr' ? 'Croissance Positive' : 'Positive Growth'}
+                    </h4>
+                    <div className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-medium rounded-full">
+                      +{revenueData.revenueGrowth.data && revenueData.revenueGrowth.data.length > 0 
+                        ? Math.max(...revenueData.revenueGrowth.data).toFixed(1) 
+                        : '0'}%
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-300 leading-relaxed">
+                    {language === 'fr' 
+                      ? 'Revenus en croissance constante avec une projection positive pour les prochains mois.'
+                      : 'Revenue showing consistent growth with positive projection for upcoming months.'
+                    }
+                  </p>
+                </div>
               </div>
-              <h4 className="font-semibold text-blue-400">{language === 'fr' ? 'Performance' : 'Performance'}</h4>
             </div>
-            <p className="text-sm text-gray-300">
-              {language === 'fr' 
-                ? 'Valeur moyenne par réservation maintenue à un niveau optimal.'
-                : 'Average booking value maintained at optimal level.'
-              }
-            </p>
-          </div>
 
-          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                <svg className="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
-                </svg>
+            {/* Performance Insight */}
+            <div className="group bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl p-5 hover:from-blue-500/15 hover:to-cyan-500/15 hover:border-blue-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h4 className="font-bold text-blue-400 text-base">
+                      {language === 'fr' ? 'Performance Stable' : 'Stable Performance'}
+                    </h4>
+                    <div className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full">
+                      {moneyFmt.format(revenueData.averageBookingValue)}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-300 leading-relaxed">
+                    {language === 'fr' 
+                      ? 'Valeur moyenne par réservation maintenue à un niveau optimal et stable.'
+                      : 'Average booking value maintained at optimal and stable level.'
+                    }
+                  </p>
+                </div>
               </div>
-              <h4 className="font-semibold text-purple-400">{language === 'fr' ? 'Opportunité' : 'Opportunity'}</h4>
             </div>
-            <p className="text-sm text-gray-300">
-              {language === 'fr' 
-                ? 'Potentiel d\'optimisation des revenus par localisation identifié.'
-                : 'Revenue optimization potential by location identified.'
-              }
-            </p>
+
+            {/* Opportunity Insight */}
+            <div className="group bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-5 hover:from-purple-500/15 hover:to-pink-500/15 hover:border-purple-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h4 className="font-bold text-purple-400 text-base">
+                      {language === 'fr' ? 'Opportunités Identifiées' : 'Opportunities Identified'}
+                    </h4>
+                    <div className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-xs font-medium rounded-full">
+                      {revenueData.revenueByLocation.length} {language === 'fr' ? 'zones' : 'areas'}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-300 leading-relaxed">
+                    {language === 'fr' 
+                      ? 'Potentiel d\'optimisation des revenus par localisation et stratégies identifié.'
+                      : 'Revenue optimization potential by location and strategies identified.'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

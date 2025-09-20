@@ -10,10 +10,9 @@ import {
   Cell
 } from 'recharts';
 
-const BarChart = ({ 
+const HorizontalBarChart = ({ 
   data = [], 
-  labels = [], 
-  height = 200, 
+  height = 300, 
   showGrid = true,
   animate = true,
   className = '',
@@ -21,26 +20,25 @@ const BarChart = ({
   subtitle = ''
 }) => {
   // Transform data for Recharts
-  const chartData = data.map((value, index) => ({
-    name: labels[index] || `Day ${index + 1}`,
-    value: value,
+  const chartData = data.map((item, index) => ({
+    name: item.label,
+    value: item.value,
     index: index
   }));
 
   if (!data || data.length === 0) {
     return (
       <div className={`flex flex-col items-center justify-center bg-gray-800/30 rounded-lg border border-gray-700/50 ${className}`} style={{ height }}>
-        <div className="text-gray-500 text-4xl mb-2">📊</div>
-        <span className="text-gray-400 text-sm">No data available</span>
+        <div className="text-gray-500 text-4xl mb-2">📍</div>
+        <span className="text-gray-400 text-sm">No location data available</span>
         <span className="text-gray-500 text-xs mt-1">Data will appear here once bookings are made</span>
       </div>
     );
   }
 
   // Calculate statistics
-  const maxValue = Math.max(...data);
-  const avgValue = data.reduce((a, b) => a + b, 0) / data.length;
-  const totalValue = data.reduce((a, b) => a + b, 0);
+  const maxValue = Math.max(...data.map(item => item.value));
+  const totalValue = data.reduce((sum, item) => sum + item.value, 0);
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {
@@ -51,16 +49,16 @@ const BarChart = ({
       return (
         <div className="bg-gray-900/95 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-3 shadow-xl">
           <div className="text-cyan-400 font-medium text-sm mb-1">
-            Day {label}
+            {label}
           </div>
           <div className="text-white font-bold text-lg">
             {value} bookings
           </div>
           <div className="text-gray-400 text-xs mt-1">
-            {percentage}% of total activity
+            {percentage}% of total bookings
           </div>
           <div className="text-gray-500 text-xs">
-            {value > avgValue ? '↗️ Above average' : value < avgValue ? '↘️ Below average' : '➡️ Average'}
+            📍 Pickup location
           </div>
         </div>
       );
@@ -68,14 +66,16 @@ const BarChart = ({
     return null;
   };
 
-  // Generate gradient colors based on values
-  const getBarColor = (value) => {
-    const intensity = value / maxValue;
-    if (intensity > 0.8) return '#06b6d4'; // High activity - cyan
-    if (intensity > 0.6) return '#3b82f6'; // Medium-high - blue
-    if (intensity > 0.4) return '#8b5cf6'; // Medium - purple
-    if (intensity > 0.2) return '#6366f1'; // Low-medium - indigo
-    return '#64748b'; // Low activity - gray
+  // Generate colors based on ranking
+  const getBarColor = (index) => {
+    const colors = [
+      '#06b6d4', // 1st place - cyan
+      '#3b82f6', // 2nd place - blue
+      '#8b5cf6', // 3rd place - purple
+      '#6366f1', // 4th place - indigo
+      '#64748b'  // 5th place - gray
+    ];
+    return colors[index] || '#64748b';
   };
 
   return (
@@ -93,58 +93,44 @@ const BarChart = ({
       )}
 
       {/* Statistics Bar */}
-      <div className="grid grid-cols-4 gap-3 mb-4 px-2">
+      <div className="grid grid-cols-3 gap-3 mb-4 px-2">
         <div className="bg-gray-800/50 rounded-lg p-2 border border-gray-700/30">
-          <div className="text-xs text-gray-400 mb-1">Peak</div>
-          <div className="text-cyan-400 font-bold text-sm">{maxValue}</div>
+          <div className="text-xs text-gray-400 mb-1">Top Location</div>
+          <div className="text-cyan-400 font-bold text-sm truncate">{data[0]?.label || 'N/A'}</div>
         </div>
         <div className="bg-gray-800/50 rounded-lg p-2 border border-gray-700/30">
-          <div className="text-xs text-gray-400 mb-1">Average</div>
-          <div className="text-blue-400 font-bold text-sm">{avgValue.toFixed(1)}</div>
+          <div className="text-xs text-gray-400 mb-1">Peak Bookings</div>
+          <div className="text-blue-400 font-bold text-sm">{maxValue}</div>
         </div>
         <div className="bg-gray-800/50 rounded-lg p-2 border border-gray-700/30">
-          <div className="text-xs text-gray-400 mb-1">Total</div>
-          <div className="text-green-400 font-bold text-sm">{totalValue}</div>
-        </div>
-        <div className="bg-gray-800/50 rounded-lg p-2 border border-gray-700/30">
-          <div className="text-xs text-gray-400 mb-1">Days</div>
-          <div className="text-purple-400 font-bold text-sm">{data.length}</div>
+          <div className="text-xs text-gray-400 mb-1">Locations</div>
+          <div className="text-green-400 font-bold text-sm">{data.length}</div>
         </div>
       </div>
 
       {/* Chart Container */}
-      <div className="bg-gray-800/20 rounded-lg p-4 border border-gray-700/30" style={{ height: height - 80 }}>
+      <div className="bg-gray-800/20 rounded-lg p-4 border border-gray-700/30" style={{ height: height - 120 }}>
         <ResponsiveContainer width="100%" height="100%">
           <RechartsBarChart
+            layout="horizontal"
             data={chartData}
             margin={{
               top: 20,
               right: 30,
-              left: 20,
+              left: 80,
               bottom: 20,
             }}
-            barCategoryGap="20%"
           >
             {showGrid && (
               <CartesianGrid 
                 strokeDasharray="3 3" 
                 stroke="rgba(255,255,255,0.1)"
-                horizontal={true}
-                vertical={false}
+                horizontal={false}
+                vertical={true}
               />
             )}
             <XAxis 
-              dataKey="name" 
-              axisLine={false}
-              tickLine={false}
-              tick={{ 
-                fill: '#9CA3AF', 
-                fontSize: 11,
-                fontWeight: 500
-              }}
-              interval={Math.floor(data.length / 8)} // Show every nth label to avoid crowding
-            />
-            <YAxis 
+              type="number"
               axisLine={false}
               tickLine={false}
               tick={{ 
@@ -154,17 +140,29 @@ const BarChart = ({
               }}
               domain={[0, 'dataMax + 1']}
             />
+            <YAxis 
+              type="category"
+              dataKey="name" 
+              axisLine={false}
+              tickLine={false}
+              tick={{ 
+                fill: '#9CA3AF', 
+                fontSize: 11,
+                fontWeight: 500
+              }}
+              width={70}
+            />
             <Tooltip content={<CustomTooltip />} />
             <Bar 
               dataKey="value" 
-              radius={[4, 4, 0, 0]}
+              radius={[0, 4, 4, 0]}
               animationDuration={animate ? 1000 : 0}
               animationBegin={0}
             >
               {chartData.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
-                  fill={getBarColor(entry.value)}
+                  fill={getBarColor(index)}
                   className="hover:opacity-80 transition-opacity duration-200"
                 />
               ))}
@@ -173,27 +171,23 @@ const BarChart = ({
         </ResponsiveContainer>
       </div>
 
-      {/* Activity Legend */}
+      {/* Ranking Legend */}
       <div className="flex items-center justify-center gap-4 mt-3 px-2">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-cyan-400 rounded"></div>
-          <span className="text-xs text-gray-400">High Activity</span>
+          <span className="text-xs text-gray-400">#1 Location</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-blue-500 rounded"></div>
-          <span className="text-xs text-gray-400">Medium</span>
+          <span className="text-xs text-gray-400">#2-3</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-purple-500 rounded"></div>
-          <span className="text-xs text-gray-400">Low</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-gray-500 rounded"></div>
-          <span className="text-xs text-gray-400">Minimal</span>
+          <span className="text-xs text-gray-400">#4-5</span>
         </div>
       </div>
     </div>
   );
 };
 
-export default BarChart;
+export default HorizontalBarChart;
