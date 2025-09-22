@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
@@ -8,6 +8,7 @@ import HeroSection from '../components/CarsDetails/HeroSection';
 import PerformanceStats from '../components/CarsDetails/PerformanceStats';
 import AvailabilitySection from '../components/CarsDetails/AvailabilitySection';
 import DetailsTabSection from '../components/CarsDetails/DetailsTabSection';
+import { checkCarAvailability } from '../utils/carAvailability';
 
 const CarDetailPage = () => {
   const { id } = useParams();
@@ -45,6 +46,26 @@ const CarDetailPage = () => {
   // Use CarContext for data management
   const { cars } = useContext(CarContext);
   
+  // State for car availability
+  const [carAvailability, setCarAvailability] = useState(null);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  
+  // Function to load car availability
+  const loadCarAvailability = useCallback(async (carId) => {
+    if (!carId) return;
+    
+    setAvailabilityLoading(true);
+    try {
+      const availability = await checkCarAvailability(carId);
+      setCarAvailability(availability);
+    } catch (error) {
+      console.error('Error loading car availability:', error);
+      setCarAvailability({ available: true }); // Default to available on error
+    } finally {
+      setAvailabilityLoading(false);
+    }
+  }, []);
+  
   // Scroll to Top on Component Mount
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -65,6 +86,13 @@ const CarDetailPage = () => {
     String(car._id) === id ||
     String(car.id) === id
   );
+
+  // Load car availability when car is found
+  useEffect(() => {
+    if (car) {
+      loadCarAvailability(car._id || car.id);
+    }
+  }, [car, loadCarAvailability]);
   
   // If Car is not Found, Show the Error UI
   if (!car) {
@@ -98,7 +126,11 @@ const CarDetailPage = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section Component */}
-      <HeroSection car={processedCar} />
+      <HeroSection 
+        car={processedCar} 
+        availability={carAvailability}
+        availabilityLoading={availabilityLoading}
+      />
 
       {/* Availability Section */}
       <section className="py-8 px-4">

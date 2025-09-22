@@ -18,7 +18,7 @@ const resolvePath = (path) => {
   return path;
 };
 
-const HeroSection = ({ car }) => {
+const HeroSection = ({ car, availability, availabilityLoading }) => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const t = useTranslations(language);
@@ -32,8 +32,15 @@ const HeroSection = ({ car }) => {
 
   // Handle booking
   const handleBookNow = () => {
-    navigate(`/booking/${car._id || car.id}`);
+    // Only navigate if car is available
+    if (availability?.available !== false) {
+      navigate(`/booking/${car._id || car.id}`);
+    }
   };
+
+  // Determine if car is available
+  const isAvailable = availability?.available ?? true; // Default to available if no data yet
+  const isLoading = availabilityLoading && !availability;
   
   // Handle navigation back to cars page
   const handleBackClick = () => {
@@ -121,12 +128,26 @@ const HeroSection = ({ car }) => {
                   <div className="mt-1 text-xs text-gray-400 text-center font-['Orbitron']">{t('premiumExperience')}</div>
                   
                   {/* Book Now button */}
-                  <button 
-                    onClick={handleBookNow}
-                    className="w-full mt-3 px-6 py-2.5 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] text-sm transition-all duration-300 rounded-lg shadow-lg hover:shadow-cyan-500/30 transform hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    {t('bookNow')}
-                  </button>
+                  {isLoading ? (
+                    <div className="w-full mt-3 px-6 py-2.5 bg-gray-800/50 border border-gray-600/50 text-gray-400 font-['Orbitron'] text-sm rounded-lg flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                      {t('checkingAvailability')}
+                    </div>
+                  ) : isAvailable ? (
+                    <button 
+                      onClick={handleBookNow}
+                      className="w-full mt-3 px-6 py-2.5 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] text-sm transition-all duration-300 rounded-lg shadow-lg hover:shadow-cyan-500/30 transform hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      {t('bookNow')}
+                    </button>
+                  ) : (
+                    <div className="w-full mt-3 px-6 py-2.5 bg-gradient-to-r from-gray-600/50 to-gray-500/50 text-gray-300 font-['Orbitron'] text-sm rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      {t('unavailable')}
+                    </div>
+                  )}
                   
                   {/* Back to Vehicles Button */}
                   <button 

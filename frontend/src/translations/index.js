@@ -236,6 +236,8 @@ export const translations = {
     users: "users",
     next: "Next",
     previous: "Previous",
+    unavailable: "Unavailable",
+    available: "Available",
 
     // Modals
     changeUserRole: "Change User Role",
@@ -1347,6 +1349,8 @@ export const translations = {
     adminCarsNoDescriptionAvailable: "Aucune description disponible",
     adminCarsSeatsSlashDoors: "Sièges/Portes",
     adminCarsAvailabilityStatus: "Statut de disponibilité",
+    unavailable: "Indisponible",
+    available: "Disponible",
 
     // Booking Management Section
     bookingManagement: "Gestion des réservations",

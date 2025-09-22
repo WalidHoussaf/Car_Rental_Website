@@ -9,6 +9,7 @@ import HeroSection from '../components/Cars/HeroSection';
 import CallToAction from '../components/Cars/CallToAction';
 import FiltersSidebar from '../components/Cars/Filters/FiltersSidebar';
 import { selectStyles } from '../styles/selectStyles';
+import { getMultipleCarAvailability } from '../utils/carAvailability';
 
 const CarsPage = () => {
   const navigate = useNavigate();
@@ -57,6 +58,10 @@ const CarsPage = () => {
   
   // State for Search
   const [searchQuery, setSearchQuery] = useState(searchParam || '');
+  
+  // State for car availability
+  const [carAvailability, setCarAvailability] = useState({});
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
   
   // Reference to Store Current Scroll Position
   const scrollPositionRef = useRef(0);
@@ -109,6 +114,21 @@ const CarsPage = () => {
   }, [handleSearchUpdate]);
   
   
+  // Function to load car availability
+  const loadCarAvailability = useCallback(async (carsToCheck) => {
+    if (!carsToCheck || carsToCheck.length === 0) return;
+    
+    setAvailabilityLoading(true);
+    try {
+      const availabilityMap = await getMultipleCarAvailability(carsToCheck);
+      setCarAvailability(availabilityMap);
+    } catch (error) {
+      console.error('Error loading car availability:', error);
+    } finally {
+      setAvailabilityLoading(false);
+    }
+  }, []);
+
   // Initialize Cars Data and handle URL parameters
   useEffect(() => {
     // Handle URL parameters on component mount
@@ -125,6 +145,13 @@ const CarsPage = () => {
       updateFilters({ category: categoryParam });
     }
   }, [locationParam, categoryParam]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Load car availability when cars change
+  useEffect(() => {
+    if (cars && cars.length > 0) {
+      loadCarAvailability(cars);
+    }
+  }, [cars, loadCarAvailability]);
   
   // Handle Scroll to Cars Section
   const scrollToCarsSection = () => {
@@ -437,10 +464,19 @@ const CarsPage = () => {
               {/* Cars Grid */}
               {!loading && sortedCars.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 relative">                  
-                  {sortedCars.map((car, index) => (
+                  {sortedCars.map((car, index) => {
+                    const availability = carAvailability[car._id || car.id];
+                    const isAvailable = availability?.available ?? true; // Default to available if no data yet
+                    const isLoading = availabilityLoading && !availability;
+                    
+                    return (
                     <div
                       key={car._id || car.id || `car-${index}`}
-                      className="bg-gradient-to-b from-gray-900/40 to-black/20 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 group hover:border-cyan-500/30 flex flex-col h-full relative"
+                      className={`bg-gradient-to-b from-gray-900/40 to-black/20 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col h-full relative ${
+                        isAvailable 
+                          ? 'hover:shadow-cyan-500/30 hover:border-cyan-500/30' 
+                          : 'opacity-75 hover:shadow-red-500/20 hover:border-red-500/30'
+                      }`}
                     >                      
                       {/* Card Header */}
                       <div className="relative h-48 overflow-hidden">
@@ -458,6 +494,28 @@ const CarsPage = () => {
                               ? categoryTranslations[car.category][language] 
                               : car.category}
                           </div>
+                        </div>
+                        
+                        {/* Availability Badge */}
+                        <div className="absolute top-3 right-3">
+                          {isLoading ? (
+                            <div className="px-3 py-1 rounded-full bg-gray-800/80 backdrop-blur-sm border border-gray-600/50">
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                                <span className="text-xs font-bold text-gray-400 font-['Orbitron'] uppercase">
+                                  {t('checking')}
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className={`px-3 py-1 rounded-full backdrop-blur-sm text-xs font-bold font-['Orbitron'] uppercase tracking-wider shadow-lg ${
+                              isAvailable 
+                                ? 'bg-gradient-to-r from-green-500/80 to-emerald-500/80 text-white shadow-green-900/20' 
+                                : 'bg-gradient-to-r from-red-500/80 to-rose-500/80 text-white shadow-red-900/20'
+                            }`}>
+                              {isAvailable ? t('available') : t('unavailable')}
+                            </div>
+                          )}
                         </div>
                         
                         {/* Price Badge */}
@@ -518,14 +576,25 @@ const CarsPage = () => {
                         
                         {/* Action Buttons */}
                         <div className="flex space-x-2 mt-auto">
-                          <button
-                            onClick={() => {
-                              navigateWithScroll(`/booking/${car._id || car.id}`);
-                            }}
-                            className="flex-1 px-4 py-2 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] text-sm transition-all duration-500 rounded-md cursor-pointer shadow-lg shadow-cyan-800/10 hover:shadow-cyan-800/30"
-                          >
-                            {t('bookNow')}
-                          </button>
+                          {isAvailable ? (
+                            <button
+                              onClick={() => {
+                                navigateWithScroll(`/booking/${car._id || car.id}`);
+                              }}
+                              className="flex-1 px-4 py-2 bg-gradient-to-r from-white to-cyan-400 hover:from-cyan-400 hover:to-white text-black font-['Orbitron'] text-sm transition-all duration-500 rounded-md cursor-pointer shadow-lg shadow-cyan-800/10 hover:shadow-cyan-800/30"
+                            >
+                              {t('bookNow')}
+                            </button>
+                          ) : (
+                            <div className="flex-1 px-4 py-2 bg-gradient-to-r from-gray-600/50 to-gray-500/50 text-gray-300 font-['Orbitron'] text-sm rounded-md cursor-not-allowed shadow-lg">
+                              <div className="flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                <span className="truncate">{t('unavailable')}</span>
+                              </div>
+                            </div>
+                          )}
                           <button 
                             onClick={() => {
                               navigateWithScroll(`/cars/${car._id || car.id}`);
@@ -537,7 +606,8 @@ const CarsPage = () => {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
               
