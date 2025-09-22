@@ -5,7 +5,8 @@
  * - Cars are unavailable if they have 'active' OR 'confirmed' bookings
  * - 'active' = currently rented (picked up)
  * - 'confirmed' = booked and confirmed (waiting for pickup)
- * - 'completed', 'cancelled', 'pending' = car is available
+ * - 'pending' = waiting for admin approval, car remains available
+ * - 'completed', 'cancelled' = car is available
  */
 
 import { api } from '../config/api';
@@ -31,11 +32,15 @@ export const checkCarAvailability = async (carId, bookings = null) => {
     const carBookings = bookings.filter(booking => 
       booking.car && booking.car._id === carId
     );
-
-    // Check for unavailable bookings (active or confirmed)
+    
+    // Check for unavailable bookings (active or confirmed only)
+    // active = currently rented (picked up)
+    // confirmed = booked and confirmed (waiting for pickup)
+    // pending = waiting for admin approval, car remains available
     const unavailableBookings = carBookings.filter(booking => 
       ['active', 'confirmed'].includes(booking.status)
     );
+    
 
     if (unavailableBookings.length === 0) {
       return {
@@ -50,6 +55,7 @@ export const checkCarAvailability = async (carId, bookings = null) => {
     // Car is unavailable, find the reason and next available date
     const activeBookings = unavailableBookings.filter(b => b.status === 'active');
     const confirmedBookings = unavailableBookings.filter(b => b.status === 'confirmed');
+    const pendingBookings = unavailableBookings.filter(b => b.status === 'pending');
 
     let reason = '';
     let nextAvailableDate = null;
@@ -64,6 +70,11 @@ export const checkCarAvailability = async (carId, bookings = null) => {
       // Find the earliest end date from confirmed bookings
       const returnDates = confirmedBookings.map(b => new Date(b.endDate));
       nextAvailableDate = new Date(Math.min(...returnDates)).toISOString().split('T')[0];
+    } else if (pendingBookings.length > 0) {
+      reason = 'Car has pending booking (awaiting approval)';
+      // Find the earliest end date from pending bookings
+      const returnDates = pendingBookings.map(b => new Date(b.endDate));
+      nextAvailableDate = new Date(Math.min(...returnDates)).toISOString().split('T')[0];
     }
 
     return {
@@ -73,7 +84,8 @@ export const checkCarAvailability = async (carId, bookings = null) => {
       currentBookings: carBookings.length,
       unavailableBookings: unavailableBookings.length,
       activeBookings: activeBookings.length,
-      confirmedBookings: confirmedBookings.length
+      confirmedBookings: confirmedBookings.length,
+      pendingBookings: pendingBookings.length
     };
 
   } catch (error) {

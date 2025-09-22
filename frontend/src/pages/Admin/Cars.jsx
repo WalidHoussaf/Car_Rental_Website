@@ -31,7 +31,6 @@ const defaultForm = {
   seats: '5',
   doors: '4',
   availability: true,
-  // All specification fields
   engine: '',
   power: '',
   torque: '',
@@ -61,12 +60,12 @@ const AdminCars = () => {
 
   const [cars, setCars] = useState([]);
   const [carAvailability, setCarAvailability] = useState({});
+  const [globalAvailabilityStats, setGlobalAvailabilityStats] = useState({ available: 0, unavailable: 0, total: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
 
   // filters
   const [search, setSearch] = useState('');
@@ -77,13 +76,10 @@ const AdminCars = () => {
   
 
   const [categories, setCategories] = useState([]);
-  // dropdown state (location)
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
   const locationDropdownRef = useRef(null);
-  // dropdown state (category)
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const categoryDropdownRef = useRef(null);
-  // dropdown state (availability)
   const [isAvailabilityDropdownOpen, setIsAvailabilityDropdownOpen] = useState(false);
   const availabilityDropdownRef = useRef(null);
 
@@ -99,15 +95,26 @@ const AdminCars = () => {
     return localizedLocations.find(l => l.value === locationFilter)?.label || 'Location';
   }, [locationFilter, localizedLocations]);
 
-  // Filter cars based on real availability status
   const filteredCars = useMemo(() => {
+    
     if (availabilityFilter === 'all') {
       return cars;
     }
     
-    return cars.filter(car => {
+    const hasAvailabilityData = cars.length > 0 && Object.keys(carAvailability).length > 0;
+    if (!hasAvailabilityData) {
+      return cars;
+    }
+    
+    const filtered = cars.filter(car => {
       const availability = carAvailability[car._id];
-      const isAvailable = availability?.available ?? car.availability; // Fallback to static field
+      
+      if (!availability) {
+        return availabilityFilter === 'all';
+      }
+      
+      const isAvailable = availability.available;
+      
       
       if (availabilityFilter === 'available') {
         return isAvailable;
@@ -115,15 +122,46 @@ const AdminCars = () => {
         return !isAvailable;
       }
       
-      return true; // Default: show all
+      return true;
     });
+    
+    return filtered;
   }, [cars, carAvailability, availabilityFilter]);
 
-  // Helper function to get translated category name
+  const paginatedCars = useMemo(() => {
+    if (availabilityFilter === 'all') {
+      return filteredCars;
+    } else {
+      const startIndex = (page - 1) * PAGE_SIZE;
+      const endIndex = startIndex + PAGE_SIZE;
+      return filteredCars.slice(startIndex, endIndex);
+    }
+  }, [filteredCars, page, availabilityFilter]);
+
+  const paginationInfo = useMemo(() => {
+    if (availabilityFilter === 'all') {
+      return {
+        currentPage: page,
+        totalPages: totalPages,
+        totalItems: globalAvailabilityStats.total,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      };
+    } else {
+      const totalFilteredPages = Math.ceil(filteredCars.length / PAGE_SIZE);
+      return {
+        currentPage: page,
+        totalPages: totalFilteredPages,
+        totalItems: filteredCars.length,
+        hasNextPage: page < totalFilteredPages,
+        hasPrevPage: page > 1
+      };
+    }
+  }, [filteredCars.length, page, totalPages, availabilityFilter, globalAvailabilityStats.total]);
+
   const getTranslatedCategory = (categoryName) => {
     if (!categoryName) return t('adminCarsAllCategories');
-    // Try to get translation for the category, fallback to original name if no translation exists
-    const translationKey = categoryName.toLowerCase();
+      const translationKey = categoryName.toLowerCase();
     const translated = t(translationKey);
     return translated !== translationKey ? translated : categoryName;
   };
@@ -140,6 +178,59 @@ const AdminCars = () => {
       if (res?.success) setCategories(res.data.categories || []);
     } catch {
       // non-blocking
+    }
+  };
+
+  const loadGlobalAvailabilityStats = async (filterParams = {}) => {
+    try {
+        const baseParams = {
+        search: filterParams.search ?? search,
+        category: filterParams.category ?? category,
+        location: filterParams.location ?? locationFilter,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      };
+      const cleanParams = Object.fromEntries(
+        Object.entries(baseParams).filter(([, v]) => v !== undefined && v !== null && v !== '')
+      );
+      
+      let allCars = [];
+      let totalPages = 1;
+      
+      const firstRes = await api.cars.getAll({ ...cleanParams, limit: 50, page: 1 });
+      if (!firstRes?.success) {
+        throw new Error('Failed to fetch cars for global stats');
+      }
+      
+      allCars = firstRes.data.cars || [];
+      totalPages = firstRes.data.pagination?.totalPages || 1;
+      
+      for (let page = 2; page <= totalPages; page++) {
+        const res = await api.cars.getAll({ ...cleanParams, limit: 50, page });
+        if (res?.success) {
+          allCars = [...allCars, ...(res.data.cars || [])];
+        }
+      }
+      
+        const availabilityMap = await getMultipleCarAvailability(allCars);
+      
+        const stats = {
+        total: allCars.length,
+        available: 0,
+        unavailable: 0
+      };
+      
+      Object.values(availabilityMap).forEach(availability => {
+        if (availability.available) {
+          stats.available++;
+        } else {
+          stats.unavailable++;
+        }
+      });
+      
+      setGlobalAvailabilityStats(stats);
+    } catch (error) {
+      console.error('Error loading global availability stats:', error);
     }
   };
 
@@ -170,42 +261,81 @@ const AdminCars = () => {
   };
 
   const fetchCars = async (opts = {}) => {
-    // Build params while excluding undefined/empty values to avoid sending "undefined" strings
-    const raw = {
-      page: opts.page || page,
-      limit: PAGE_SIZE,
-      search: opts.search ?? search,
-      category: opts.category ?? category,
-      location: opts.location ?? locationFilter,
-      sortBy: 'createdAt',
-      sortOrder: 'desc',
-    };
-    const params = Object.fromEntries(
-      Object.entries(raw).filter(([, v]) => v !== undefined && v !== null && v !== '')
-    );
+    const needsAllCars = availabilityFilter !== 'all';
+    
+    let fetchedCars = [];
+    let paginationInfo = {};
+    
+    if (needsAllCars) {
+          let allCars = [];
+      let totalPages = 1;
+      
+      const baseParams = {
+        search: opts.search ?? search,
+        category: opts.category ?? category,
+        location: opts.location ?? locationFilter,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      };
+      const cleanParams = Object.fromEntries(
+        Object.entries(baseParams).filter(([, v]) => v !== undefined && v !== null && v !== '')
+      );
+      
+      const firstRes = await api.cars.getAll({ ...cleanParams, limit: 50, page: 1 });
+      if (!firstRes?.success) {
+        throw new Error('Failed to fetch cars');
+      }
+      
+      allCars = firstRes.data.cars || [];
+      totalPages = firstRes.data.pagination?.totalPages || 1;
+      
+      for (let page = 2; page <= totalPages; page++) {
+        const res = await api.cars.getAll({ ...cleanParams, limit: 50, page });
+        if (res?.success) {
+          allCars = [...allCars, ...(res.data.cars || [])];
+        }
+      }
+      
+      fetchedCars = allCars;
+      paginationInfo = {
+        currentPage: 1,
+        totalPages: 1, 
+        totalItems: allCars.length
+      };
+      
+    } else {
+      const raw = {
+        page: opts.page || page,
+        limit: PAGE_SIZE,
+        search: opts.search ?? search,
+        category: opts.category ?? category,
+        location: opts.location ?? locationFilter,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      };
+      const params = Object.fromEntries(
+        Object.entries(raw).filter(([, v]) => v !== undefined && v !== null && v !== '')
+      );
 
-    // Note: We'll filter by availability on the frontend after getting real booking data
-    // So we always fetch all cars and filter them based on real availability status
+      const res = await api.cars.getAll(params);
+      if (!res?.success) {
+        throw new Error('Failed to fetch cars');
+      }
+      
+      fetchedCars = res.data.cars || [];
+      paginationInfo = res.data.pagination || {};
+    }
 
     setLoading(true);
     setError('');
     try {
-      const res = await api.cars.getAll(params);
-      if (res?.success) {
-        const fetchedCars = res.data.cars || [];
-        setCars(fetchedCars);
-        setPage(res.data.pagination.currentPage || 1);
-        setTotalPages(res.data.pagination.totalPages || 1);
-        setTotalItems(res.data.pagination.totalItems || 0);
-        
-        // Fetch real availability status for all cars
-        console.log('Fetching real availability status for cars...');
-        const availabilityMap = await getMultipleCarAvailability(fetchedCars);
-        setCarAvailability(availabilityMap);
-        console.log('Car availability map:', availabilityMap);
-      } else {
-        throw new Error(res?.message || 'Failed to load cars');
-      }
+      setCars(fetchedCars);
+      setPage(paginationInfo.currentPage || 1);
+      setTotalPages(paginationInfo.totalPages || 1);
+      
+      const availabilityMap = await getMultipleCarAvailability(fetchedCars);
+      setCarAvailability(availabilityMap);
+      
     } catch (error) {
       console.error('Error in fetchCars:', error);
       setError(t('adminCarsFailedToLoadCars'));
@@ -219,6 +349,7 @@ const AdminCars = () => {
     if (isAuthenticated && isAdmin) {
       fetchCars({ page: 1 });
       loadCategories();
+      loadGlobalAvailabilityStats();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, isAdmin]);
@@ -272,7 +403,6 @@ const AdminCars = () => {
       ...car,
       features: Array.isArray(car.features) ? car.features.join(', ') : (car.features || ''),
       imagesText: Array.isArray(car.images) ? car.images.join(', ') : '',
-      // All specification fields from specifications
       engine: car.specifications?.engine || '',
       power: car.specifications?.power || '',
       torque: car.specifications?.torque || '',
@@ -331,7 +461,6 @@ const AdminCars = () => {
         seats: Number(form.seats),
         doors: Number(form.doors),
         availability: form.availability,
-        // Complete specifications
         specifications: {
           engine: form.engine?.trim() || '',
           power: form.power?.trim() || '',
@@ -367,6 +496,7 @@ const AdminCars = () => {
       }
       setModal({ type: null, car: null });
       await fetchCars({ page: 1 });
+        loadGlobalAvailabilityStats();
     } catch {
       showError(t('adminCarsOperationFailed'));
     } finally {
@@ -383,6 +513,7 @@ const AdminCars = () => {
       const newPage = cars.length === 1 && page > 1 ? page - 1 : page;
       await fetchCars({ page: newPage });
       setModal({ type: null, car: null });
+        loadGlobalAvailabilityStats();
     } catch (e) {
       showError(e?.message || t('adminCarsFailedToDeleteCar'));
     } finally {
@@ -393,11 +524,14 @@ const AdminCars = () => {
   const onSearch = (e) => {
     e?.preventDefault?.();
     fetchCars({ page: 1, search });
+    loadGlobalAvailabilityStats({ search });
   };
 
   const handleAvailabilityChange = (value) => {
     setAvailabilityFilter(value);
-    fetchCars({ page: 1, availability: value });
+    setPage(1);
+    fetchCars({ page: 1 });
+    loadGlobalAvailabilityStats();
   };
 
   return (
@@ -428,7 +562,12 @@ const AdminCars = () => {
               <div className="text-right flex items-end gap-4">
                 <div>
                   <div className="text-2xl font-bold text-white">
-                    {availabilityFilter === 'all' ? totalItems : filteredCars.length}
+                    {availabilityFilter === 'all' 
+                      ? globalAvailabilityStats.total 
+                      : availabilityFilter === 'available' 
+                        ? globalAvailabilityStats.available 
+                        : globalAvailabilityStats.unavailable
+                    }
                   </div>
                   <div className="text-sm text-gray-400">
                     {availabilityFilter === 'all' 
@@ -470,7 +609,7 @@ const AdminCars = () => {
                   <button
                     type="button"
                     onClick={() => setIsCategoryDropdownOpen(v => !v)}
-                    className="w-full px-3 py-2 bg-black/40 border border-cyan-900/30 rounded-md text-gray-200 flex items-center justify-between hover:bg-white/5 transition-colors"
+                    className="w-full px-3 py-2 bg-black/40 border border-cyan-900/30 rounded-md text-gray-200 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer"
                   >
                     <span className="truncate capitalize">{getTranslatedCategory(category)}</span>
                     <svg
@@ -496,8 +635,9 @@ const AdminCars = () => {
                                   setCategory(value);
                                   setIsCategoryDropdownOpen(false);
                                   fetchCars({ page: 1, category: value });
+                                  loadGlobalAvailabilityStats({ category: value });
                                 }}
-                                className={`w-full text-left px-3 py-2 text-sm capitalize ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'}`}
+                                className={`w-full text-left px-3 py-2 text-sm capitalize ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'} cursor-pointer`}
                               >
                                 {opt === t('adminCarsAllCategories') ? opt : getTranslatedCategory(opt)}
                               </button>
@@ -513,7 +653,7 @@ const AdminCars = () => {
                   <button
                     type="button"
                     onClick={() => setIsAvailabilityDropdownOpen(v => !v)}
-                    className="w-full px-3 py-2 bg-black/40 border border-cyan-900/30 rounded-md text-gray-200 flex items-center justify-between hover:bg-white/5 transition-colors"
+                    className="w-full px-3 py-2 bg-black/40 border border-cyan-900/30 rounded-md text-gray-200 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer"
                   >
                     <span className="truncate capitalize">{
                       availabilityFilter === 'all' ? t('adminCarsAllStatuses') : 
@@ -543,7 +683,7 @@ const AdminCars = () => {
                                   handleAvailabilityChange(opt);
                                   setIsAvailabilityDropdownOpen(false);
                                 }}
-                                className={`w-full text-left px-3 py-2 text-sm capitalize ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'}`}
+                                className={`w-full text-left px-3 py-2 text-sm capitalize ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'} cursor-pointer`}
                               >
                                 {opt === 'all' ? t('adminCarsAllStatuses') : 
                                  opt === 'available' ? t('adminCarsAvailable') : 
@@ -562,7 +702,7 @@ const AdminCars = () => {
                   <button
                     type="button"
                     onClick={() => setIsLocationDropdownOpen(v => !v)}
-                    className="w-full px-3 py-2 bg-black/40 border border-cyan-900/30 rounded-md text-gray-200 flex items-center justify-between hover:bg-white/5 transition-colors"
+                    className="w-full px-3 py-2 bg-black/40 border border-cyan-900/30 rounded-md text-gray-200 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer"
                   >
                     <span className="truncate">{selectedLocationLabel}</span>
                     <svg
@@ -588,8 +728,9 @@ const AdminCars = () => {
                                   setLocationFilter(value);
                                   setIsLocationDropdownOpen(false);
                                   fetchCars({ page: 1, location: value });
+                                  loadGlobalAvailabilityStats({ location: value });
                                 }}
-                                className={`w-full text-left px-3 py-2 text-sm ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'}`}
+                                className={`w-full text-left px-3 py-2 text-sm ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'} cursor-pointer`}
                               >
                                 {opt.label}
                               </button>
@@ -600,7 +741,7 @@ const AdminCars = () => {
                     </div>
                   )}
                 </div>
-                <button type="button" onClick={() => { setSearch(''); setCategory(''); setLocationFilter(''); setAvailabilityFilter('all'); fetchCars({ page: 1, search: '', category: '', location: '', availability: 'all' }); }} className="px-6 py-2 text-base rounded-md border border-gray-600/40 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer w-full md:w-auto">
+                <button type="button" onClick={() => { setSearch(''); setCategory(''); setLocationFilter(''); setAvailabilityFilter('all'); fetchCars({ page: 1, search: '', category: '', location: '' }); loadGlobalAvailabilityStats({ search: '', category: '', location: '' }); }} className="px-6 py-2 text-base rounded-md border border-gray-600/40 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer w-full md:w-auto">
                   {t('adminCarsReset')}
                 </button>
               </form>
@@ -623,10 +764,10 @@ const AdminCars = () => {
                       <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('adminCarsLoadingCars')}</td></tr>
                     ) : error ? (
                       <tr><td className="py-6 text-center text-red-300" colSpan={6}>{t('adminCarsFailedToLoadCars')}</td></tr>
-                    ) : filteredCars.length === 0 ? (
+                    ) : paginatedCars.length === 0 ? (
                       <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('adminCarsNoCarsFound')}</td></tr>
                     ) : (
-                      filteredCars.map((c) => (
+                      paginatedCars.map((c) => (
                         <tr key={c._id} className="border-b border-cyan-900/20 hover:bg-white/5 transition-colors">
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-3">
@@ -652,7 +793,7 @@ const AdminCars = () => {
                           <td className="py-4 px-4">
                             {(() => {
                               const availability = carAvailability[c._id];
-                              const isAvailable = availability?.available ?? c.availability; // Fallback to static field
+                              const isAvailable = availability?.available ?? c.availability; 
                               
                               return (
                                 <div className="flex flex-col gap-2">
@@ -744,20 +885,54 @@ const AdminCars = () => {
               {/* Pagination */}
               <div className="mt-6 flex items-center justify-between text-sm text-gray-300 bg-black/40 rounded-lg p-4 border border-cyan-900/30">
                 <div className="flex items-center gap-4">
-                  <div>{t('adminCarsShowing')} <span className="text-white font-medium">{Math.min((page - 1) * PAGE_SIZE + 1, totalItems)}</span> {t('adminCarsTo')} <span className="text-white font-medium">{Math.min(page * PAGE_SIZE, totalItems)}</span> {t('adminCarsOf')} <span className="text-white font-medium">{totalItems}</span> {t('adminCarsCars')}</div>
+                  <div>{t('adminCarsShowing')} <span className="text-white font-medium">{Math.min((paginationInfo.currentPage - 1) * PAGE_SIZE + 1, paginatedCars.length > 0 ? paginatedCars.length : 1)}</span> {t('adminCarsTo')} <span className="text-white font-medium">{Math.min(paginationInfo.currentPage * PAGE_SIZE, paginationInfo.totalItems)}</span> {t('adminCarsOf')} <span className="text-white font-medium">{
+                    availabilityFilter === 'all' 
+                      ? globalAvailabilityStats.total 
+                      : availabilityFilter === 'available' 
+                        ? globalAvailabilityStats.available 
+                        : globalAvailabilityStats.unavailable
+                  }</span> {t('adminCarsCars')}</div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button disabled={page <= 1 || loading} onClick={() => fetchCars({ page: page - 1 })} className={`px-4 py-2 rounded-md border transition-colors flex items-center gap-2 ${page <= 1 || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                    {t('adminCarsPrevious')}
-                  </button>
-                  <div className="px-3 py-2 bg-cyan-600/20 border border-cyan-600/40 rounded-md text-cyan-300">
-                    {page} of {totalPages}
-                  </div>
-                  <button disabled={page >= totalPages || loading} onClick={() => fetchCars({ page: page + 1 })} className={`px-4 py-2 rounded-md border transition-colors flex items-center gap-2 ${page >= totalPages || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}>
-                    {t('adminCarsNext')}
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  </button>
+                  {paginationInfo.totalPages > 1 ? (
+                                    <>
+                      <button 
+                        disabled={!paginationInfo.hasPrevPage || loading} 
+                        onClick={() => {
+                          const newPage = page - 1;
+                          setPage(newPage);
+                          if (availabilityFilter === 'all') {
+                            fetchCars({ page: newPage });
+                          }
+                        }} 
+                        className={`px-4 py-2 rounded-md border transition-colors flex items-center gap-2 ${!paginationInfo.hasPrevPage || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                        {t('adminCarsPrevious')}
+                      </button>
+                      <div className="px-3 py-2 bg-cyan-600/20 border border-cyan-600/40 rounded-md text-cyan-300">
+                        {paginationInfo.currentPage} of {paginationInfo.totalPages}
+                      </div>
+                      <button 
+                        disabled={!paginationInfo.hasNextPage || loading} 
+                        onClick={() => {
+                          const newPage = page + 1;
+                          setPage(newPage);
+                          if (availabilityFilter === 'all') {
+                            fetchCars({ page: newPage });
+                          }
+                        }} 
+                        className={`px-4 py-2 rounded-md border transition-colors flex items-center gap-2 ${!paginationInfo.hasNextPage || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
+                      >
+                        {t('adminCarsNext')}
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                      </button>
+                    </>
+                  ) : (
+                                    <div className="px-3 py-2 bg-gray-600/20 border border-gray-600/40 rounded-md text-gray-400">
+                      {availabilityFilter === 'all' ? 'All cars' : `All ${availabilityFilter} cars`}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
