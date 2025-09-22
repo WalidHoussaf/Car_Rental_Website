@@ -1,18 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getCarImage } from '../../utils/imageResolver';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
+import { checkCarAvailability } from '../../utils/carAvailability';
 
 const CarViewModal = ({ open, onClose, car }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
+  const [availability, setAvailability] = useState(null);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+  
+  // Fetch availability data when modal opens
+  useEffect(() => {
+    if (open && car?._id) {
+      setLoadingAvailability(true);
+      checkCarAvailability(car._id)
+        .then(availabilityData => {
+          setAvailability(availabilityData);
+        })
+        .catch(error => {
+          console.error('Error fetching car availability:', error);
+          setAvailability(null);
+        })
+        .finally(() => {
+          setLoadingAvailability(false);
+        });
+    }
+  }, [open, car?._id]);
   
   if (!open || !car) return null;
 
   const carImageSrc = getCarImage(car);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-20">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pt-20">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
@@ -106,15 +127,84 @@ const CarViewModal = ({ open, onClose, car }) => {
           )}
 
           {/* Availability Status */}
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide">{t('adminCarsAvailabilityStatus')}</div>
-            <span className={`px-3 py-1 rounded-full text-xs font-['Orbitron'] ${
-              car.availability 
-                ? 'bg-green-600/20 text-green-300 border border-green-500/30' 
-                : 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30'
-            }`}>
-              {car.availability ? t('adminCarsAvailable') : t('adminCarsUnavailable')}
-            </span>
+          <div className="mt-6">
+            <div className="text-gray-400 font-['Orbitron'] text-xs uppercase tracking-wide mb-4">{t('adminCarsAvailabilityStatus')}</div>
+            
+            {loadingAvailability ? (
+              <div className="flex items-center gap-2 px-3 py-2 bg-gray-600/10 border border-gray-500/30 rounded-lg">
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                <span className="text-gray-400 text-sm font-['Orbitron']">Loading availability...</span>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {(() => {
+                  const isAvailable = availability?.available ?? car.availability; // Fallback to static field
+                  
+                  return (
+                    <>
+                      {/* Main Status Badge */}
+                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border ${
+                        isAvailable 
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-emerald-500/20' 
+                          : 'bg-red-500/10 text-red-400 border-red-500/30 shadow-red-500/20'
+                      } shadow-sm font-['Orbitron']`}>
+                        {/* Status Icon */}
+                        <div className={`w-2 h-2 rounded-full ${
+                          isAvailable ? 'bg-emerald-400' : 'bg-red-400'
+                        } animate-pulse`}></div>
+                        
+                        {/* Status Text */}
+                        <span className="font-semibold">
+                          {isAvailable ? t('adminCarsAvailable') : t('adminCarsUnavailable')}
+                        </span>
+                      </div>
+                      
+                      {/* Booking Details for Unavailable Cars */}
+                      {!isAvailable && availability && (
+                        <div className="flex flex-col gap-2 ml-4">
+                          {availability.activeBookings > 0 && (
+                            <div className="flex items-center gap-2 px-2 py-1 bg-orange-500/10 border border-orange-500/20 rounded-md">
+                              <div className="w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
+                              <span className="text-xs text-orange-300 font-medium font-['Orbitron']">
+                                {availability.activeBookings} active booking{availability.activeBookings > 1 ? 's' : ''}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {availability.confirmedBookings > 0 && (
+                            <div className="flex items-center gap-2 px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded-md">
+                              <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                              <span className="text-xs text-blue-300 font-medium font-['Orbitron']">
+                                {availability.confirmedBookings} confirmed booking{availability.confirmedBookings > 1 ? 's' : ''}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {/* Next Available Date */}
+                          {availability.nextAvailableDate && (
+                            <div className="text-xs text-gray-400 mt-1 font-['Orbitron']">
+                              <span className="text-gray-500">Available:</span> {new Date(availability.nextAvailableDate).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Available Cars - Show Ready Status */}
+                      {isAvailable && (
+                        <div className="flex items-center gap-2 px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded-md ml-4">
+                          <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-xs text-emerald-300 font-medium font-['Orbitron']">
+                            Ready to rent
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            )}
           </div>
         </div>
       </div>

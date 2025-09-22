@@ -10,6 +10,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 import { locations as allLocations } from '../../assets/assets';
 import { getCarImage } from '../../utils/imageResolver';
+import { getMultipleCarAvailability } from '../../utils/carAvailability';
 
 const PAGE_SIZE = 10;
 
@@ -59,6 +60,7 @@ const AdminCars = () => {
   const t = useTranslations(language);
 
   const [cars, setCars] = useState([]);
+  const [carAvailability, setCarAvailability] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -96,6 +98,26 @@ const AdminCars = () => {
     if (!locationFilter) return (localizedLocations.find(l => l.value === 'all')?.label) || 'All Locations';
     return localizedLocations.find(l => l.value === locationFilter)?.label || 'Location';
   }, [locationFilter, localizedLocations]);
+
+  // Filter cars based on real availability status
+  const filteredCars = useMemo(() => {
+    if (availabilityFilter === 'all') {
+      return cars;
+    }
+    
+    return cars.filter(car => {
+      const availability = carAvailability[car._id];
+      const isAvailable = availability?.available ?? car.availability; // Fallback to static field
+      
+      if (availabilityFilter === 'available') {
+        return isAvailable;
+      } else if (availabilityFilter === 'unavailable') {
+        return !isAvailable;
+      }
+      
+      return true; // Default: show all
+    });
+  }, [cars, carAvailability, availabilityFilter]);
 
   // Helper function to get translated category name
   const getTranslatedCategory = (categoryName) => {
@@ -162,29 +184,30 @@ const AdminCars = () => {
       Object.entries(raw).filter(([, v]) => v !== undefined && v !== null && v !== '')
     );
 
-    const availability = opts.availability ?? availabilityFilter;
-    if (availability === 'available') {
-      params.availability = true;
-    } else if (availability === 'unavailable') {
-      params.availability = false;
-    } else {
-      // Default: show all cars (both available and unavailable)
-      params.availability = 'all';
-    }
+    // Note: We'll filter by availability on the frontend after getting real booking data
+    // So we always fetch all cars and filter them based on real availability status
 
     setLoading(true);
     setError('');
     try {
       const res = await api.cars.getAll(params);
       if (res?.success) {
-        setCars(res.data.cars || []);
+        const fetchedCars = res.data.cars || [];
+        setCars(fetchedCars);
         setPage(res.data.pagination.currentPage || 1);
         setTotalPages(res.data.pagination.totalPages || 1);
         setTotalItems(res.data.pagination.totalItems || 0);
+        
+        // Fetch real availability status for all cars
+        console.log('Fetching real availability status for cars...');
+        const availabilityMap = await getMultipleCarAvailability(fetchedCars);
+        setCarAvailability(availabilityMap);
+        console.log('Car availability map:', availabilityMap);
       } else {
         throw new Error(res?.message || 'Failed to load cars');
       }
-    } catch {
+    } catch (error) {
+      console.error('Error in fetchCars:', error);
       setError(t('adminCarsFailedToLoadCars'));
       showError(t('adminCarsFailedToLoadCars'));
     } finally {
@@ -404,8 +427,15 @@ const AdminCars = () => {
               </div>
               <div className="text-right flex items-end gap-4">
                 <div>
-                  <div className="text-2xl font-bold text-white">{totalItems}</div>
-                  <div className="text-sm text-gray-400">{t('adminCarsTotalCars')}</div>
+                  <div className="text-2xl font-bold text-white">
+                    {availabilityFilter === 'all' ? totalItems : filteredCars.length}
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    {availabilityFilter === 'all' 
+                      ? t('adminCarsTotalCars')
+                      : `${availabilityFilter === 'available' ? t('adminCarsAvailable') : t('adminCarsUnavailable')} ${t('adminCarsCars')}`
+                    }
+                  </div>
                 </div>
                 <button onClick={openCreate} className="px-6 py-3 text-base rounded-md border border-cyan-600/40 text-cyan-300 hover:bg-cyan-600/15 transition-colors cursor-pointer font-['Orbitron']">
                   <span className="inline-flex items-center gap-2">
@@ -593,10 +623,10 @@ const AdminCars = () => {
                       <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('adminCarsLoadingCars')}</td></tr>
                     ) : error ? (
                       <tr><td className="py-6 text-center text-red-300" colSpan={6}>{t('adminCarsFailedToLoadCars')}</td></tr>
-                    ) : cars.length === 0 ? (
+                    ) : filteredCars.length === 0 ? (
                       <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('adminCarsNoCarsFound')}</td></tr>
                     ) : (
-                      cars.map((c) => (
+                      filteredCars.map((c) => (
                         <tr key={c._id} className="border-b border-cyan-900/20 hover:bg-white/5 transition-colors">
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-3">
@@ -620,9 +650,73 @@ const AdminCars = () => {
                           <td className="py-4 px-4 text-gray-300 capitalize">{c.location || '-'}</td>
                           <td className="py-4 px-4 text-gray-300">${c.pricePerDay ?? c.price}</td>
                           <td className="py-4 px-4">
-                            <span className={`px-2 py-0.5 rounded text-xs ${c.availability ? 'bg-green-600/20 text-green-300 border border-green-500/30' : 'bg-yellow-600/20 text-yellow-300 border border-yellow-500/30'}`}>
-                              {c.availability ? t('adminCarsAvailable') : t('adminCarsUnavailable')}
-                            </span>
+                            {(() => {
+                              const availability = carAvailability[c._id];
+                              const isAvailable = availability?.available ?? c.availability; // Fallback to static field
+                              
+                              return (
+                                <div className="flex flex-col gap-2">
+                                  {/* Main Status Badge */}
+                                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border ${
+                                    isAvailable 
+                                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-emerald-500/20' 
+                                      : 'bg-red-500/10 text-red-400 border-red-500/30 shadow-red-500/20'
+                                  } shadow-sm`}>
+                                    {/* Status Icon */}
+                                    <div className={`w-2 h-2 rounded-full ${
+                                      isAvailable ? 'bg-emerald-400' : 'bg-red-400'
+                                    } animate-pulse`}></div>
+                                    
+                                    {/* Status Text */}
+                                    <span className="font-semibold text-sm">
+                                      {isAvailable ? t('adminCarsAvailable') : t('adminCarsUnavailable')}
+                                    </span>
+                                  </div>
+                                  
+                                  {/* Booking Details for Unavailable Cars */}
+                                  {!isAvailable && availability && (
+                                    <div className="flex flex-col gap-1">
+                                      {availability.activeBookings > 0 && (
+                                        <div className="flex items-center gap-2 px-2 py-1 bg-orange-500/10 border border-orange-500/20 rounded-md">
+                                          <div className="w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
+                                          <span className="text-xs text-orange-300 font-medium">
+                                            {availability.activeBookings} active booking{availability.activeBookings > 1 ? 's' : ''}
+                                          </span>
+                                        </div>
+                                      )}
+                                      
+                                      {availability.confirmedBookings > 0 && (
+                                        <div className="flex items-center gap-2 px-2 py-1 bg-blue-500/10 border border-blue-500/20 rounded-md">
+                                          <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+                                          <span className="text-xs text-blue-300 font-medium">
+                                            {availability.confirmedBookings} confirmed booking{availability.confirmedBookings > 1 ? 's' : ''}
+                                          </span>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Next Available Date */}
+                                      {availability.nextAvailableDate && (
+                                        <div className="text-xs text-gray-400 mt-1">
+                                          <span className="text-gray-500">Available:</span> {new Date(availability.nextAvailableDate).toLocaleDateString()}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                  
+                                  {/* Available Cars - Show Ready Status */}
+                                  {isAvailable && (
+                                    <div className="flex items-center gap-2 px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded-md">
+                                      <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                      <span className="text-xs text-emerald-300 font-medium">
+                                        Ready to rent
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </td>
                           <td className="py-4 px-4">
                             <div className="flex items-center justify-end gap-2">

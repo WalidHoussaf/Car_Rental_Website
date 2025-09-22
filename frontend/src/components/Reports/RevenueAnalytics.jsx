@@ -653,6 +653,37 @@ const RevenueAnalytics = () => {
 
           <div className="space-y-3">
             {revenueData.topRevenueMonths.slice(0, 5).map((month, index) => {
+              // SVG Medal Icons
+              const GoldMedalIcon = () => (
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="8" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2"/>
+                  <text x="12" y="16" textAnchor="middle" className="text-xs font-bold fill-yellow-900">1</text>
+                </svg>
+              );
+
+              const SilverMedalIcon = () => (
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="8" fill="#d1d5db" stroke="#9ca3af" strokeWidth="2"/>
+                  <text x="12" y="16" textAnchor="middle" className="text-xs font-bold fill-gray-700">2</text>
+                </svg>
+              );
+
+              const BronzeMedalIcon = () => (
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="8" fill="#f97316" stroke="#ea580c" strokeWidth="2"/>
+                  <text x="12" y="16" textAnchor="middle" className="text-xs font-bold fill-orange-900">3</text>
+                </svg>
+              );
+
+              const CalendarIcon = () => (
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              );
+
               // Enhanced medal system with better colors and effects
               const getRankStyle = (rank) => {
                 switch(rank) {
@@ -660,28 +691,28 @@ const RevenueAnalytics = () => {
                     bg: 'bg-gradient-to-br from-yellow-400/20 to-amber-500/20',
                     border: 'border-yellow-400/40',
                     text: 'text-yellow-400',
-                    icon: '🥇',
+                    icon: <GoldMedalIcon />,
                     shadow: 'shadow-yellow-400/20'
                   };
                   case 1: return {
                     bg: 'bg-gradient-to-br from-gray-300/20 to-slate-400/20',
                     border: 'border-gray-300/40',
                     text: 'text-gray-300',
-                    icon: '🥈',
+                    icon: <SilverMedalIcon />,
                     shadow: 'shadow-gray-300/20'
                   };
                   case 2: return {
                     bg: 'bg-gradient-to-br from-orange-400/20 to-amber-600/20',
                     border: 'border-orange-400/40',
                     text: 'text-orange-400',
-                    icon: '🥉',
+                    icon: <BronzeMedalIcon />,
                     shadow: 'shadow-orange-400/20'
                   };
                   default: return {
                     bg: 'bg-gray-700/30',
                     border: 'border-gray-600/40',
                     text: 'text-gray-400',
-                    icon: '📅',
+                    icon: <CalendarIcon />,
                     shadow: 'shadow-gray-600/10'
                   };
                 }
@@ -695,7 +726,7 @@ const RevenueAnalytics = () => {
                     <div className="flex items-center gap-4">
                       <div className="flex-shrink-0">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${rankStyle.text} bg-gray-800/50 border ${rankStyle.border}`}>
-                          <span className="text-lg">{rankStyle.icon}</span>
+                          {rankStyle.icon}
                         </div>
                       </div>
                       <div>
@@ -753,8 +784,9 @@ const RevenueAnalytics = () => {
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                      <polyline points="17 6 23 6 23 12"/>
                     </svg>
                   </div>
                 </div>
@@ -784,8 +816,9 @@ const RevenueAnalytics = () => {
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <line x1="12" y1="1" x2="12" y2="23"/>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                     </svg>
                   </div>
                 </div>
@@ -813,8 +846,8 @@ const RevenueAnalytics = () => {
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
+                    <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 1024 1024">
+                      <path d="M384 960v-64h192.064v64H384zm448-544a350.656 350.656 0 0 1-128.32 271.424C665.344 719.04 640 763.776 640 813.504V832H320v-14.336c0-48-19.392-95.36-57.216-124.992a351.552 351.552 0 0 1-128.448-344.256c25.344-136.448 133.888-248.128 269.76-276.48A352.384 352.384 0 0 1 832 416zm-544 32c0-132.288 75.904-224 192-224v-64c-154.432 0-256 122.752-256 288h64z"/>
                     </svg>
                   </div>
                 </div>
