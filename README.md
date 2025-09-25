@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="assets/icons/logo.png" alt="Rent My Ride - Car Rental Platform" width="200" height="auto" style="margin: 20px 0; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);" />
+<img src="assets/icons/logo.png" alt="Rent My Ride - Car Rental Platform" width="350" height="auto" style="margin: 30px 0; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); transform: scale(1.05);" />
 
-# 🚗 **Rent My Ride** - Premium Car Rental Platform
+# **Rent My Ride** - Premium Car Rental Platform
 
 <p style="font-size: 1.2em; color: #6B7280; margin: 10px 0 30px 0;">
   <em>Drive Your Dreams, Rent with Confidence</em>
@@ -10,7 +10,12 @@
 
 </div> 
 
-> **Rent My Ride** is a comprehensive, full-stack car rental platform engineered with cutting-edge web technologies. This production-ready application delivers a seamless rental experience through intelligent real-time availability tracking, automated booking workflows, and a sophisticated admin dashboard. Built with React 18, Express.js, and MongoDB, it features bilingual support, interactive maps, automated status management, and comprehensive business analytics. The platform ensures optimal user experience with smart booking validation, location-based filtering, and responsive design across all devices.
+<div align="center">
+
+> **A modern, full-stack car rental platform built with React, Express.js, and MongoDB.**  
+> **Features real-time availability, automated workflows, and comprehensive admin dashboard.**
+
+</div>
 
 <div align="center">
 
@@ -37,7 +42,7 @@
 
 ---
 
-## <img src="assets/icons/tableofcontent.png" alt="Table of Contents" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Table of Contents
+## Table of Contents
 
 - [✨ Key Features](#-key-features)
 - [🛠 Tech Stack](#-tech-stack)
@@ -50,7 +55,7 @@
 
 ---
 
-## <img src="assets/icons/key-feature.png" alt="Key Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Key Features
+## <img src="assets/icons/key-feature.png" alt="Key Features" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Key Features
 
 ### 🎯 **User Experience**
 - **Real-time Car Availability** - Live availability checking prevents booking conflicts
@@ -84,7 +89,7 @@
 
 ---
 
-## <img src="assets/icons/tech-stack.png" alt="Tech Stack" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Tech Stack
+## <img src="assets/icons/tech-stack.png" alt="Tech Stack" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Tech Stack
 
 ### **Frontend**
 ```javascript
@@ -120,7 +125,7 @@ Git + GitHub          // Version control
 
 ---
 
-## <img src="assets/icons/architecture.png" alt="Architecture" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Architecture
+## <img src="assets/icons/architecture.png" alt="Architecture" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Architecture
 
 ### **Project Structure**
 ```
@@ -148,7 +153,7 @@ Car_Rental_Website/
 └── 📄 README.md
 ```
 
-## <img src="assets/icons/quick-start.png" alt="Quick Start" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Quick Start
+## <img src="assets/icons/quick-start.png" alt="Quick Start" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Quick Start
 
 ### **Prerequisites**
 - Node.js 16+ and npm
@@ -195,31 +200,11 @@ npm run seed         # Populate with sample data
 
 ---
 
-## <img src="assets/icons/screenshot.png" alt="Screenshots" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Screenshots
-
-### **🏠 Homepage - Modern Hero Design**
-![Homepage](screenshots/homepage.png)
-*Responsive hero section with featured cars and smooth animations*
-
-### **🚗 Car Catalog - Smart Filtering**
-![Car Catalog](screenshots/cars-page.png)
-*Real-time availability checking with advanced search filters*
-
-### **📅 Booking Flow - Intuitive Process**
-![Booking Process](screenshots/booking-flow.png)
-*Multi-step booking with date validation and location selection*
-
-### **📊 Admin Dashboard - Comprehensive Analytics**
-![Admin Dashboard](screenshots/admin-dashboard.png)
-*Real-time business metrics with interactive charts*
-
-### **📱 Mobile Experience - Fully Responsive**
-![Mobile Views](screenshots/mobile-responsive.png)
-*Optimized mobile interface across all devices*
+## <img src="assets/icons/screenshot.png" alt="Screenshots" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Screenshots
 
 ---
 
-## <img src="assets/icons/feature.png" alt="Advanced Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Advanced Features
+## <img src="assets/icons/feature.png" alt="Advanced Features" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Advanced Features
 
 ### **🤖 Automated Booking Management**
 ```javascript
@@ -254,7 +239,7 @@ active → completed (return date passes)
 - Localized date/time formatting
 - Currency formatting
 
-## <img src="assets/icons/deployment.png" alt="Deployment" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Deployment
+## <img src="assets/icons/deployment.png" alt="Deployment" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Deployment
 
 ### **Frontend Deployment** (Netlify/Vercel)
 ```bash
@@ -275,7 +260,7 @@ npm start           # Production server
 
 ---
 
-## <img src="assets/icons/contibution.png" alt="Contributing" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contributing
+## <img src="assets/icons/contibution.png" alt="Contributing" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -288,28 +273,28 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## <img src="assets/icons/contact.png" alt="Contact" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contact
+## <img src="assets/icons/contact.png" alt="Contact" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Contact
 
-**My Name** - [@WalidHoussafX] - walid.houssaf.dev@gmail.com
+**Please Contact me on my Professional Gmail** - walid.houssaf.dev@gmail.com
 
 **Project Link**: [https://github.com/WalidHoussaf/Car_Rental_Website](https://github.com/WalidHoussaf/Car_Rental_Website)
 
 ---
 
-## <img src="assets/icons/licence.png" alt="License" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> License
+## <img src="assets/icons/licence.png" alt="License" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ---
 
-## <img src="assets/icons/acknowledgments.png" alt="Acknowledgments" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Acknowledgments
+## <img src="assets/icons/acknowledgments.png" alt="Acknowledgments" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Acknowledgments
 
 - React team for the amazing framework
 - MongoDB for the flexible database
 - Tailwind CSS for the utility-first approach
 - All open-source contributors who made this project possible
 - GitHub for the version control
-- Attribution for the icons and images used in the project that are not created by me
+- Attribution for the icons, videos and images used in the project that are not created by me
 ---
 
 <div align="center">
