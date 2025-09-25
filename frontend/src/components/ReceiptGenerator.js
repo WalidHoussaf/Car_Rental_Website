@@ -7,7 +7,6 @@ class ReceiptGenerator {
     this.t = t;
   }
 
-  // Available options with pricing
   getAvailableOptions() {
     return [
       { id: 'insurance', name: 'Assurance Premium', price: 45 },
@@ -19,7 +18,6 @@ class ReceiptGenerator {
     ];
   }
 
-  // Format date helper
   formatDate(date) {
     if (!date) return '';
     return new Date(date).toLocaleDateString('fr-FR', { 
@@ -30,12 +28,10 @@ class ReceiptGenerator {
     });
   }
 
-  // Create receipt HTML content
   createReceiptHTML(bookingData, bookingId) {
     const { bookingDetails, carDetails } = bookingData;
     const availableOptions = this.getAvailableOptions();
     
-    // Store local copies to avoid reference issues
     const carName = carDetails?.name || 'Véhicule';
     const carCategory = carDetails?.category || 'Premium';
     const carPrice = carDetails?.price || 0;
@@ -48,7 +44,6 @@ class ReceiptGenerator {
     const hasOptions = bookingDetails?.options && bookingDetails.options.length > 0;
     const optionsPrice = hasOptions ? totalPrice - (carPrice * totalDays) : 0;
     
-    // Determine which options have been selected
     const selectedOptions = bookingDetails?.options?.map(optionId => {
       return availableOptions.find(opt => opt.id === optionId);
     }).filter(Boolean) || [];
@@ -217,7 +212,6 @@ class ReceiptGenerator {
     `;
   }
 
-  // Add required styles to document
   addStylesToDocument() {
     const existingStyle = document.getElementById('receipt-styles');
     if (!existingStyle) {
@@ -261,7 +255,6 @@ class ReceiptGenerator {
     return document.getElementById('orbitron-font');
   }
 
-  // Show notification
   showNotification(message, type = 'info', duration = 3000) {
     const notification = document.createElement('div');
     notification.style.position = 'fixed';
@@ -274,7 +267,6 @@ class ReceiptGenerator {
     notification.style.fontWeight = '500';
     notification.textContent = message;
 
-    // Set colors based on type
     switch (type) {
       case 'success':
         notification.style.background = 'linear-gradient(to right, white, #22d3ee)';
@@ -294,7 +286,6 @@ class ReceiptGenerator {
 
     document.body.appendChild(notification);
 
-    // Remove notification after duration
     setTimeout(() => {
       if (document.body.contains(notification)) {
         document.body.removeChild(notification);
@@ -304,24 +295,19 @@ class ReceiptGenerator {
     return notification;
   }
 
-  // Clean up PDF generation elements
   cleanupPDFElements(receiptContent, loadingNotification, fontElement = null) {
-    // Remove PDF content element
     if (receiptContent && document.body.contains(receiptContent)) {
       document.body.removeChild(receiptContent);
     }
     
-    // Remove loading notification
     if (loadingNotification && document.body.contains(loadingNotification)) {
       document.body.removeChild(loadingNotification);
     }
-    
-    // Remove temporary font element if added
+
     if (fontElement && document.head.contains(fontElement) && fontElement.id !== 'orbitron-font') {
       document.head.removeChild(fontElement);
     }
 
-    // Clean up any background containers
     const backgroundContainers = document.querySelectorAll('[data-pdf-background]');
     backgroundContainers.forEach(container => {
       if (document.body.contains(container)) {
@@ -330,18 +316,14 @@ class ReceiptGenerator {
     });
   }
 
-  // Generate and download PDF receipt
   async generateReceipt(bookingData, bookingId, onSuccess, onError) {
     try {
       const pdfBookingId = bookingId || 'TEMP-' + Math.floor(Math.random() * 10000);
-      
-      // Show loading notification
+
       const loadingNotification = this.showNotification(this.t('receiptPreparation'), 'info', 10000);
-      
-      // Add styles to document
+
       const fontElement = this.addStylesToDocument();
-      
-      // Create receipt content element
+
       const receiptContent = document.createElement('div');
       receiptContent.id = 'pdf-content';
       receiptContent.style.width = '210mm';
@@ -356,16 +338,12 @@ class ReceiptGenerator {
       receiptContent.style.margin = '0';
       receiptContent.style.boxSizing = 'border-box';
       receiptContent.style.overflow = 'hidden';
-      
-      // Set the receipt HTML content
+
       receiptContent.innerHTML = this.createReceiptHTML(bookingData, pdfBookingId);
-      
-      // Add to document
+
       document.body.appendChild(receiptContent);
-      
-      // Delay for content rendering
+
       setTimeout(() => {
-        // Create background container
         const containerBackground = document.createElement('div');
         containerBackground.setAttribute('data-pdf-background', 'true');
         containerBackground.style.position = 'fixed';
@@ -376,8 +354,7 @@ class ReceiptGenerator {
         containerBackground.style.backgroundColor = 'black';
         containerBackground.style.zIndex = '-10000';
         document.body.appendChild(containerBackground);
-        
-        // Generate canvas and PDF
+
         html2canvas(receiptContent, {
           scale: 2,
           useCORS: true,
@@ -397,24 +374,19 @@ class ReceiptGenerator {
             compress: true,
             background: 'black'
           });
-          
-          // Set black background
+
           pdf.setFillColor(0, 0, 0);
           pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight(), 'F');
-          
-          // Calculate image dimensions
+
           const pageWidth = pdf.internal.pageSize.getWidth();
           const contentRatio = canvas.height / canvas.width;
           const imgWidth = pageWidth;
           const imgHeight = imgWidth * contentRatio;
-          
-          // Add image to PDF
+
           pdf.addImage(imgData, 'JPEG', 0, 6, imgWidth, imgHeight);
-          
-          // Save the PDF
+
           pdf.save(`recu-reservation-${pdfBookingId}.pdf`);
-          
-          // Clean up and call success callback
+
           this.cleanupPDFElements(receiptContent, loadingNotification, fontElement);
           
           if (onSuccess) {
@@ -433,15 +405,11 @@ class ReceiptGenerator {
     }
   }
 
-  // Handle errors during PDF generation
   handleError(receiptContent, loadingNotification, fontElement, onError) {
-    // Clean up elements
     this.cleanupPDFElements(receiptContent, loadingNotification, fontElement);
-    
-    // Show error notification
+
     this.showNotification(this.t('receiptError'), 'error', 3000);
-    
-    // Call error callback if provided
+
     if (onError) {
       onError();
     }

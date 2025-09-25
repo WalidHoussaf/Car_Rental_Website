@@ -1,10 +1,8 @@
 import { createContext, useContext } from 'react';
 import { toast } from 'react-toastify';
 
-// Create the context
 export const NotificationContext = createContext();
 
-// Custom hook to use the notification context
 export const useNotification = () => {
   return useContext(NotificationContext);
 };

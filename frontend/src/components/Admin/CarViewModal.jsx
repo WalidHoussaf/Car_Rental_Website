@@ -10,7 +10,6 @@ const CarViewModal = ({ open, onClose, car }) => {
   const [availability, setAvailability] = useState(null);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
   
-  // Fetch availability data when modal opens
   useEffect(() => {
     if (open && car?._id) {
       setLoadingAvailability(true);
@@ -138,7 +137,7 @@ const CarViewModal = ({ open, onClose, car }) => {
             ) : (
               <div className="flex flex-col gap-3">
                 {(() => {
-                  const isAvailable = availability?.available ?? car.availability; // Fallback to static field
+                  const isAvailable = availability?.available ?? car.availability;
                   
                   return (
                     <>

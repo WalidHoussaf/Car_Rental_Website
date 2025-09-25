@@ -1,4 +1,3 @@
-// Utility helpers for price normalization and formatting
 
 export const getNumericPrice = (car) => {
   if (!car) return 0;

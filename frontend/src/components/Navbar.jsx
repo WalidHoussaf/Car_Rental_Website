@@ -19,10 +19,8 @@ const Navbar = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
 
-  // Check if currently on cars page
   const isOnCarsPage = location.pathname === '/cars';
 
-  // Extract searchParam from URL if on cars page
   useEffect(() => {
     if (isOnCarsPage) {
       const queryParams = new URLSearchParams(location.search);
@@ -35,7 +33,6 @@ const Navbar = () => {
     }
   }, [isOnCarsPage, location.search]);
 
-  // Change navbar style on scroll
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -45,7 +42,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close account menu on outside click or Esc
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (accountRef.current && !accountRef.current.contains(e.target)) {
@@ -63,28 +59,23 @@ const Navbar = () => {
     };
   }, []);
 
-  // Toggle search box - only works on cars page
   const toggleSearch = () => {
     if (isOnCarsPage) {
       setIsSearchOpen(!isSearchOpen);
     }
   };
 
-  // Handle search submission
   const handleSearch = (e) => {
     if (e) {
       e.preventDefault();
     }
     
     if (searchValue.trim() !== '') {
-      // If already on the cars page, use handleSearchUpdate from the page context
       if (isOnCarsPage) {
-        // Send custom event with search value
         window.dispatchEvent(new CustomEvent('update-search', { 
           detail: { query: searchValue.trim() }
         }));
       } else {
-        // Navigate to cars page with search parameter
         navigate(`/cars?search=${encodeURIComponent(searchValue.trim())}`);
       }
       setIsSearchOpen(false);

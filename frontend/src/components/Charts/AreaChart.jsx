@@ -28,7 +28,6 @@ const AreaChart = ({
   const minValue = Math.min(...data);
   const range = Math.max(1, maxValue - minValue);
 
-  // Generate area path
   const generateAreaPath = () => {
     const points = data.map((value, index) => {
       const x = padding + (index * chartWidth) / Math.max(1, data.length - 1);
@@ -43,7 +42,6 @@ const AreaChart = ({
     return `M ${firstX},${bottomY} L ${points.join(' L ')} L ${lastX},${bottomY} Z`;
   };
 
-  // Generate line path
   const generateLinePath = () => {
     const points = data.map((value, index) => {
       const x = padding + (index * chartWidth) / Math.max(1, data.length - 1);
@@ -54,12 +52,10 @@ const AreaChart = ({
     return `M ${points.join(' L ')}`;
   };
 
-  // Generate grid lines
   const generateGridLines = () => {
     const lines = [];
     const gridCount = 5;
     
-    // Horizontal grid lines
     for (let i = 0; i <= gridCount; i++) {
       const y = padding + (i * chartHeight) / gridCount;
       lines.push(

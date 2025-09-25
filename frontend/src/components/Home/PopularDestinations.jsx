@@ -7,13 +7,11 @@ const PopularDestinations = ({ destinations }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
 
-  // Function to get the translated name of a destination
   const getTranslatedName = (destination) => {
     const key = `destination_${destination.name.toLowerCase().replace(/\s+/g, '_')}`;
     return t(key) || destination.name;
   };
 
-  // Function to get the translated description of a destination
   const getTranslatedDescription = (destination) => {
     const key = `destination_${destination.name.toLowerCase().replace(/\s+/g, '_')}_desc`;
     return t(key) || destination.description || t('exploreDestination');

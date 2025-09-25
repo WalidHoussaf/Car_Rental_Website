@@ -53,37 +53,31 @@ const UsersAnalytics = () => {
       registrationLabels.push(label);
     }
 
-    // Process users
     let newUsersThisMonth = 0;
     const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     
     users.forEach(user => {
       const registrationDate = new Date(user.createdAt || user.registrationDate);
       
-      // Monthly growth
       const monthKey = `${registrationDate.getFullYear()}-${String(registrationDate.getMonth() + 1).padStart(2, '0')}`;
       if (Object.prototype.hasOwnProperty.call(monthlyData, monthKey)) {
         monthlyData[monthKey]++;
       }
 
-      // New users this month
       if (monthKey === currentMonth) {
         newUsersThisMonth++;
       }
 
-      // Role distribution
       if (Object.prototype.hasOwnProperty.call(roleCounts, user.role)) {
         roleCounts[user.role]++;
       }
 
-      // Registration trends (last 7 days)
       const dayKey = registrationDate.toISOString().split('T')[0];
       if (Object.prototype.hasOwnProperty.call(registrationData, dayKey)) {
         registrationData[dayKey]++;
       }
     });
 
-    // Calculate active users (users with bookings in last 30 days)
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
@@ -95,7 +89,6 @@ const UsersAnalytics = () => {
       }
     });
 
-    // User engagement (bookings per user)
     const userBookingCounts = {};
     bookings.forEach(booking => {
       if (booking.user?._id) {
@@ -117,7 +110,6 @@ const UsersAnalytics = () => {
       else engagementRanges['6+ bookings']++;
     });
 
-    // Convert to cumulative growth
     const monthlyGrowth = [];
     let cumulativeUsers = 0;
     Object.values(monthlyData).forEach(monthlyCount => {
@@ -148,7 +140,7 @@ const UsersAnalytics = () => {
         value: count
       }))
     });
-  }, [language]); // Dependencies: language is used in the function
+  }, [language]);
 
   useEffect(() => {
     const fetchUsersData = async () => {
@@ -171,7 +163,7 @@ const UsersAnalytics = () => {
     };
 
     fetchUsersData();
-  }, [processUsersData]); // Now includes processUsersData in dependencies
+  }, [processUsersData]); 
 
   if (loading) {
     return (
@@ -338,7 +330,7 @@ const UsersAnalytics = () => {
           </div>
         </div>
 
-        {/* Enhanced Recharts Area Chart */}
+        {/* Recharts Area Chart */}
         <div className="h-80 mb-4">
           <ResponsiveContainer width="100%" height="100%">
             <RechartsAreaChart
@@ -735,8 +727,7 @@ const UsersAnalytics = () => {
                 const percentage = totalEngagedUsers > 0 
                   ? (engagement.value / totalEngagedUsers * 100).toFixed(1)
                   : 0;
-                
-                // SVG Icons for engagement levels
+
                 const HighEngagementIcon = () => (
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
@@ -765,7 +756,6 @@ const UsersAnalytics = () => {
                   </svg>
                 );
 
-                // Get engagement level styling
                 const getEngagementStyle = () => {
                   if (engagement.label.includes('6+')) return {
                     bg: 'bg-gradient-to-r from-green-500/20 to-emerald-500/20',

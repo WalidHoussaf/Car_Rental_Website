@@ -24,35 +24,23 @@ const CarsAnalytics = () => {
   useEffect(() => {
     const fetchCarsData = async () => {
       try {
-        console.log('Fetching bookings data first...');
-        // First try just bookings since that works in RevenueAnalytics
         const bookingsResponse = await api.bookings.getAll({ limit: 1000 });
-        console.log('Bookings response:', bookingsResponse);
         
         if (bookingsResponse.success && bookingsResponse.data.bookings) {
-          console.log('Bookings fetched successfully, now trying cars...');
-          
-          // Fetch all cars with proper limit
-          console.log('Fetching all cars...');
           const carsResponse = await api.cars.getAll({ limit: 50 });
-          console.log('Cars response:', carsResponse);
-          console.log(`Successfully fetched ${carsResponse.data.cars?.length || 0} cars`);
           
           if (carsResponse.success && carsResponse.data.cars) {
             const cars = carsResponse.data.cars;
             const bookings = bookingsResponse.data.bookings;
             
-            console.log(`Processing ${cars.length} cars and ${bookings.length} bookings`);
             processCarsData(cars, bookings);
           } else {
             console.error('Invalid cars response:', carsResponse);
-            // Use only bookings data for now
             const mockCars = [];
             processCarsData(mockCars, bookingsResponse.data.bookings);
           }
         } else {
           console.error('Invalid bookings response:', bookingsResponse);
-          // Set empty data to prevent errors
           setCarsData({
             totalCars: 0,
             availableCars: 0,
@@ -67,36 +55,7 @@ const CarsAnalytics = () => {
         }
       } catch (error) {
         console.error('Failed to fetch cars data:', error);
-        console.error('Error details:', error.message);
         
-        // Try to fetch cars and bookings separately to identify which one is failing
-        try {
-          console.log('Trying to fetch cars separately...');
-          const carsOnly = await api.cars.getAll({ limit: 1000 });
-          console.log('Cars only response:', carsOnly);
-        } catch (carsError) {
-          console.error('Cars API error:', carsError);
-          console.error('Cars API error details:', carsError.message);
-          
-          // Try without limit parameter
-          try {
-            console.log('Trying cars API without limit parameter...');
-            const carsNoLimit = await api.cars.getAll();
-            console.log('Cars without limit response:', carsNoLimit);
-          } catch (noLimitError) {
-            console.error('Cars API without limit error:', noLimitError);
-          }
-        }
-        
-        try {
-          console.log('Trying to fetch bookings separately...');
-          const bookingsOnly = await api.bookings.getAll({ limit: 1000 });
-          console.log('Bookings only response:', bookingsOnly);
-        } catch (bookingsError) {
-          console.error('Bookings API error:', bookingsError);
-        }
-        
-        // Set empty data to prevent errors
         setCarsData({
           totalCars: 0,
           availableCars: 0,
@@ -117,12 +76,7 @@ const CarsAnalytics = () => {
   }, []);
 
   const processCarsData = (cars = [], bookings = []) => {
-    console.log('Processing cars data...', { carsCount: cars.length, bookingsCount: bookings.length });
-    
-    // Handle empty cars array
     if (cars.length === 0) {
-      console.log('No cars data available, using mock data for demonstration');
-      // Create some mock data for demonstration
       const mockCars = [
         { _id: '1', name: 'Toyota Camry', category: 'Sedan', location: 'Downtown', rating: 4.5, pricePerDay: 50 },
         { _id: '2', name: 'Honda CR-V', category: 'SUV', location: 'Airport', rating: 4.2, pricePerDay: 65 },
@@ -132,28 +86,22 @@ const CarsAnalytics = () => {
       cars = mockCars;
     }
     
-    // Category distribution
     const categoryCount = {};
     cars.forEach(car => {
       const category = car.category || 'Unknown';
       categoryCount[category] = (categoryCount[category] || 0) + 1;
     });
-    console.log('Category distribution:', categoryCount);
 
-    // Location distribution
     const locationCount = {};
     cars.forEach(car => {
       const location = car.location || 'Unknown';
       locationCount[location] = (locationCount[location] || 0) + 1;
     });
-    console.log('Location distribution:', locationCount);
 
-    // Calculate car performance metrics
     const carPerformance = {};
     const carRevenue = {};
     const carBookingCount = {};
 
-    // Initialize car metrics
     cars.forEach(car => {
       carPerformance[car._id] = {
         id: car._id,
@@ -170,7 +118,6 @@ const CarsAnalytics = () => {
       carBookingCount[car._id] = 0;
     });
 
-    // Process bookings to calculate performance
     bookings.forEach(booking => {
       if (booking.car && booking.car._id && carPerformance[booking.car._id]) {
         const amount = Number(booking.totalAmount) || 0;
@@ -178,7 +125,6 @@ const CarsAnalytics = () => {
         const endDate = new Date(booking.endDate);
         const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) || 1;
 
-        // Only count revenue from confirmed, active, and completed bookings
         if (['confirmed', 'active', 'completed'].includes(booking.status)) {
           carPerformance[booking.car._id].revenue += amount;
           carRevenue[booking.car._id] += amount;
@@ -190,51 +136,35 @@ const CarsAnalytics = () => {
       }
     });
 
-    // Get top performing cars by revenue
     const topPerformingCars = Object.values(carPerformance)
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 10);
 
-    // Calculate utilization rate (simplified - based on bookings vs available days)
     const totalBookings = bookings.length;
     const totalCars = cars.length;
-    const utilizationRate = totalCars > 0 ? (totalBookings / (totalCars * 30)) * 100 : 0; // Assuming 30 days period
+    const utilizationRate = totalCars > 0 ? (totalBookings / (totalCars * 30)) * 100 : 0;
 
-    // Calculate average rating
     const carsWithRating = cars.filter(car => car.rating && car.rating > 0);
     const averageRating = carsWithRating.length > 0 
       ? carsWithRating.reduce((sum, car) => sum + car.rating, 0) / carsWithRating.length 
       : 0;
 
-    // Maintenance status (simulated based on car age and usage)
     const maintenanceStatus = {
       'Good': Math.floor(cars.length * 0.7),
       'Needs Service': Math.floor(cars.length * 0.2),
       'In Maintenance': Math.floor(cars.length * 0.1)
     };
 
-    // Available cars (cars not currently in active or confirmed bookings)
     const unavailableCars = new Set();
-    const bookingStatusBreakdown = {};
     
     bookings.forEach(booking => {
-      const status = booking.status;
-      bookingStatusBreakdown[status] = (bookingStatusBreakdown[status] || 0) + 1;
-      
-      // Cars are unavailable if they have active or confirmed bookings
-      if (['active', 'confirmed'].includes(status) && booking.car?._id) {
+      if (['active', 'confirmed'].includes(booking.status) && booking.car?._id) {
         unavailableCars.add(booking.car._id);
-        console.log(`Car ${booking.car.name || booking.car._id} is unavailable due to ${status} booking`);
       }
     });
     
-    console.log('Booking status breakdown:', bookingStatusBreakdown);
-    console.log(`Unavailable cars: ${unavailableCars.size} out of ${cars.length} total cars`);
-    console.log('Unavailable car IDs:', Array.from(unavailableCars));
-    
     const availableCars = cars.length - unavailableCars.size;
 
-    // Revenue per car analysis
     const revenuePerCarData = Object.values(carPerformance)
       .filter(car => car.revenue > 0)
       .sort((a, b) => b.revenue - a.revenue)
@@ -265,7 +195,6 @@ const CarsAnalytics = () => {
       revenuePerCar: revenuePerCarData
     };
     
-    console.log('Final processed cars data:', finalData);
     setCarsData(finalData);
   };
 
@@ -680,7 +609,6 @@ const CarsAnalytics = () => {
                   <td className="py-3 pr-4">
                     <div className="flex items-center gap-2">
                       {(() => {
-                        // SVG Medal Icons
                         const GoldMedalIcon = () => (
                           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="12" r="8" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2"/>

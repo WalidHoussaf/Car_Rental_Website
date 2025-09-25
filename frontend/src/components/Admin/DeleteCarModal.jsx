@@ -14,14 +14,12 @@ const DeleteCarModal = ({
   const t = useTranslations(language);
   const [confirmAck, setConfirmAck] = useState(false);
 
-  // Reset confirmation when modal opens/closes
   useEffect(() => {
     if (open) {
       setConfirmAck(false);
     }
   }, [open]);
 
-  // Handle ESC key
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') onClose?.();

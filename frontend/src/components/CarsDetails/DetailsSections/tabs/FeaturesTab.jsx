@@ -3,7 +3,6 @@ import FeatureCard from '../FeatureCard';
 import { useLanguage } from '../../../../hooks/useLanguage';
 import { useTranslations } from '../../../../translations';
 
-// Helper function to determine iconType based on feature name
 const getIconTypeFromFeature = (featureName) => {
   const featureLower = featureName.toLowerCase();
   
@@ -26,7 +25,6 @@ const getIconTypeFromFeature = (featureName) => {
   if (featureLower.includes('bluetooth')) 
     return 'bluetooth';
   
-  // Default, return 'default'
   return 'default';
 };
 
@@ -52,7 +50,6 @@ const FeaturesTab = ({ car }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-rows-[repeat(auto-fit,minmax(0,1fr))]">
           {car.features && car.features.length > 0 ? (
             car.features.map((feature, index) => {
-              // Get feature translation if it exists
               const featureKey = `feature_${feature.toLowerCase().replace(/\s+/g, '_')}`;
               const translatedFeature = t(featureKey) !== featureKey ? t(featureKey) : feature;
               

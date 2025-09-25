@@ -1,7 +1,6 @@
 // API Configuration
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Create API instance with default configuration
 const createApiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   
@@ -11,7 +10,6 @@ const createApiRequest = async (endpoint, options = {}) => {
     },
   };
 
-  // Add authorization header if token exists
   const token = localStorage.getItem('token');
   if (token) {
     defaultOptions.headers.Authorization = `Bearer ${token}`;
@@ -26,7 +24,6 @@ const createApiRequest = async (endpoint, options = {}) => {
     },
   };
 
-  // If body is FormData, let the browser set the Content-Type with boundary
   if (config.body instanceof FormData) {
     delete config.headers['Content-Type'];
   }
@@ -117,7 +114,6 @@ export const api = {
   // Booking endpoints
   bookings: {
     getMyBookings: (params = {}) => {
-      // Clean params to avoid sending undefined/null/empty values
       const cleanParams = {};
       Object.keys(params).forEach(key => {
         if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
@@ -131,7 +127,6 @@ export const api = {
     getStats: () => createApiRequest('/bookings/stats'),
     
     getAll: (params = {}) => {
-      // Clean params to avoid sending undefined/null/empty values (e.g., status=undefined)
       const cleanParams = {};
       Object.keys(params).forEach(key => {
         if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
@@ -177,7 +172,6 @@ export const api = {
   // User endpoints
   users: {
     getAll: (params = {}) => {
-      // Filter out undefined values to prevent them from being sent as 'undefined' strings
       const cleanParams = {};
       Object.keys(params).forEach(key => {
         if (params[key] !== undefined && params[key] !== null && params[key] !== '') {

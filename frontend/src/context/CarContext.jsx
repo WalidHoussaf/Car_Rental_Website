@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { api } from '../config/api.js';
 
-// Create the context
 const CarContext = createContext();
 
 
@@ -30,7 +29,6 @@ export const CarProvider = ({ children }) => {
     itemsPerPage: 50
   });
 
-  // Fetch cars with filters
   const fetchCars = async (searchFilters = filters, page = 1) => {
     setLoading(true);
     setError(null);
@@ -42,7 +40,6 @@ export const CarProvider = ({ children }) => {
         ...searchFilters
       };
 
-      // Remove empty filters
       Object.keys(params).forEach(key => {
         if (params[key] === '' || params[key] === null || params[key] === undefined) {
           delete params[key];
@@ -65,7 +62,6 @@ export const CarProvider = ({ children }) => {
     }
   };
 
-  // Get single car by ID
   const getCarById = async (carId) => {
     try {
       const response = await api.cars.getById(carId);
@@ -120,7 +116,7 @@ export const CarProvider = ({ children }) => {
   // Fetch featured cars (unfiltered)
   const fetchFeaturedCars = async () => {
     try {
-      const response = await api.cars.getAll({ limit: 6 }); // Get 6 cars for featured section
+      const response = await api.cars.getAll({ limit: 6 }); 
       if (response.success) {
         setFeaturedCars(response.data.cars);
       }

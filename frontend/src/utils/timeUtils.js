@@ -1,5 +1,3 @@
-// src/utils/timeUtils.js
-
 // Generate time options for select dropdowns with 30-minute intervals
 export const generateTimeOptions = () => {
   const options = [];

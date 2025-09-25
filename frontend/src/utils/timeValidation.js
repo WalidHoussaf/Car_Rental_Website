@@ -43,15 +43,9 @@ export const LOCATION_OPERATING_HOURS = {
     weekdays: { open: '06:00', close: '22:00' },
     weekends: { open: '06:00', close: '22:00' }
   },
-  // Legacy support for 'airport' key
-  airport: {
-    weekdays: { open: '06:00', close: '22:00' },
-    weekends: { open: '06:00', close: '22:00' }
-  }
 };
 
-// Buffer time in minutes for booking processing
-const BOOKING_BUFFER_MINUTES = 60; // Increased to 1 hour for safer booking window
+const BOOKING_BUFFER_MINUTES = 60; 
 
 /**
  * Get available time slots for a location on a specific date
@@ -71,16 +65,11 @@ export const getAvailableTimeSlots = (location, date) => {
     const selectedDate = new Date(date);
     const today = new Date();
     const isToday = selectedDate.toDateString() === today.toDateString();
-    
-    
-    // Get operating hours for the location
-    
+      
     const locationHours = LOCATION_OPERATING_HOURS[location.toLowerCase()];
     if (!locationHours) {
-      // Fallback to default hours if location not found
       const allTimeSlots = generateTimeOptions();
       
-      // Still apply time filtering for today even with default hours
       if (isToday) {
         const now = new Date();
         const currentTimeWithBuffer = new Date(now.getTime() + BOOKING_BUFFER_MINUTES * 60000);
@@ -126,16 +115,13 @@ export const getAvailableTimeSlots = (location, date) => {
       return slot.value >= hours.open && slot.value <= hours.close;
     });
 
-    // For today's bookings, filter out past times with buffer
     if (isToday) {
       const now = new Date();
       const currentTimeWithBuffer = new Date(now.getTime() + BOOKING_BUFFER_MINUTES * 60000);
       
-      // Round up to next 30-minute slot
       const minutes = currentTimeWithBuffer.getMinutes();
       const roundedMinutes = Math.ceil(minutes / 30) * 30;
       
-      // Handle hour overflow when rounding minutes
       if (roundedMinutes >= 60) {
         currentTimeWithBuffer.setHours(currentTimeWithBuffer.getHours() + 1);
         currentTimeWithBuffer.setMinutes(0, 0, 0);
@@ -150,7 +136,6 @@ export const getAvailableTimeSlots = (location, date) => {
         const isAvailable = slot.value > minTimeString;
         return isAvailable;
       });
-      
       
       // If no slots available, return empty with message
       if (availableSlots.length === 0) {

@@ -7,7 +7,6 @@ const SpecificationsTab = ({ car }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
  
-  // Group specs by category
   const performanceSpecs = ['engine', 'horsepower', 'power', 'torque', 'acceleration', 'topSpeed', 'transmission', 'fuelEconomy', 'range'];
   const dimensionSpecs = ['weight', 'length', 'width', 'height', 'wheelbase', 'driveType', 'seatingCapacity', 'luggage', 'doors'];
  

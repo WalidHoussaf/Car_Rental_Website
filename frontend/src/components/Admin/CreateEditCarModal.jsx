@@ -62,7 +62,6 @@ const CreateEditCarModal = ({
   
   const title = mode === 'create' ? t('adminCarsCreateCar') : t('adminCarsUpdateCar');
 
-  // Localized locations (excluding 'all' option for form)
   const localizedLocations = useMemo(() => {
     return allLocations.filter(loc => loc.value !== 'all').map(loc => ({
       value: loc.value,
@@ -207,7 +206,6 @@ const CreateEditCarModal = ({
                     value={form.year}
                     onChange={(e) => {
                       const v = e.target.value;
-                      // Allow empty value or partial input (less than 4 digits) or valid complete years
                       if (v === '' || v.length < 4 || (Number(v) >= 1900 && Number(v) <= 2030)) {
                         setForm({ ...form, year: v });
                       }

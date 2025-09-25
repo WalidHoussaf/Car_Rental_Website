@@ -19,14 +19,12 @@ const DonutChart = ({
 
   const total = data.reduce((sum, value) => sum + value, 0);
   
-  // Transform data for Recharts
   const chartData = data.map((value, index) => ({
     name: labels[index] || `Item ${index + 1}`,
     value: value,
     color: colors[index % colors.length]
   }));
 
-  // Custom tooltip component
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0];

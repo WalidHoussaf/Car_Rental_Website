@@ -14,7 +14,6 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
   const statusDropdownRef = useRef(null);
   const [editStatus, setEditStatus] = useState(booking?.status || '');
 
-  // Close status dropdown on outside click or Esc
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (statusDropdownRef.current && !statusDropdownRef.current.contains(e.target)) {
@@ -32,7 +31,6 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
     };
   }, []);
 
-  // Update status when booking changes
   useEffect(() => {
     if (booking) {
       setEditStatus(booking.status || '');
@@ -439,8 +437,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
               </div>
 
               {/* Selected Options */}
-              {(() => {
-                // Get selected extras from booking 
+              {(() => { 
                 const selectedExtras = booking.extras || [];
 
                 const days = (() => {

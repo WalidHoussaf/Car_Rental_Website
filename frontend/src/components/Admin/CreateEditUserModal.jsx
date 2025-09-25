@@ -53,10 +53,8 @@ const CreateEditUserModal = ({
 }) => {
   const title = mode === 'create' ? t('createNewUser') : t('editUser');
   
-  // Validation state
   const [errors, setErrors] = useState({});
 
-  // Validation functions
   const validateAge = useCallback((dateOfBirth) => {
     if (!dateOfBirth) return null;
     const today = new Date();
@@ -127,14 +125,11 @@ const CreateEditUserModal = ({
     return emptyFieldErrors;
   };
 
-  // Submit handler with validation
   const handleSubmit = (e) => {
     e?.preventDefault?.();
     
-    // Check for empty required fields
     const emptyFieldErrors = validateRequiredFields();
     
-    // Check for validation errors
     const validationErrors = {};
     const ageError = validateAge(form.dateOfBirth);
     if (ageError) validationErrors.dateOfBirth = ageError;
@@ -148,20 +143,17 @@ const CreateEditUserModal = ({
     const zipError = validateZipCode(form.zipCode);
     if (zipError) validationErrors.zipCode = zipError;
 
-    // Combine all errors
     const allErrors = { ...emptyFieldErrors, ...validationErrors };
     
     if (Object.keys(allErrors).length > 0) {
       setErrors(allErrors);
-      return; // Don't submit if there are errors
+      return; 
     }
 
-    // Clear errors and proceed with submission
     setErrors({});
     onSubmit(e);
   };
 
-  // Real-time validation (only for format validation, not empty fields)
   useEffect(() => {
     const newErrors = {};
     
@@ -207,7 +199,7 @@ const CreateEditUserModal = ({
           </button>
         </div>
 
-        {/* Body - Scrollable Content */}
+        {/* Body */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-6">
             <form onSubmit={onSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6">

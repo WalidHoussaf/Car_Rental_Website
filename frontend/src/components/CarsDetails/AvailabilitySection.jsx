@@ -15,7 +15,6 @@ const AvailabilitySection = ({ carId }) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [dateError, setDateError] = useState(null);
 
-  // Get today's date in YYYY-MM-DD format
   const getTodayString = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -23,7 +22,6 @@ const AvailabilitySection = ({ carId }) => {
   
   const todayString = getTodayString();
 
-  // Function to check if a date is valid (not in the past)
   const isValidDate = useCallback((dateString) => {
     const selectedDateObj = new Date(dateString);
     selectedDateObj.setHours(0, 0, 0, 0);
@@ -34,10 +32,8 @@ const AvailabilitySection = ({ carId }) => {
     return selectedDateObj >= todayDateObj;
   }, []);
 
-  // Function to find next available date
   const findNextAvailableDate = useCallback(async (startDate) => {
     try {
-      // Check availability for the next 30 days
       for (let i = 1; i <= 30; i++) {
         const checkDate = new Date(startDate);
         checkDate.setDate(checkDate.getDate() + i);
@@ -55,13 +51,11 @@ const AvailabilitySection = ({ carId }) => {
     }
   }, [carId]);
 
-  // Function to check availability
   const checkAvailability = useCallback(async (date) => {
     setLoading(true);
     setDateError(null);
     setNextAvailableDate(null);
     
-    // Validate date is not in the past
     if (!isValidDate(date)) {
       setIsAvailable(false);
       setDateError(t('cannotSelectPastDate'));
@@ -70,7 +64,6 @@ const AvailabilitySection = ({ carId }) => {
     }
     
     try {
-      // Make actual API call to check availability
       const response = await api.cars.checkAvailability(carId, date, date);
       
       if (response.success) {
@@ -78,7 +71,6 @@ const AvailabilitySection = ({ carId }) => {
         setIsAvailable(available);
         
         if (!available) {
-          // Find the next available date
           const nextDate = await findNextAvailableDate(date);
           setNextAvailableDate(nextDate);
         }
@@ -94,7 +86,6 @@ const AvailabilitySection = ({ carId }) => {
     }
   }, [t, isValidDate, carId, findNextAvailableDate]);
 
-  // Handle date selection with validation
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
     
@@ -108,13 +99,10 @@ const AvailabilitySection = ({ carId }) => {
     setIsCalendarOpen(false);
   };
 
-  // Handle reservation button click
   const handleReserveNow = () => {
-    // Navigate to booking page with car ID and selected date as URL parameters
     navigate(`/booking/${carId}?date=${selectedDate}`);
   };
 
-  // Format date for display
   const formatDateForDisplay = (dateString) => {
     const date = new Date(dateString);
     const options = { 
@@ -127,7 +115,6 @@ const AvailabilitySection = ({ carId }) => {
     return date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', options);
   };
 
-  // Check availability when component mounts or date changes
   useEffect(() => {
     if (isValidDate(selectedDate)) {
       checkAvailability(selectedDate);
@@ -138,7 +125,6 @@ const AvailabilitySection = ({ carId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [carId, selectedDate]);
 
-  // Generate date buttons for the next 3 days
   const generateDateButtons = () => {
     const buttons = [];
     const today = new Date();

@@ -52,7 +52,6 @@ const RevenueAnalytics = () => {
       monthLabels.push(label);
     }
 
-    // Revenue by status
     const statusRevenue = {
       pending: 0,
       confirmed: 0,
@@ -61,10 +60,8 @@ const RevenueAnalytics = () => {
       cancelled: 0
     };
 
-    // Revenue by location
     const locationRevenue = {};
 
-    // Process bookings
     let confirmedRevenue = 0; // Only confirmed, active, and completed bookings
     let totalBookings = 0;
 
@@ -72,10 +69,8 @@ const RevenueAnalytics = () => {
       const amount = Number(booking.totalAmount) || 0;
       const bookingDate = new Date(booking.createdAt || booking.startDate);
       
-      // Monthly revenue
       const monthKey = `${bookingDate.getFullYear()}-${String(bookingDate.getMonth() + 1).padStart(2, '0')}`;
       if (Object.prototype.hasOwnProperty.call(monthlyData, monthKey)) {
-        // Only count revenue from confirmed, active, and completed bookings
         if (['confirmed', 'active', 'completed'].includes(booking.status)) {
           monthlyData[monthKey] += amount;
           confirmedRevenue += amount;
@@ -84,27 +79,22 @@ const RevenueAnalytics = () => {
 
       totalBookings++;
 
-      // Revenue by status
       if (Object.prototype.hasOwnProperty.call(statusRevenue, booking.status)) {
         statusRevenue[booking.status] += amount;
       }
 
-      // Revenue by location
       const location = booking.pickupLocation?.branch || booking.pickupLocation || 'Unknown';
       locationRevenue[location] = (locationRevenue[location] || 0) + amount;
     });
 
-    // Calculate average booking value
     const averageBookingValue = totalBookings > 0 ? confirmedRevenue / totalBookings : 0;
 
-    // Calculate projected revenue (based on current month trend)
     const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const currentMonthRevenue = monthlyData[currentMonth] || 0;
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
     const daysPassed = now.getDate();
     const projectedRevenue = daysPassed > 0 ? (currentMonthRevenue / daysPassed) * daysInMonth : 0;
 
-    // Revenue growth calculation
     const monthlyRevenueArray = Object.values(monthlyData);
     const revenueGrowth = monthlyRevenueArray.map((current, index) => {
       if (index === 0) return 0;
@@ -113,7 +103,6 @@ const RevenueAnalytics = () => {
       return ((current - previous) / previous) * 100;
     });
 
-    // Top revenue months
     const monthsWithRevenue = Object.entries(monthlyData)
       .map(([, revenue], index) => ({
         month: monthLabels[index],
@@ -122,7 +111,6 @@ const RevenueAnalytics = () => {
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
-    // Convert location revenue to array
     const locationRevenueArray = Object.entries(locationRevenue)
       .sort(([,a], [,b]) => b - a)
       .slice(0, 5)
@@ -381,7 +369,6 @@ const RevenueAnalytics = () => {
                     innerRadius={0}
                     dataKey="value"
                     label={({ value }) => {
-                      // Calculate total and percentage
                       const total = revenueData.revenueByStatus.reduce((sum, item) => sum + item.value, 0);
                       if (total === 0 || value === 0) return '0%';
                       const percentage = (value / total) * 100;
@@ -390,13 +377,12 @@ const RevenueAnalytics = () => {
                     labelLine={true}
                   >
                     {revenueData.revenueByStatus.filter(item => item.value > 0).map((entry, index) => {
-                      // Map colors to specific status types for consistency
                       const statusColorMap = {
-                        'Pending': '#8F5300',    // Brown
-                        'Confirmed': '#101D42',  // Dark Blue  
-                        'Active': '#285943',     // Dark Green
-                        'Completed': '#2E1F47',  // Dark Purple
-                        'Cancelled': '#6E0C18'   // Dark Red
+                        'Pending': '#8F5300',   
+                        'Confirmed': '#101D42',  
+                        'Active': '#285943',     
+                        'Completed': '#2E1F47',  
+                        'Cancelled': '#6E0C18'  
                       };
                       const color = statusColorMap[entry.label] || '#8F5300';
                       return (
@@ -433,13 +419,12 @@ const RevenueAnalytics = () => {
           <div className="mt-6 flex justify-center">
             <div className="flex flex-wrap items-center gap-6 justify-center">
               {revenueData.revenueByStatus.filter(item => item.value > 0).map((item, index) => {
-                // Map colors to specific status types for consistency
                 const statusColorMap = {
-                  'Pending': '#8F5300',    // Brown
-                  'Confirmed': '#101D42',  // Dark Blue  
-                  'Active': '#285943',     // Dark Green
-                  'Completed': '#2E1F47',  // Dark Purple
-                  'Cancelled': '#6E0C18'   // Dark Red
+                  'Pending': '#8F5300',    
+                  'Confirmed': '#101D42',   
+                  'Active': '#285943',     
+                  'Completed': '#2E1F47', 
+                  'Cancelled': '#6E0C18'  
                 };
                 const color = statusColorMap[item.label] || '#8F5300';
                 const total = revenueData.revenueByStatus.reduce((sum, status) => sum + status.value, 0);
@@ -570,10 +555,8 @@ const RevenueAnalytics = () => {
               ? (location.value / revenueData.totalRevenue * 100).toFixed(1)
               : 0;
             
-            // Capitalize first letter of location name
             const capitalizedLocation = location.label.charAt(0).toUpperCase() + location.label.slice(1).toLowerCase();
             
-            // Generate different colors for each location
             const locationColors = [
               'from-emerald-400 to-green-500',
               'from-blue-400 to-cyan-500', 
@@ -601,7 +584,7 @@ const RevenueAnalytics = () => {
                   </div>
                   
                   <div className="flex items-center gap-5">
-                    {/* Enhanced progress bar */}
+                    {/* Progress bar */}
                     <div className="w-36 bg-gray-700/60 rounded-full h-2.5 overflow-hidden shadow-inner">
                       <div 
                         className={`h-2.5 rounded-full transition-all duration-1000 bg-gradient-to-r ${colorClass} shadow-sm`}
@@ -609,7 +592,7 @@ const RevenueAnalytics = () => {
                       ></div>
                     </div>
                     
-                    {/* Enhanced revenue display */}
+                    {/* Revenue display */}
                     <div className="text-right min-w-28">
                       <div className="text-white font-bold text-base mb-0.5">
                         {moneyFmt.format(location.value)}
@@ -653,7 +636,6 @@ const RevenueAnalytics = () => {
 
           <div className="space-y-3">
             {revenueData.topRevenueMonths.slice(0, 5).map((month, index) => {
-              // SVG Medal Icons
               const GoldMedalIcon = () => (
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="8" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2"/>
@@ -684,7 +666,6 @@ const RevenueAnalytics = () => {
                 </svg>
               );
 
-              // Enhanced medal system with better colors and effects
               const getRankStyle = (rank) => {
                 switch(rank) {
                   case 0: return {

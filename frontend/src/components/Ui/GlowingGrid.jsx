@@ -7,7 +7,6 @@ const GlowingGrid = ({ containerRef }) => {
   const mousePosition = useRef({ x: null, y: null });
 
 
-  // Initialize the grid
   const initGrid = useCallback((canvas, containerWidth, containerHeight) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -34,7 +33,6 @@ const GlowingGrid = ({ containerRef }) => {
   }, []);
 
 
-  // Animation loop
   const animate = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -44,7 +42,6 @@ const GlowingGrid = ({ containerRef }) => {
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw connection lines
     for (let i = 0; i < gridPoints.current.length; i++) {
       const point = gridPoints.current[i];
       point.size = point.baseSize + Math.sin(Date.now() * point.pulseSpeed + point.pulseOffset) * 0.5;
@@ -67,9 +64,7 @@ const GlowingGrid = ({ containerRef }) => {
       }
     }
     
-    // Draw points
     gridPoints.current.forEach(point => {
-      // Check if the point is affected by the mouse position
       if (mousePosition.current.x !== null && mousePosition.current.y !== null) {
         const dx = point.x - mousePosition.current.x;
         const dy = point.y - mousePosition.current.y;
@@ -114,7 +109,6 @@ const GlowingGrid = ({ containerRef }) => {
     canvas.width = width;
     canvas.height = height;
     
-    // Reinitialize the grid with new dimensions
     initGrid(canvas, width, height);
   }, [containerRef, initGrid]);
   
@@ -129,26 +123,20 @@ const GlowingGrid = ({ containerRef }) => {
   }, [containerRef]);
   
   
-  // Effects to manage component lifecycle
   useEffect(() => {
     if (!containerRef.current || !canvasRef.current) return;
     
-    // Initialize dimensions and grid
     updateDimensions();
     
-    // Start animation
     animate();
     
-    // Add event listeners
     window.addEventListener('resize', updateDimensions);
     window.addEventListener('mousemove', handleMouseMove);
 
-    
-    // Observe container size changes
+
     const resizeObserver = new ResizeObserver(updateDimensions);
     resizeObserver.observe(containerRef.current);
     
-    // Cleanup
     return () => {
       window.removeEventListener('resize', updateDimensions);
       window.removeEventListener('mousemove', handleMouseMove);

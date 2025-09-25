@@ -26,7 +26,6 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Available options with pricing
   const availableOptions = useMemo(() => ([
     { 
       id: 'insurance', 
@@ -72,7 +71,6 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
     }
   ]), [t]);
 
-  // O(1) lookup map for options
   const optionsById = useMemo(() => {
     const dict = {};
     for (const option of availableOptions) {
@@ -81,10 +79,8 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
     return dict;
   }, [availableOptions]);
   
-  // State for selected options
   const [selectedOptions, setSelectedOptions] = useState([]);
   
-  // Calculate additional price
   const additionalPrice = useMemo(() => {
     const days = bookingDetails.totalDays || 1;
     return selectedOptions.reduce((total, optionId) => {
@@ -93,11 +89,9 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
     }, 0);
   }, [selectedOptions, bookingDetails.totalDays, optionsById]);
   
-  // Base price calculation
   const basePrice = car ? calcBasePrice(car, bookingDetails.totalDays) : 0;
   const totalPrice = basePrice + additionalPrice;
   
-  // Toggle option selection
   const toggleOption = (optionId) => {
     setSelectedOptions(prev => {
       if (prev.includes(optionId)) {
@@ -108,7 +102,6 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
     });
   };
   
-  // Handle continue button click
   const handleContinue = () => {
     onOptionSelection(selectedOptions, additionalPrice);
   };
@@ -162,7 +155,6 @@ const BookingOption = ({ car, bookingDetails, onOptionSelection, onPreviousStep 
                 onChange={() => toggleOption(option.id)}
                 aria-label={option.name}
               />
-              {/* Glow effect for selected items */}
               {selectedOptions.includes(option.id) && (
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-cyan-500/20 blur-sm rounded-xl opacity-75"></div>
               )}

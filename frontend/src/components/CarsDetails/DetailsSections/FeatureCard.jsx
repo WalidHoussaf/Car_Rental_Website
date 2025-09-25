@@ -4,25 +4,20 @@ import { useLanguage } from '../../../hooks/useLanguage';
 import { useTranslations } from '../../../translations';
 
 const FeatureCard = ({ feature, iconType, icon, description = "" }) => {
-  // Use hooks for translation
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Determine which icon to display based on iconType or use the provided custom icon
   const displayIcon = iconType ? featureIcons[iconType] || featureIcons.default : icon;
   
-  // Get feature-specific description based on iconType or feature name
   const getFeatureDescription = () => {
     if (description) return description;
     
-    // Try to get description based on iconType first
     if (iconType) {
       const descKey = `featureDesc_${iconType}`;
       const specificDesc = t(descKey);
       if (specificDesc !== descKey) return specificDesc;
     }
     
-    // Try to get description based on feature name
     const featureLower = feature.toLowerCase();
     let descKey = '';
     
@@ -42,7 +37,6 @@ const FeatureCard = ({ feature, iconType, icon, description = "" }) => {
       if (specificDesc !== descKey) return specificDesc;
     }
     
-    // Fallback to default description
     return t('defaultFeatureDescription');
   };
   
@@ -50,7 +44,6 @@ const FeatureCard = ({ feature, iconType, icon, description = "" }) => {
   
   return (
     <div className="group relative bg-gradient-to-br from-gray-900/70 to-black/80 border border-gray-800 rounded-xl px-6 pt-6 pb-4 hover:border-blue-500 transition-all duration-300 overflow-hidden shadow-lg h-full flex flex-col">
-      {/* Glow effect */}
       <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/0 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       
       {/* Decorative Element */}

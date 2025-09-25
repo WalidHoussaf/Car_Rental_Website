@@ -4,7 +4,6 @@ import { assets, categoryTranslations } from '../../assets/assets';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 
-// Function to resolve image paths
 const resolvePath = (path) => {
   if (!path || typeof path !== 'string') return null;
   
@@ -23,26 +22,21 @@ const HeroSection = ({ car, availability, availabilityLoading }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Normalize price (support pricePerDay or price and handle strings)
   const getDisplayPrice = () => {
     const p = (car.pricePerDay ?? car.price ?? 0);
     const n = typeof p === 'string' ? parseFloat(p) : p;
     return Number.isFinite(n) ? n : 0;
   };
 
-  // Handle booking
   const handleBookNow = () => {
-    // Only navigate if car is available
     if (availability?.available !== false) {
       navigate(`/booking/${car._id || car.id}`);
     }
   };
 
-  // Determine if car is available
-  const isAvailable = availability?.available ?? true; // Default to available if no data yet
+  const isAvailable = availability?.available ?? true; 
   const isLoading = availabilityLoading && !availability;
   
-  // Handle navigation back to cars page
   const handleBackClick = () => {
     navigate('/cars');
   };

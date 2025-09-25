@@ -8,10 +8,8 @@ const FeaturesFilter = ({ filters, toggleFeature }) => {
   const t = useTranslations(language);
   const [showAllFeatures, setShowAllFeatures] = useState(false);
   
-  // Default number of features to display
   const defaultVisibleCount = 6;
   
-  // Visible features based on current state
   const visibleFeatures = showAllFeatures 
     ? featureOptions 
     : featureOptions.slice(0, defaultVisibleCount);

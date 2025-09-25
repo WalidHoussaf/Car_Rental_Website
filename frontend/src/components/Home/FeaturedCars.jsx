@@ -8,16 +8,13 @@ const FeaturedCars = ({ featuredCars }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
 
-  // Helper function to resolve image paths from backend
   const resolveImagePath = (imagePath) => {
     if (!imagePath) return "/api/placeholder/400/240";
     
-    // If it's already a full URL or starts with /, return as is
     if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
       return imagePath;
     }
     
-    // If it's a dot notation path like "cars.car1", resolve from assets
     if (imagePath.includes('.')) {
       const path = imagePath.split('.');
       let resolved = assets;
@@ -35,16 +32,13 @@ const FeaturedCars = ({ featuredCars }) => {
     return imagePath;
   };
 
-  // Normalize horsepower to a plain value without the 'hp' unit
   const normalizeHorsepower = (value) => {
     if (value === undefined || value === null) return '';
     const str = String(value).toLowerCase().replace(/\s*hp\s*$/,'').trim();
     return str;
   };
 
-  // Helper function to get car-specific specs
   const getCarSpecs = (car) => {
-    // Use backend specifications if available
     if (car.specifications) {
       return {
         horsepower: normalizeHorsepower(car.specifications.power) || '415',
@@ -54,7 +48,6 @@ const FeaturedCars = ({ featuredCars }) => {
       };
     }
 
-    // Fallback to car properties or defaults
     return {
       horsepower: normalizeHorsepower(car.horsepower) || '415',
       acceleration: car.acceleration || '5.6s', 

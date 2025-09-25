@@ -15,7 +15,6 @@ const PayPalIcon = React.memo(() => (
   <img src={assets.paypal} alt="PayPal" className="h-12 w-12 object-contain align-middle" />
 ));
 
-// Radio Button Component
 const CustomRadio = React.memo(({ id, name, value, checked, onChange, children }) => (
   <label htmlFor={id} className="flex items-center cursor-pointer w-full">
     <div className="relative flex items-center justify-center w-5 h-5 mr-4">
@@ -57,7 +56,6 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
   const [carImage, setCarImage] = useState(null);
   const [locationAddresses, setLocationAddresses] = useState({});
   
-  // Only resolve image once and cache it properly
   const resolvedCarImage = useMemo(() => {
     if (!car) return null;
     
@@ -75,13 +73,12 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
     }
 
     return image || null;
-  }, [car]); // Car object includes all necessary properties
+  }, [car]); 
 
   useEffect(() => {
     setCarImage(resolvedCarImage);
   }, [resolvedCarImage]);
 
-  // Get structured office location addresses
   useEffect(() => {
     const addresses = {};
     
@@ -102,8 +99,7 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
     setLocationAddresses(addresses);
   }, [bookingDetails.pickupLocation, bookingDetails.dropoffLocation, language]);
   
-  
-  // Memory leak in setTimeout
+
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
     
@@ -113,7 +109,6 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
     
     setIsSubmitting(true);
     
-    // Clear existing timeout to prevent multiple calls
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -125,7 +120,6 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
     }, 1500);
   }, [termsAccepted, onSubmit, paymentMethod]);
 
-  // Add cleanup for timeout
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -142,12 +136,10 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
     setTermsAccepted(checked);
   };
 
-  // Keep expensive calculations memoized (price calculations and array operations)
   const calculations = useMemo(() => {
     const basePrice = calcBasePrice(car, bookingDetails.totalDays || 1);
     const totalPrice = bookingDetails.totalPrice || basePrice;
     
-    // Inline date formatting to avoid dependency issues
     const formattedStartDate = bookingDetails.startDate 
       ? new Date(bookingDetails.startDate).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { 
           month: 'short', day: 'numeric', year: 'numeric' 
@@ -159,7 +151,6 @@ const BookingSummary = React.memo(({ car, bookingDetails, bookingStep, onSubmit,
         })
       : '';
     
-    // Move availableOptions inside useMemo to avoid dependency issues
     const availableOptions = [
       { id: 'insurance', name: t('option_insurance'), price: 45 },
       { id: 'driver', name: t('option_driver'), price: 120 },

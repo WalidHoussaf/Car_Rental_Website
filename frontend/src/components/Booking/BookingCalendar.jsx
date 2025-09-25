@@ -16,17 +16,14 @@ const DatePicker = forwardRef(({
   placeholder = '',
   ...props 
 }, ref) => {
-  // Format date safely without timezone issues
   const formatDateForInput = (date) => {
     if (!date) return '';
     return format(date, 'yyyy-MM-dd');
   };
 
-  // Parse date from input value
   const handleDateChange = (e) => {
     const value = e.target.value;
     if (value) {
-      // Create date at local midnight to avoid timezone shifts
       const [year, month, day] = value.split('-').map(Number);
       const localDate = new Date(year, month - 1, day);
       onChange(localDate);
@@ -62,22 +59,18 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
   const [maxDurationWarning, setMaxDurationWarning] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   
-  // Configuration
-  const MAX_RENTAL_DAYS = 90; // Maximum rental duration
-  const MIN_RENTAL_DAYS = 3; // Minimum rental duration
+  const MAX_RENTAL_DAYS = 90; 
+  const MIN_RENTAL_DAYS = 3; 
   
-  // Get today's date for min start date (allow same-day bookings)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // Calculate total days for preview (inclusive date range)
   const calculateDays = useCallback(() => {
     return calculateInclusiveDays(startDate, endDate);
   }, [startDate, endDate]);
 
   const totalDays = calculateDays();
   
-  // Calculate total cost
   const calculateTotalCost = () => {
     if (!startDate || !endDate || !car?.pricePerDay) {
       return 0;
@@ -86,13 +79,11 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
     const days = calculateDays();
     const numericPrice = getNumericPrice(car);
     const cost = days * numericPrice;
-    // Prevent negative cost from showing
     return Math.max(cost, 0);
   };
 
   const totalCost = calculateTotalCost();
   
-  // Validation with max duration checking, past date validation, and minimum duration
   useEffect(() => {
     if (!startDate || !endDate) {
       setValidationError('');
@@ -101,23 +92,20 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
     }
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of today for accurate comparison
+    today.setHours(0, 0, 0, 0); 
 
-    // Check if start date is in the past
     if (startDate < today) {
       setValidationError('Pickup date cannot be in the past. Please select today or a future date.');
       setMaxDurationWarning('');
       return;
     }
 
-    // Check if end date is in the past
     if (endDate < today) {
       setValidationError('Return date cannot be in the past. Please select today or a future date.');
       setMaxDurationWarning('');
       return;
     }
 
-    // Check if end date is before or same as start date
     if (endDate <= startDate) {
       setValidationError(t('validationErrors') || 'Return date must be after pickup date');
       setMaxDurationWarning('');
@@ -126,19 +114,16 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
 
     const daysDifference = calculateDays();
     
-    // Check minimum rental duration (uniform 3-day minimum)
     if (daysDifference < MIN_RENTAL_DAYS) {
       setValidationError(`Minimum rental duration is ${MIN_RENTAL_DAYS} days. Please extend your rental period.`);
       setMaxDurationWarning('');
       return;
     }
 
-    // Check max rental duration
     if (daysDifference > MAX_RENTAL_DAYS) {
       setValidationError('');
       setMaxDurationWarning(t('maxRentalDurationWarning') || `Maximum rental duration is ${MAX_RENTAL_DAYS} days`);
     } else if (daysDifference > MAX_RENTAL_DAYS * 0.8) {
-      // Warning when approaching max duration (80% threshold)
       setValidationError('');
       setMaxDurationWarning(t('approachingMaxDuration') || `Rental duration is ${daysDifference} days (max: ${MAX_RENTAL_DAYS})`);
     } else {
@@ -147,12 +132,10 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
     }
   }, [startDate, endDate, t, MAX_RENTAL_DAYS, MIN_RENTAL_DAYS, calculateDays]);
   
-  // Quick select handlers
   const handleQuickSelect = (days) => {
     setIsAnimating(true);
     const newStartDate = new Date(today);
     const newEndDate = new Date(today);
-    // Subtract 1 from days since calculateInclusiveDays includes both start and end dates
     newEndDate.setDate(newEndDate.getDate() + days - 1);
     
     setStartDate(newStartDate);
@@ -161,7 +144,6 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
     setTimeout(() => setIsAnimating(false), 300);
   };
   
-  // Calculate dynamic max date for end date picker
   const getMaxEndDate = () => {
     if (!startDate) return null;
     const maxDate = new Date(startDate);
@@ -169,7 +151,6 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
     return maxDate;
   };
 
-  // Handle continue button click
   const handleContinue = () => {
     if (startDate && endDate && !validationError && !maxDurationWarning) {
       setIsAnimating(true);
@@ -382,7 +363,6 @@ const BookingCalendar = ({ car, onDateSelection = () => {} }) => {
   );
 };
 
-// PropTypes validation
 BookingCalendar.propTypes = {
   car: PropTypes.shape({
     name: PropTypes.string.isRequired,

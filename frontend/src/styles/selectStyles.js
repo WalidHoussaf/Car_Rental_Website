@@ -1,5 +1,3 @@
-// src/styles/selectStyles.js
-
 // Select styles for booking location component
 export const locationSelectStyles = {
   control: (provided, state) => ({
@@ -72,7 +70,6 @@ export const locationSelectStyles = {
   })
 };
 
-// Time select styles with custom accent colors
 export const timeSelectStyles = (accentColor = '#22d3ee') => ({
   ...locationSelectStyles,
   control: (provided, state) => ({
@@ -90,7 +87,6 @@ export const timeSelectStyles = (accentColor = '#22d3ee') => ({
   })
 });
 
-// Original select styles for backward compatibility
 export const selectStyles = {
     control: (provided, state) => ({
       ...provided,

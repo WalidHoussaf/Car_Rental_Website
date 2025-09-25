@@ -20,7 +20,6 @@ const BarChart = ({
   title = '',
   subtitle = ''
 }) => {
-  // Transform data for Recharts
   const chartData = data.map((value, index) => ({
     name: labels[index] || `Day ${index + 1}`,
     value: value,
@@ -37,12 +36,10 @@ const BarChart = ({
     );
   }
 
-  // Calculate statistics
   const maxValue = Math.max(...data);
   const avgValue = data.reduce((a, b) => a + b, 0) / data.length;
   const totalValue = data.reduce((a, b) => a + b, 0);
 
-  // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const value = payload[0].value;
@@ -68,14 +65,13 @@ const BarChart = ({
     return null;
   };
 
-  // Generate gradient colors based on values
   const getBarColor = (value) => {
     const intensity = value / maxValue;
-    if (intensity > 0.8) return '#06b6d4'; // High activity - cyan
-    if (intensity > 0.6) return '#3b82f6'; // Medium-high - blue
-    if (intensity > 0.4) return '#8b5cf6'; // Medium - purple
-    if (intensity > 0.2) return '#6366f1'; // Low-medium - indigo
-    return '#64748b'; // Low activity - gray
+    if (intensity > 0.8) return '#06b6d4'; 
+    if (intensity > 0.6) return '#3b82f6';
+    if (intensity > 0.4) return '#8b5cf6'; 
+    if (intensity > 0.2) return '#6366f1'; 
+    return '#64748b';
   };
 
   return (
@@ -142,7 +138,7 @@ const BarChart = ({
                 fontSize: 11,
                 fontWeight: 500
               }}
-              interval={Math.floor(data.length / 8)} // Show every nth label to avoid crowding
+              interval={Math.floor(data.length / 8)} 
             />
             <YAxis 
               axisLine={false}

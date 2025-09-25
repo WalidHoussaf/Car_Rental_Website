@@ -12,8 +12,7 @@ import { getNumericPrice } from '../../utils/price';
 const BookingHeader = ({ car, bookingStep }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
-  
-  // Booking process steps 
+   
   const steps = [
     { id: 1, name: t('dates'), icon: <CalendarStepIcon />, description: t('selectRentalPeriod') },
     { id: 2, name: t('location'), icon: <LocationStepIcon />, description: t('choosePickupReturn') },

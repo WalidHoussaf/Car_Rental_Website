@@ -6,7 +6,6 @@ const PerformanceStats = ({ specifications = {} }) => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Provide fallback values for missing specifications
   const safeSpecs = {
     engine: specifications?.engine || 'N/A',
     acceleration: specifications?.acceleration || 'N/A',

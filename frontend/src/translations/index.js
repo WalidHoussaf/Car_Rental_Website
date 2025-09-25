@@ -1,4 +1,3 @@
-// Translations by language and key
 export const translations = {
   en: {
     // Navigation

@@ -28,7 +28,6 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
   const [validationErrors, setValidationErrors] = useState({});
   const [locationAddresses, setLocationAddresses] = useState({});
   
-  // Memoized time options based on selected locations
   const pickupTimeOptions = useMemo(() => {
     if (!pickup || !bookingDetails.startDate) return generateTimeOptions();
     
@@ -43,17 +42,14 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
     return result.success ? result.timeSlots : generateTimeOptions();
   }, [pickup, bookingDetails.endDate]);
   
-  // Load office locations filtered by car availability
   useEffect(() => {
     try {
       setLoading(true);
       setError(null);
       
-      // Filter locations based on car availability
       let availableOfficeLocations = [];
       
       if (car && car.location) {
-        // Find the specific office location where this car is available
         const carLocation = OFFICE_LOCATIONS.find(office => 
           office.id === car.location.toLowerCase() || 
           office.name.toLowerCase() === car.location.toLowerCase()
@@ -62,12 +58,10 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
         if (carLocation) {
           availableOfficeLocations = [carLocation];
         } else {
-          // Fallback: if car.location doesn't match exactly, show all locations
           console.warn(`Car location "${car.location}" not found in office locations`);
           availableOfficeLocations = OFFICE_LOCATIONS;
         }
       } else {
-        // If no car or location specified, show all locations
         availableOfficeLocations = OFFICE_LOCATIONS;
       }
       
@@ -89,7 +83,6 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
     }
   }, [car, language]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Set location addresses from office configuration
   useEffect(() => {
     const addresses = {};
     
@@ -100,31 +93,26 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
     setLocationAddresses(addresses);
   }, [language]);
 
-  // Initialize with bookingDetails when locations are loaded
   useEffect(() => {
     if (bookingDetails.pickupLocation && locations.length > 0) {
       setPickup(bookingDetails.pickupLocation);
     }
   }, [bookingDetails.pickupLocation, locations]);
 
-  // Reset pickup time when pickup location changes to ensure it's within operating hours
   useEffect(() => {
     if (pickup && bookingDetails.startDate) {
       const result = getAvailableTimeSlots(pickup, bookingDetails.startDate);
       if (result.success && result.timeSlots.length > 0) {
-        // Use a callback to get the current pickupTime value to avoid dependency
         setPickupTime(currentPickupTime => {
-          // Only set if no current time or current time is invalid
           if (!currentPickupTime || !result.timeSlots.some(slot => slot.value === currentPickupTime)) {
             return result.timeSlots[0].value;
           }
-          return currentPickupTime; // Keep existing valid time
+          return currentPickupTime; 
         });
       }
     }
   }, [pickup, bookingDetails.startDate]);
 
-  // Real-time validation for today's bookings to prevent past time selection
   useEffect(() => {
     if (!pickup || !bookingDetails.startDate) return;
     
@@ -141,17 +129,15 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
         }
         return currentTime;
       });
-    }, 60000); // Check every minute
+    }, 60000); 
 
     return () => clearInterval(interval);
   }, [pickup, bookingDetails.startDate]);
 
-  // Reset dropoff time when pickup location changes (since dropoff = pickup)
   useEffect(() => {
     if (pickup && bookingDetails.endDate) {
       const result = getAvailableTimeSlots(pickup, bookingDetails.endDate);
       if (result.success && result.timeSlots.length > 0) {
-        // Only set if no current time or current time is invalid
         if (!dropoffTime || !result.timeSlots.some(slot => slot.value === dropoffTime)) {
           const preferredTime = '18:00';
           const preferredSlot = result.timeSlots.find(slot => slot.value === preferredTime);
@@ -161,7 +147,6 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
     }
   }, [pickup, bookingDetails.endDate, dropoffTime]);
 
-  // Create location options with dynamic addresses
   const enhancedLocationOptions = useMemo(() => {
     return availableLocations.map(location => ({
       ...location,
@@ -172,14 +157,12 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
   }, [availableLocations, locationAddresses]);
 
   
-  // Handle location selection from map
   const handleLocationSelect = useCallback((locationId, type) => {
     if (type === 'pickup') {
       setPickup(locationId);
     }
   }, []);
   
-  // Time validation
   const timeValidationError = useMemo(() => {
     if (bookingDetails.startDate && bookingDetails.endDate && 
         bookingDetails.startDate === bookingDetails.endDate && 
@@ -189,7 +172,6 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
     return null;
   }, [pickupTime, dropoffTime, bookingDetails.startDate, bookingDetails.endDate]); // eslint-disable-line react-hooks/exhaustive-deps
   
-  // Validate location availability before continuing
   const validateAndContinue = async () => {
     setValidationErrors({});
     
@@ -197,22 +179,16 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       setValidationErrors(prev => ({ ...prev, pickup: t('pleaseSelectPickupLocation') }));
       return;
     }
-    
-    // Dropoff location is always same as pickup, no validation needed
-    
-    // Validate time order
+  
     if (timeValidationError) {
       setValidationErrors(prev => ({ ...prev, time: timeValidationError }));
       return;
     }
     
-    // Validate pickup location availability
     if (bookingDetails.startDate && bookingDetails.endDate) {
-      // Create date objects with selected times
       const startDateTime = new Date(bookingDetails.startDate);
       const endDateTime = new Date(bookingDetails.endDate);
       
-      // Set the selected times
       const [pickupHour, pickupMinute] = pickupTime.split(':').map(Number);
       const [dropoffHour, dropoffMinute] = dropoffTime.split(':').map(Number);
       
@@ -220,10 +196,9 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
       endDateTime.setHours(dropoffHour, dropoffMinute, 0, 0);
     }
     
-    // All validations passed, proceed with booking
     onLocationSelection({
       pickupLocation: pickup,
-      dropoffLocation: pickup, // Always same as pickup
+      dropoffLocation: pickup, 
       pickupTime,
       dropoffTime
     });
@@ -266,13 +241,11 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                     value={enhancedLocationOptions.find(loc => loc.value === pickup)}
                     onChange={(selected) => {
                       setPickup(selected?.value || '');
-                      // Clear validation error when user makes a selection
                       if (validationErrors.pickup) {
                         setValidationErrors(prev => ({ ...prev, pickup: null }));
                       }
                     }}
                     onInputChange={(inputValue, { action }) => {
-                      // Clear selected value when user starts typing
                       if (action === 'input-change' && pickup) {
                         setPickup('');
                       }
@@ -334,7 +307,6 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
                 )}
               </div>
               
-              {/* Note: Dropoff location is always same as pickup */}
               <div className="mb-6 p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg">
                 <p className="text-sm text-blue-300 font-['Orbitron']">
                   {t('dropoffSameAsPickup') || 'Vehicle must be returned to the same pickup location'}

@@ -69,7 +69,6 @@ const BookingsAnalytics = () => {
       dailyLabels.push(label);
     }
 
-    // Status distribution
     const statusCounts = {
       pending: 0,
       confirmed: 0,
@@ -78,36 +77,29 @@ const BookingsAnalytics = () => {
       cancelled: 0
     };
 
-    // Location distribution
     const locationCounts = {};
 
-    // Process each booking
     bookings.forEach(booking => {
       const bookingDate = new Date(booking.createdAt || booking.startDate);
       
-      // Monthly data
       const monthKey = `${bookingDate.getFullYear()}-${String(bookingDate.getMonth() + 1).padStart(2, '0')}`;
       if (Object.prototype.hasOwnProperty.call(monthlyData, monthKey)) {
         monthlyData[monthKey]++;
       }
 
-      // Daily data
       const dayKey = bookingDate.toISOString().split('T')[0];
       if (Object.prototype.hasOwnProperty.call(dailyData, dayKey)) {
         dailyData[dayKey]++;
       }
 
-      // Status distribution
       if (Object.prototype.hasOwnProperty.call(statusCounts, booking.status)) {
         statusCounts[booking.status]++;
       }
 
-      // Location distribution
       const location = booking.pickupLocation?.branch || booking.pickupLocation || 'Unknown';
       locationCounts[location] = (locationCounts[location] || 0) + 1;
     });
 
-    // Convert to arrays
     const monthlyBookings = Object.values(monthlyData);
     const dailyBookings = Object.values(dailyData);
     

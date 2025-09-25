@@ -1,9 +1,5 @@
 import { assets } from '../assets/assets';
 
-// Resolve image paths 
-// - Returns as-is if full URL or starts with '/'
-// - Supports dot-notation references into assets (e.g., "cars.bmw")
-// - Falls back to the raw imagePath if none match
 export const resolveImagePath = (imagePath) => {
   if (!imagePath) return null;
 
@@ -23,7 +19,5 @@ export const resolveImagePath = (imagePath) => {
       // ignore and fall-through
     }
   }
-
-  // Otherwise return as-is (could be backend relative path)
   return imagePath;
 };

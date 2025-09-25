@@ -1,7 +1,6 @@
 import React, { createContext, useState } from 'react';
 import { api } from '../config/api.js';
 
-// Create the context
 const BookingContext = createContext();
 
 export const BookingProvider = ({ children }) => {
@@ -91,7 +90,6 @@ export const BookingProvider = ({ children }) => {
       const response = await api.bookings.cancel(bookingId, cancellationReason);
       
       if (response.success) {
-        // Update bookings list
         const updatedBookings = bookings.map(booking => 
           booking._id === bookingId 
             ? { ...booking, status: 'cancelled', cancellationReason, refundAmount: response.data.refundAmount }
@@ -100,7 +98,6 @@ export const BookingProvider = ({ children }) => {
         
         setBookings(updatedBookings);
         
-        // Update current booking if it's the one being cancelled
         if (currentBooking && currentBooking._id === bookingId) {
           setCurrentBooking({ 
             ...currentBooking, 
@@ -124,7 +121,6 @@ export const BookingProvider = ({ children }) => {
     }
   };
 
-  // Fetch dashboard stats
   const fetchDashboardStats = async () => {
     try {
       const response = await api.users.getDashboardStats();
@@ -139,7 +135,6 @@ export const BookingProvider = ({ children }) => {
     return null;
   };
 
-  // Clear error
   const clearError = () => {
     setError(null);
   };

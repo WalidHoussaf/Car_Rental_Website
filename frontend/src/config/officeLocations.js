@@ -218,12 +218,10 @@ export const OFFICE_LOCATIONS = [
   }
 ];
 
-// Helper function to get location by ID
 export const getLocationById = (id) => {
   return OFFICE_LOCATIONS.find(location => location.id === id);
 };
 
-// Helper function to get all location options for dropdowns
 export const getLocationOptions = (language = 'en') => {
   return OFFICE_LOCATIONS.map(location => ({
     value: location.id,
@@ -236,13 +234,11 @@ export const getLocationOptions = (language = 'en') => {
   }));
 };
 
-// Helper function to format address for display
 export const formatLocationAddress = (location, language = 'en') => {
   if (!location) return '';
   return location.address[language] || location.address.en || '';
 };
 
-// Helper function to get operating hours text
 export const getOperatingHoursText = (location, date, language = 'en') => {
   if (!location || !date) return '';
   

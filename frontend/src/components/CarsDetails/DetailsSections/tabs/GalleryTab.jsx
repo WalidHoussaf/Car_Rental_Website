@@ -17,21 +17,17 @@ const GalleryTab = ({ car }) => {
   const [favorites, setFavorites] = useState([]);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Check if car has gallery property and that it contains valid images
   const hasGallery = car && car.gallery && Array.isArray(car.gallery) && car.gallery.length > 0;
   const hasImages = car && car.images && Array.isArray(car.images) && car.images.length > 0;
   
-  // Create a combined array of images from multiple sources
   const allImages = useMemo(() => {
     const imageArray = [];
     
-    // Always add main image first if it exists
     if (car?.image) {
       const resolvedMainImage = resolveImagePath(car.image);
       imageArray.push({ path: resolvedMainImage, alt: `${car.name} main view` });
     }
     
-    // Add gallery images if they exist (new cars)
     if (hasGallery) {
       car.gallery.forEach((img, index) => {
         const resolvedPath = resolveImagePath(img.path || img);
@@ -41,7 +37,6 @@ const GalleryTab = ({ car }) => {
         });
       });
     }
-    // Check for galleryRef (old cars from assets)
     else if (car?.galleryRef) {
       try {
         const parts = car.galleryRef.split('.');
@@ -65,11 +60,9 @@ const GalleryTab = ({ car }) => {
       }
     }
     
-    // Add images array if it exists and we don't have enough images yet
     if (hasImages && imageArray.length < 6) {
       car.images.forEach((img, index) => {
         const resolvedPath = resolveImagePath(img);
-        // Avoid duplicates
         if (!imageArray.some(existing => existing.path === resolvedPath)) {
           imageArray.push({
             path: resolvedPath,
@@ -79,7 +72,6 @@ const GalleryTab = ({ car }) => {
       });
     }
     
-    // If we still don't have enough images, create some variations of the main image
     if (imageArray.length < 3 && car?.image) {
       const mainImage = resolveImagePath(car.image);
       for (let i = imageArray.length; i < 3; i++) {
@@ -93,7 +85,6 @@ const GalleryTab = ({ car }) => {
     return imageArray;
   }, [hasGallery, hasImages, car?.image, car?.gallery, car?.images, car?.name, car?.galleryRef]);
 
-  // Load favorites from localStorage on component mount
   useEffect(() => {
     try {
       const savedFavorites = localStorage.getItem(`gallery-favorites-${car?.id}`);
@@ -105,19 +96,16 @@ const GalleryTab = ({ car }) => {
     }
   }, [car?.id]);
 
-  // Save favorites to localStorage when they change
   useEffect(() => {
     if (car?.id && favorites.length > 0) {
       localStorage.setItem(`gallery-favorites-${car?.id}`, JSON.stringify(favorites));
     }
   }, [favorites, car?.id]);
 
-  // Auto-rotate images every 5 seconds (only when modal is open and autoplay is on)
   useEffect(() => {
     if (allImages.length <= 1 || !isModalOpen || !isAutoplayOn) return;
     
     const interval = setInterval(() => {
-      // Match the same transition sequence as manual navigation
       setIsTransitioning(true);
       setTimeout(() => {
         setSelectedImage((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
@@ -128,13 +116,11 @@ const GalleryTab = ({ car }) => {
     return () => clearInterval(interval);
   }, [allImages, isModalOpen, isAutoplayOn]);
 
-  // Reset zoom when changing images
   useEffect(() => {
     setZoomLevel(1);
     setImagePosition({ x: 0, y: 0 });
   }, [selectedImage]);
 
-  // Function to handle thumbnail click with animation
   const handleThumbnailClick = useCallback((index) => {
     if (index === selectedImage) return;
     
@@ -145,19 +131,16 @@ const GalleryTab = ({ car }) => {
     }, 80);
   }, [selectedImage]);
 
-  // Function to open modal with full-size image
   const openModal = useCallback(() => {
     setIsModalOpen(true);
   }, []);
 
-  // Function to close modal
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setZoomLevel(1);
     setImagePosition({ x: 0, y: 0 });
   }, []);
 
-  // Navigation functions with animation
   const goToPrevious = useCallback(() => {
     setIsTransitioning(true);
     setTimeout(() => {
@@ -174,7 +157,6 @@ const GalleryTab = ({ car }) => {
     }, 80);
   }, [allImages.length]);
 
-  // Zoom functions
   const handleZoomIn = useCallback(() => {
     if (zoomLevel < 3) {
       setZoomLevel(prev => Math.min(prev + 0.25, 3));
@@ -192,7 +174,6 @@ const GalleryTab = ({ car }) => {
     setImagePosition({ x: 0, y: 0 });
   }, []);
 
-  // Keyboard navigation for modal
   useEffect(() => {
     if (!isModalOpen) return;
 
@@ -222,11 +203,9 @@ const GalleryTab = ({ car }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isModalOpen, selectedImage, closeModal, goToNext, goToPrevious, handleZoomIn, handleZoomOut]);
 
-  // Handle mouse movement for panning when zoomed
   const handleMouseMove = useCallback((e) => {
     if (zoomLevel <= 1) return;
     
-    // Only move the image if mouse button is pressed
     if (e.buttons === 1) {
       setImagePosition(prev => ({
         x: prev.x + e.movementX,
@@ -235,29 +214,23 @@ const GalleryTab = ({ car }) => {
     }
   }, [zoomLevel]);
 
-  // Toggle favorite status - Fixed to properly stop event propagation
   const toggleFavorite = useCallback((index, e) => {
-    // Always stop propagation
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
 
     setFavorites(prev => {
-      // Get array of all image indices
       const allIndices = allImages.map((_, i) => i);
       const allAreFavorited = allIndices.every(i => prev.includes(i));
       if (allAreFavorited) {
-        // Unfavorite all
         return [];
       } else {
-        // Favorite all
         return allIndices;
       }
     });
   }, [allImages]);
-
-  // Function to handle image sharing 
+ 
   const handleShare = useCallback((e) => {
     if (e) {
       e.preventDefault();
@@ -272,14 +245,12 @@ const GalleryTab = ({ car }) => {
       })
       .catch(() => {});
     } else {
-      // Fallback - copy URL to clipboard
       navigator.clipboard.writeText(window.location.href)
         .then(() => alert('Link copied to clipboard!'))
         .catch(err => console.error('Could not copy text: ', err));
     }
   }, [car?.name]);
 
-  // Function to handle image download 
   const handleDownload = useCallback((e) => {
     if (e) {
       e.preventDefault();
@@ -294,22 +265,18 @@ const GalleryTab = ({ car }) => {
     document.body.removeChild(link);
   }, [allImages, selectedImage, car?.name]);
 
-  // Function to handle modal background click
   const handleModalBackgroundClick = useCallback((e) => {
     if (e.target === e.currentTarget) {
       closeModal();
     }
   }, [closeModal]);
 
-  // Function to handle featured image click
   const handleFeatureClick = useCallback((e) => {
     e.stopPropagation();
-    // Ensure the modal opens with the first (featured) image
     setSelectedImage(0);
     openModal();
   }, [openModal]);
 
-  // Function to handle thumbnail image click with animation
   const handleThumbImageClick = useCallback((index, e) => {
     e.stopPropagation();
     if (index === selectedImage) {
@@ -459,7 +426,6 @@ const GalleryTab = ({ car }) => {
             </div>
           ))}
 
-          {/* Fill in with placeholders if needed */}
           {allImages.length < 3 && 
             Array(3 - allImages.length).fill(0).map((_, index) => (
               <div
