@@ -38,7 +38,7 @@
 
 ---
 
-## <img src="assets/icons/key-features.png" alt="Key Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Key Features
+## <img src="assets/icons/key-feature.png" alt="Key Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Key Features
 
 ### 🎯 **User Experience**
 - **Real-time Car Availability** - Live availability checking prevents booking conflicts
@@ -183,7 +183,7 @@ npm run seed         # Populate with sample data
 
 ---
 
-## <img src="assets/icons/screenshots.png" alt="Screenshots" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Screenshots
+## <img src="assets/icons/screenshot.png" alt="Screenshots" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Screenshots
 
 ### **🏠 Homepage - Modern Hero Design**
 ![Homepage](screenshots/homepage.png)
@@ -207,7 +207,7 @@ npm run seed         # Populate with sample data
 
 ---
 
-## <img src="assets/icons/advanced-features.png" alt="Advanced Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Advanced Features
+## <img src="assets/icons/feature.png" alt="Advanced Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Advanced Features
 
 ### **🤖 Automated Booking Management**
 ```javascript
@@ -263,7 +263,7 @@ npm start           # Production server
 
 ---
 
-## <img src="assets/icons/contributing.png" alt="Contributing" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contributing
+## <img src="assets/icons/contribution.png" alt="Contributing" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -284,7 +284,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## <img src="assets/icons/license.png" alt="License" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> License
+## <img src="assets/icons/licence.png" alt="License" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
