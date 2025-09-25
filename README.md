@@ -1,4 +1,4 @@
-# <img src="assets/icons/car.svg" alt="Car" width="28" height="28" style="vertical-align:-4px; margin-right:6px" /> Premium Car Rental Website
+# <img src="assets/icons/car.png" alt="Car" width="28" height="28" style="vertical-align:-4px; margin-right:6px" /> Premium Car Rental Website
 
 > A full-stack, production-ready car rental platform built with modern web technologies, featuring real-time availability, comprehensive admin dashboard, and seamless user experience.
 
@@ -19,13 +19,13 @@
 
 </div>
 
-## <img src="assets/icons/demo.svg" alt="Live Demo" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Live Demo
+## <img src="assets/icons/demo.png" alt="Live Demo" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Live Demo
 
 🔗 **[View Live Demo](https://your-demo-link.com)**
 
 ---
 
-## <img src="assets/icons/toc.svg" alt="Table of Contents" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Table of Contents
+## <img src="assets/icons/table-of-contents.png" alt="Table of Contents" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Table of Contents
 
 - [✨ Key Features](#-key-features)
 - [🛠 Tech Stack](#-tech-stack)
@@ -38,7 +38,7 @@
 
 ---
 
-## <img src="assets/icons/features.svg" alt="Key Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Key Features
+## <img src="assets/icons/key-features.png" alt="Key Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Key Features
 
 ### 🎯 **User Experience**
 - **Real-time Car Availability** - Live availability checking prevents booking conflicts
@@ -72,7 +72,7 @@
 
 ---
 
-## <img src="assets/icons/stack.svg" alt="Tech Stack" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Tech Stack
+## <img src="assets/icons/tech-stack.png" alt="Tech Stack" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Tech Stack
 
 ### **Frontend**
 ```javascript
@@ -108,7 +108,7 @@ Git + GitHub          // Version control
 
 ---
 
-## <img src="assets/icons/architecture.svg" alt="Architecture" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Architecture
+## <img src="assets/icons/architecture.png" alt="Architecture" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Architecture
 
 ### **Project Structure**
 ```
@@ -136,7 +136,7 @@ Car_Rental_Website/
 └── 📄 README.md
 ```
 
-## <img src="assets/icons/quickstart.svg" alt="Quick Start" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Quick Start
+## <img src="assets/icons/quick-start.png" alt="Quick Start" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Quick Start
 
 ### **Prerequisites**
 - Node.js 16+ and npm
@@ -183,7 +183,7 @@ npm run seed         # Populate with sample data
 
 ---
 
-## <img src="assets/icons/screenshots.svg" alt="Screenshots" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Screenshots
+## <img src="assets/icons/screenshots.png" alt="Screenshots" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Screenshots
 
 ### **🏠 Homepage - Modern Hero Design**
 ![Homepage](screenshots/homepage.png)
@@ -207,7 +207,7 @@ npm run seed         # Populate with sample data
 
 ---
 
-## <img src="assets/icons/advanced.svg" alt="Advanced Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Advanced Features
+## <img src="assets/icons/advanced-features.png" alt="Advanced Features" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Advanced Features
 
 ### **🤖 Automated Booking Management**
 ```javascript
@@ -242,7 +242,7 @@ active → completed (return date passes)
 - Localized date/time formatting
 - Currency formatting
 
-## <img src="assets/icons/deployment.svg" alt="Deployment" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Deployment
+## <img src="assets/icons/deployment.png" alt="Deployment" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Deployment
 
 ### **Frontend Deployment** (Netlify/Vercel)
 ```bash
@@ -263,7 +263,7 @@ npm start           # Production server
 
 ---
 
-## <img src="assets/icons/contributing.svg" alt="Contributing" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contributing
+## <img src="assets/icons/contributing.png" alt="Contributing" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -276,7 +276,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## <img src="assets/icons/contact.svg" alt="Contact" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contact
+## <img src="assets/icons/contact.png" alt="Contact" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contact
 
 **My Name** - [@WalidHoussafX] - walid.houssaf.dev@gmail.com
 
@@ -284,13 +284,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## <img src="assets/icons/license.svg" alt="License" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> License
+## <img src="assets/icons/license.png" alt="License" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ---
 
-## <img src="assets/icons/thanks.svg" alt="Acknowledgments" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Acknowledgments
+## <img src="assets/icons/acknowledgments.png" alt="Acknowledgments" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Acknowledgments
 
 - React team for the amazing framework
 - MongoDB for the flexible database
