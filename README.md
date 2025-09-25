@@ -1,6 +1,16 @@
-# <img src="assets/icons/car.png" alt="Car" width="28" height="28" style="vertical-align:-4px; margin-right:6px" /> Premium Car Rental Website
+<div align="center">
 
-> A full-stack, production-ready car rental platform built with modern web technologies, featuring real-time availability, comprehensive admin dashboard, and seamless user experience.
+<img src="assets/icons/logo.png" alt="Rent My Ride - Car Rental Platform" width="200" height="auto" style="margin: 20px 0; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);" />
+
+# 🚗 **Rent My Ride** - Premium Car Rental Platform
+
+<p style="font-size: 1.2em; color: #6B7280; margin: 10px 0 30px 0;">
+  <em>Drive Your Dreams, Rent with Confidence</em>
+</p>
+
+</div> 
+
+> **Rent My Ride** is a comprehensive, full-stack car rental platform engineered with cutting-edge web technologies. This production-ready application delivers a seamless rental experience through intelligent real-time availability tracking, automated booking workflows, and a sophisticated admin dashboard. Built with React 18, Express.js, and MongoDB, it features bilingual support, interactive maps, automated status management, and comprehensive business analytics. The platform ensures optimal user experience with smart booking validation, location-based filtering, and responsive design across all devices.
 
 <div align="center">
 
@@ -17,15 +27,17 @@
 ![Status](https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge)
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge)
 
+<br/>
+
+<p style="font-size: 0.9em; color: #9CA3AF; margin-top: 20px;">
+  ⭐ <strong>Star this repository if you found it helpful!</strong> ⭐
+</p>
+
 </div>
-
-## <img src="assets/icons/demo.png" alt="Live Demo" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Live Demo
-
-🔗 **[View Live Demo](https://your-demo-link.com)**
 
 ---
 
-## <img src="assets/icons/table-of-contents.png" alt="Table of Contents" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Table of Contents
+## <img src="assets/icons/tableofcontent.png" alt="Table of Contents" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Table of Contents
 
 - [✨ Key Features](#-key-features)
 - [🛠 Tech Stack](#-tech-stack)
@@ -263,7 +275,7 @@ npm start           # Production server
 
 ---
 
-## <img src="assets/icons/contribution.png" alt="Contributing" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contributing
+## <img src="assets/icons/contibution.png" alt="Contributing" width="22" height="22" style="vertical-align:-4px; margin-right:6px" /> Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
