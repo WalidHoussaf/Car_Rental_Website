@@ -17,7 +17,6 @@ const HomePage = () => {
   const t = useTranslations(language);
   const { featuredCars } = useContext(CarContext);
   
-  // Hero Slides Captions 
   const heroMessages = [
     {
       title: language === 'en' ? "Luxury Cars, Affordable Prices" : "Voitures de Luxe, Prix Abordables",
@@ -33,12 +32,10 @@ const HomePage = () => {
     }
   ];
 
-  // Use first 3 featured cars for display
   const displayFeaturedCars = featuredCars.slice(0, 3);
   const destinations = resolveImagePaths(assets.data.destinations, 'image');
   const testimonials = resolveImagePaths(assets.data.testimonials, 'photo');
 
-  // Auto-Rotate Hero Captions
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroMessages.length);

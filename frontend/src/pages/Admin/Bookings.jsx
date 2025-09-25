@@ -15,7 +15,6 @@ const AdminBookings = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
 
-  // Currency formatter: English -> USD ($), French -> EUR (€)
   const currencyFormatter = useMemo(() => {
     const isFR = language === 'fr';
     return new Intl.NumberFormat(isFR ? 'fr-FR' : 'en-US', {
@@ -36,7 +35,6 @@ const AdminBookings = () => {
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const statusDropdownRef = useRef(null);
 
-  // Stats state
   const [stats, setStats] = useState({
     pending: 0,
     confirmed: 0,
@@ -45,11 +43,7 @@ const AdminBookings = () => {
     cancelled: 0
   });
   const [statsLoading, setStatsLoading] = useState(true);
-
-  // Modal state
   const [selectedBooking, setSelectedBooking] = useState(null);
-
-  // Bulk selection state
   const [selectedBookings, setSelectedBookings] = useState([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false);
@@ -58,7 +52,6 @@ const AdminBookings = () => {
 
   const isAdmin = useMemo(() => currentUser?.role === 'admin', [currentUser]);
 
-  // Close status dropdown on outside click or Esc
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (statusDropdownRef.current && !statusDropdownRef.current.contains(e.target)) {
@@ -76,7 +69,6 @@ const AdminBookings = () => {
     };
   }, []);
 
-  // Guard: only admins can view
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
       setError(t('notAuthorized'));
@@ -88,11 +80,9 @@ const AdminBookings = () => {
     try {
       const response = await api.bookings.getStats();
       
-      // Backend now returns data.statusCounts instead of array
       if (response.data && response.data.statusCounts) {
         setStats(response.data.statusCounts);
       } else {
-        // Fallback for array format
         const statsData = {
           pending: 0,
           confirmed: 0,
@@ -132,15 +122,14 @@ const AdminBookings = () => {
     setBookings(prev => prev.map(booking => 
       booking._id === updatedBooking._id ? updatedBooking : booking
     ));
-    fetchStats(); // Refresh stats after update
+    fetchStats();
   };
 
   const handleDeleteBooking = (bookingId) => {
     setBookings(prev => prev.filter(booking => booking._id !== bookingId));
-    fetchStats(); // Refresh stats after delete
+    fetchStats();
   };
 
-  // Bulk selection handlers
   const handleSelectBooking = (bookingId) => {
     setSelectedBookings(prev => {
       const newSelection = prev.includes(bookingId)
@@ -173,7 +162,7 @@ const AdminBookings = () => {
         setSelectedBookings([]);
         setShowBulkActions(false);
         setShowBulkDeleteModal(false);
-        fetchStats(); // Refresh stats after bulk delete
+        fetchStats();
         showError(`${t('successfullyDeleted')} ${selectedBookings.length} ${selectedBookings.length === 1 ? t('bookingSelected') : t('bookingsSelected')}`, 'success');
       } else {
         showError(response?.message || 'Failed to delete selected bookings');
@@ -204,7 +193,6 @@ const AdminBookings = () => {
         setPage(pag.currentPage || 1);
         setTotalPages(pag.totalPages || 1);
         setTotalItems(pag.totalItems || 0);
-        // Clear selection when data is refetched
         setSelectedBookings([]);
         setShowBulkActions(false);
       } else {
@@ -243,7 +231,6 @@ const AdminBookings = () => {
     );
   };
 
-  // Wait for auth to resolve before deciding navigation
   if (authLoading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -627,7 +614,7 @@ const AdminBookings = () => {
               </button>
             </div>
 
-            {/* Body - Scrollable Content */}
+            {/* Body */}
             <div className="flex-1 overflow-y-auto">
               <div className="px-8 py-6 space-y-6">
               {/* Warning Section */}

@@ -21,16 +21,13 @@ const CarsPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Helper function to resolve image paths from backend
   const resolveImagePath = (imagePath) => {
     if (!imagePath) return "/api/placeholder/400/240";
     
-    // If it's already a full URL or starts with /, return as is
     if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
       return imagePath;
     }
     
-    // If it's a dot notation path like "cars.car1", resolve from assets
     if (imagePath.includes('.')) {
       const path = imagePath.split('.');
       let resolved = assets;
@@ -48,7 +45,6 @@ const CarsPage = () => {
     return imagePath;
   };
   
-  // Use CarContext for data management
   const {
     cars,
     loading,
@@ -56,20 +52,12 @@ const CarsPage = () => {
     clearFilters: contextClearFilters
   } = useContext(CarContext);
   
-  // State for Search
   const [searchQuery, setSearchQuery] = useState(searchParam || '');
-  
-  // State for car availability
   const [carAvailability, setCarAvailability] = useState({});
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
-  
-  // Reference to Store Current Scroll Position
   const scrollPositionRef = useRef(0);
-  
-  // Reference for the Cars Section
   const carsSectionRef = useRef(null);
   
-  // Local state for UI-specific filters
   const [localFilters, setLocalFilters] = useState({
     location: locationParam || 'all',
     category: categoryParam || 'all',
@@ -79,14 +67,12 @@ const CarsPage = () => {
   
   const [sortBy, setSortBy] = useState('recommended');
   
-  // Update Search when the URL Changes
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const search = queryParams.get('search');
     setSearchQuery(search || '');
   }, [location.search]);
   
-  // Function to Update the URL with the Search
   const handleSearchUpdate = useCallback((query) => {
     setSearchQuery(query);
     
@@ -97,11 +83,9 @@ const CarsPage = () => {
       newParams.delete('search');
     }
     
-    // URL Update
     navigate(`/cars?${newParams.toString()}`, { replace: true });
   }, [location.search, navigate]);
   
-  // Event Listener for Updating the Search from the Navbar
   useEffect(() => {
     const handleSearchEvent = (event) => {
       handleSearchUpdate(event.detail.query);
@@ -113,8 +97,6 @@ const CarsPage = () => {
     };
   }, [handleSearchUpdate]);
   
-  
-  // Function to load car availability
   const loadCarAvailability = useCallback(async (carsToCheck) => {
     if (!carsToCheck || carsToCheck.length === 0) return;
     
@@ -129,14 +111,11 @@ const CarsPage = () => {
     }
   }, []);
 
-  // Initialize Cars Data and handle URL parameters
   useEffect(() => {
-    // Handle URL parameters on component mount
     if (locationParam && locationParam !== 'all') {
       setLocalFilters(prev => ({ ...prev, location: locationParam }));
       updateFilters({ location: locationParam });
     } else if (locationParam === 'all') {
-      // Reset location filter when 'all' is specified
       setLocalFilters(prev => ({ ...prev, location: 'all' }));
       updateFilters({ location: 'all' });
     }
@@ -146,43 +125,34 @@ const CarsPage = () => {
     }
   }, [locationParam, categoryParam]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Load car availability when cars change
   useEffect(() => {
     if (cars && cars.length > 0) {
       loadCarAvailability(cars);
     }
   }, [cars, loadCarAvailability]);
   
-  // Handle Scroll to Cars Section
   const scrollToCarsSection = () => {
     if (carsSectionRef.current) {
       carsSectionRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
   
-  // Handle Navigation to About Us Page
   const navigateToAboutUs = () => {
     navigate('/about');
   };
   
-  // Function to Navigate to a Page with Scrolling to the Top
   const navigateWithScroll = (path) => {
     window.scrollTo(0, 0);
     navigate(path);
   };
   
-  // Handle Filter Changes
   const handleFilterChange = (filterType, value) => {
-    // Save Current Scroll Position before Navigation
     scrollPositionRef.current = window.pageYOffset;
     
     const newFilters = { ...localFilters, [filterType]: value };
     setLocalFilters(newFilters);
-    
-    // Update context filters for API calls
     updateFilters({ [filterType]: value });
     
-    // Update URL if Location Filter Changes
     if (filterType === 'location' && value !== 'all') {
       navigate(`/cars?location=${value}`, { replace: true });
     } else if (filterType === 'location' && value === 'all') {
@@ -190,9 +160,7 @@ const CarsPage = () => {
     }
   };
   
-  // Toggle Feature Filter
   const toggleFeature = (feature) => {
-    // Save Current Scroll Position before Navigation
     scrollPositionRef.current = window.pageYOffset;
     
     const newFeatures = localFilters.features.includes(feature)
@@ -202,9 +170,7 @@ const CarsPage = () => {
     handleFilterChange('features', newFeatures);
   };
   
-  // Reset Filters
   const resetFilters = () => {
-    // Save Current Scroll Position before Navigation
     scrollPositionRef.current = window.pageYOffset;
     
     setLocalFilters({
@@ -217,34 +183,25 @@ const CarsPage = () => {
     navigate('/cars', { replace: true });
   };
   
-  // Filter Cars Based on Current Filters (client-side filtering for non-location filters only)
   const filteredCars = cars.filter(car => {
-    // Skip location filtering here - it's handled by backend
-    // Location filtering is done server-side via API
-    
-    // Filter by Category
     if (localFilters.category !== 'all' && car.category !== localFilters.category) {
       return false;
     }
     
-    // Filter by Price Range
     const carPrice = car.pricePerDay || car.price || 0;
     if (carPrice < localFilters.priceRange[0] || carPrice > localFilters.priceRange[1]) {
       return false;
     }
     
-    // Filter by Features
     if (localFilters.features.length > 0 && !localFilters.features.some(feature => 
       car.features && car.features.some(carFeature => carFeature.toLowerCase().includes(feature.toLowerCase()))
     )) {
       return false;
     }
     
-    // Filter by Search Query
     if (searchQuery && searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase().trim();
       
-      // List of Car Brands, Including Full and Partial Matches
       const carBrands = {
         simple: ["audi", "bmw", "mercedes", "tesla", "porsche", "bentley", "ferrari", 
                  "lamborghini", "maserati", "lexus", "cadillac", "mclaren"],
@@ -252,27 +209,20 @@ const CarsPage = () => {
         parts: ["range", "rover", "rolls", "royce", "aston", "martin"]
       };
 
-      // Case 1: Exact Search for a Composite Brand (e.g., 'range rover')
       if (carBrands.composed.includes(query)) {
         return car.name.toLowerCase().includes(query);
       }
-      // Case 2: Search for a Part of a Composite Brand (e.g., 'range' or 'rover')
       else if (carBrands.parts.includes(query)) {
-        // Check if it's a Word That is Part of a Composite Brand
         const relatedBrands = carBrands.composed.filter(brand => brand.includes(query));
         if (relatedBrands.length > 0) {
-          // Check if Any of the Associated Composite Brands are in the Name
           return relatedBrands.some(brand => car.name.toLowerCase().includes(brand));
         }
       }
-      // Case 3: Search for a Simple Brand (e.g., 'audi')
       else if (carBrands.simple.includes(query)) {
-        // Check if the Exact Brand is in the Car's Name
         const carNameWords = car.name.toLowerCase().split(/\s+/);
         return carNameWords.some(word => word === query);
       }
       
-      // Case 4: Standard Search for Any Other Term
       const nameMatch = car.name.toLowerCase().includes(query);
       const descriptionMatch = car.description ? car.description.toLowerCase().includes(query) : false;
       const featuresMatch = car.features.some(feature => 
@@ -286,13 +236,11 @@ const CarsPage = () => {
     return true;
   });
   
-  // Helper to get a numeric price consistently
   const getNumericPrice = (car) => {
     const p = (car.pricePerDay ?? car.price ?? 0);
     return typeof p === 'string' ? parseFloat(p) : p;
   };
   
-  // Sort Cars
   const sortedCars = [...filteredCars].sort((a, b) => {
     switch (sortBy) {
       case 'price-low':
@@ -466,7 +414,7 @@ const CarsPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 relative">                  
                   {sortedCars.map((car, index) => {
                     const availability = carAvailability[car._id || car.id];
-                    const isAvailable = availability?.available ?? true; // Default to available if no data yet
+                    const isAvailable = availability?.available ?? true;
                     const isLoading = availabilityLoading && !availability;
                     
                     return (
@@ -477,7 +425,7 @@ const CarsPage = () => {
                           ? 'hover:shadow-cyan-500/30 hover:border-cyan-500/30' 
                           : 'opacity-75 hover:shadow-red-500/20 hover:border-red-500/30'
                       }`}
-                    >                      
+                    >
                       {/* Card Header */}
                       <div className="relative h-48 overflow-hidden">
                         <img

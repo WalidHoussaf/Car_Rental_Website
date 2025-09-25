@@ -57,34 +57,28 @@ const BookingConfirmation = () => {
   const [isBookingCreated, setIsBookingCreated] = useState(false);
   const [locationAddresses, setLocationAddresses] = useState({});
 
-  // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Authentication check - redirect to login if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       navigate('/login');
     }
   }, [isAuthenticated, authLoading, navigate]);
 
-  // Get Booking Data from Location State
   const bookingData = location.state || {};
   const { bookingDetails, carDetails } = bookingData;
 
-  // Resolve car image
   useEffect(() => {
     if (!carDetails) return;
     
     let image = resolveImagePath(carDetails.image);
     
-    // Try using car ID
     if (!image && carDetails.id && assets.cars[`car${carDetails.id}`]) {
       image = assets.cars[`car${carDetails.id}`];
     }
     
-    // Try using car brand
     if (!image && carDetails.name) {
       const carBrand = carDetails.name.toLowerCase().split(' ')[0];
       
@@ -99,7 +93,6 @@ const BookingConfirmation = () => {
     setCarImage(image);
   }, [carDetails]);
 
-  // Get structured office location addresses
   useEffect(() => {
     const addresses = {};
     
@@ -120,9 +113,7 @@ const BookingConfirmation = () => {
     setLocationAddresses(addresses);
   }, [bookingDetails?.pickupLocation, bookingDetails?.dropoffLocation, language]);
 
-  // Create booking on component mount
   useEffect(() => {
-    // Prevent multiple booking creation attempts
     if (bookingId || isBookingCreated) return;
     
     const createNewBooking = async () => {
@@ -133,9 +124,8 @@ const BookingConfirmation = () => {
         return;
       }
       try {
-        // Transform frontend data to match backend expectations
         const transformedBookingData = {
-          car: carDetails._id || carDetails.id, // Send car ID
+          car: carDetails._id || carDetails.id,
           startDate: (() => {
             const startDateTime = new Date(bookingDetails.startDate);
             if (bookingDetails.pickupTime) {
@@ -172,27 +162,21 @@ const BookingConfirmation = () => {
           showSuccess(t('bookingConfirmed'));
         } else {
           console.error('Booking failed:', result.message);
-          // Don't navigate away on failure, show error to user
           alert(`Booking failed: ${result.message}`);
         }
       } catch (error) {
         console.error('Error creating booking:', error);
-        // Don't navigate away on error, show error to user
         alert(`Booking error: ${error.message}`);
       }
     };
 
-    // Helper function to get location address
     const getLocationAddress = (location) => {
-      // Use dynamic address if available, otherwise fallback
       if (locationAddresses[location]) {
         return locationAddresses[location];
       }
-      // Fallback to formatted location name while API call is in progress
       return location ? `${location.charAt(0).toUpperCase() + location.slice(1)}, Morocco` : 'Main Branch, Mohammedia';
     };
 
-    // Helper function to transform options to extras
     const transformOptionsToExtras = (options) => {
       return options.map(optionId => {
         const option = availableOptionsById[optionId];
@@ -204,7 +188,6 @@ const BookingConfirmation = () => {
       }).filter(Boolean);
     };
 
-    // Helper function to transform payment method
     const transformPaymentMethod = (method) => {
       const methodMap = {
         'creditCard': 'credit_card',
@@ -227,7 +210,6 @@ const BookingConfirmation = () => {
     const receiptGenerator = new ReceiptGenerator(language, t);
     
     const onSuccess = () => {
-      // Receipt generated successfully
     };
 
     const onError = (error) => {
@@ -237,7 +219,6 @@ const BookingConfirmation = () => {
     await receiptGenerator.generateReceipt(bookingData, bookingId, onSuccess, onError);
   };
 
-  // Show loading while checking authentication
   if (authLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -246,7 +227,6 @@ const BookingConfirmation = () => {
     );
   }
 
-  // Don't render if not authenticated (will redirect)
   if (!isAuthenticated) {
     return null;
   }

@@ -10,10 +10,8 @@ const FAQPage = () => {
   const faqSectionRef = useRef(null);
   const guidesRef = useRef(null);
   
-  // State to Track which FAQ Items are Expanded
   const [expandedItems, setExpandedItems] = useState({});
   
-  // Toggle FAQ Item Expansion
   const toggleItem = (id) => {
     setExpandedItems(prev => ({
       ...prev,
@@ -21,7 +19,6 @@ const FAQPage = () => {
     }));
   };
   
-  // FAQ Categories and Questions
   const faqCategories = [
     {
       id: "booking",
@@ -160,10 +157,8 @@ const FAQPage = () => {
     }
   ];
   
-  // Search Functionality
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Filter Questions Based on Search Query
   const getFilteredFAQs = () => {
     if (!searchQuery.trim()) return faqCategories;
     

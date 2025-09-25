@@ -21,7 +21,6 @@ const ContactPage = () => {
     message: '',
     subject: 'General Inquiry'
   });
-  
   const [submitStatus, setSubmitStatus] = useState(null);
   
   const subjectOptions = [
@@ -95,11 +94,9 @@ const ContactPage = () => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Simulate Form Submission
     setSubmitStatus('loading');
     setTimeout(() => {
       setSubmitStatus('success');
-      // Reset Form after Success
       setFormData({
         name: '',
         email: '',
@@ -110,7 +107,6 @@ const ContactPage = () => {
     }, 1500);
   };
   
-  // Contact Information
   const contactInfo = [
     {
       icon: (
@@ -151,7 +147,6 @@ const ContactPage = () => {
     }
   ];
   
-  // Locations 
   const locations = [
     { city: "Casablanca", address: "123 Boulevard Mohammed V" },
     { city: "Marrakech", address: "45 Avenue Hassan II" },

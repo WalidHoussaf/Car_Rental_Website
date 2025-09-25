@@ -16,16 +16,13 @@ const CarDetailPage = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
   
-  // Helper function to resolve image paths from backend
   const resolveImagePath = (imagePath) => {
     if (!imagePath) return "/api/placeholder/400/240";
     
-    // If it's already a full URL or starts with /, return as is
     if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
       return imagePath;
     }
     
-    // If it's a dot notation path like "cars.car1", resolve from assets
     if (imagePath.includes('.')) {
       const path = imagePath.split('.');
       let resolved = assets;
@@ -43,14 +40,10 @@ const CarDetailPage = () => {
     return imagePath;
   };
   
-  // Use CarContext for data management
   const { cars } = useContext(CarContext);
-  
-  // State for car availability
   const [carAvailability, setCarAvailability] = useState(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   
-  // Function to load car availability
   const loadCarAvailability = useCallback(async (carId) => {
     if (!carId) return;
     
@@ -60,24 +53,21 @@ const CarDetailPage = () => {
       setCarAvailability(availability);
     } catch (error) {
       console.error('Error loading car availability:', error);
-      setCarAvailability({ available: true }); // Default to available on error
+      setCarAvailability({ available: true });
     } finally {
       setAvailabilityLoading(false);
     }
   }, []);
   
-  // Scroll to Top on Component Mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
   
-  // Function to Scroll Navigation to the Top
   const navigateWithScroll = (path) => {
     window.scrollTo(0, 0);
     navigate(path);
   };
   
-  // Find the Car by ID from context
   const car = cars.find(car => 
     car._id === id || 
     car.id === parseInt(id) || 
@@ -87,14 +77,12 @@ const CarDetailPage = () => {
     String(car.id) === id
   );
 
-  // Load car availability when car is found
   useEffect(() => {
     if (car) {
       loadCarAvailability(car._id || car.id);
     }
   }, [car, loadCarAvailability]);
   
-  // If Car is not Found, Show the Error UI
   if (!car) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -119,7 +107,6 @@ const CarDetailPage = () => {
     );
   }
   
-  // Car data is already processed from the backend
   const processedCar = car;
   const resolvedCar = car;
   
@@ -170,7 +157,7 @@ const CarDetailPage = () => {
             </p>
           </div>
           
-          {/* Updated grid with equal height cards */}
+          {/* Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {cars
               .filter(relatedCar => relatedCar.category === car.category && (relatedCar._id || relatedCar.id) !== (car._id || car.id))
@@ -185,12 +172,10 @@ const CarDetailPage = () => {
                       animationDelay: `${index * 200}ms`
                     }}
                   >
-                    {/* Glow effect */}
                     <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-cyan-400/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
                     
-                    {/* Updated card structure with flex layout for consistent height */}
                     <div className="relative h-full bg-black/80 backdrop-blur-xl border border-gray-800/50 rounded-xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-cyan-500/20 transform group-hover:-translate-y-2 flex flex-col">
-                      {/* Card Header - Fixed height */}
+                      {/* Card Header */}
                       <div className="relative h-56 overflow-hidden flex-shrink-0">
                         <img
                           src={resolveImagePath(processedRelatedCar.image)}
@@ -217,8 +202,6 @@ const CarDetailPage = () => {
                             </div>
                           </div>
                         </div>
-
-                        {/* Hover overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-cyan-400/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       </div>
                       

@@ -22,19 +22,15 @@ const Booking = () => {
   const t = useTranslations(language);
   const { isAuthenticated, loading: authLoading } = useAuth();
   
-  // Use CarContext for data management
   const { cars } = useContext(CarContext);
   
-  // Helper function to resolve image paths from backend
   const resolveImagePath = (imagePath) => {
     if (!imagePath) return "/api/placeholder/400/240";
     
-    // If it's already a full URL or starts with /, return as is
     if (imagePath.startsWith('http') || imagePath.startsWith('/')) {
       return imagePath;
     }
     
-    // If it's a dot notation path like "cars.car1", resolve from assets
     if (imagePath.includes('.')) {
       const path = imagePath.split('.');
       let resolved = assets;
@@ -52,7 +48,6 @@ const Booking = () => {
     return imagePath;
   };
   
-  // Booking details state
   const [bookingDetails, setBookingDetails] = useState({
     startDate: null,
     endDate: null,
@@ -65,18 +60,14 @@ const Booking = () => {
     totalPrice: 0
   });
   
-  // Authentication check - redirect to login if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      // Store the intended booking URL to redirect back after login
       localStorage.setItem('redirectAfterLogin', `/booking/${id}`);
       navigate('/login');
     }
   }, [isAuthenticated, authLoading, navigate, id]);
 
-  // Load car data on component mount
   useEffect(() => {
-    // Don't load car data if user is not authenticated
     if (!isAuthenticated && !authLoading) {
       return;
     }
@@ -99,15 +90,10 @@ const Booking = () => {
       );
       
       if (foundCar) {
-        // Clone the object to avoid reference issues
         const carWithResolvedImage = {...foundCar};
-        
-        // Process images using resolveImagePath
         carWithResolvedImage.image = resolveImagePath(foundCar.image);
-        
         setCar(carWithResolvedImage);
         
-        // Initialize locations based on car availability
         const initialLocation = Array.isArray(foundCar.location) 
           ? foundCar.location[0] 
           : foundCar.location;
@@ -123,22 +109,13 @@ const Booking = () => {
   }, [id, cars, isAuthenticated, authLoading]);
   
   const handleDateSelection = (startDate, endDate) => {
-    // Calculate total days using inclusive date range
     const start = new Date(startDate);
     const end = new Date(endDate);
     
-    // Calculate days correctly for inclusive range
     const differenceInTime = end.getTime() - start.getTime();
     const daysDifference = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-    
-    // For inclusive ranges: same day = 1 day, next day = 2 days, etc.
-    // The daysDifference already gives us the correct count for inclusive ranges
     const totalDays = daysDifference === 0 ? 1 : daysDifference;
-    
-    // Ensure minimum of 1 day for same-day rentals
     const finalTotalDays = Math.max(totalDays, 1);
-    
-    // Calculate base price
     const basePrice = car ? calcBasePrice(car, finalTotalDays) : 0;
     
     setBookingDetails(prev => ({
@@ -177,7 +154,6 @@ const Booking = () => {
   };
   
   const handleBookingSubmit = (paymentMethod = 'creditCard') => {
-    // Navigate to confirmation page with booking data including payment method
     navigate('/booking-confirmation', { 
       state: { 
         bookingDetails: {
@@ -189,7 +165,6 @@ const Booking = () => {
     });
   };
   
-  // Navigation functions
   const goToNextStep = () => {
     setBookingStep(prev => Math.min(prev + 1, 4));
   };
@@ -206,7 +181,6 @@ const Booking = () => {
     );
   }
 
-  // Show loading while checking authentication
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">

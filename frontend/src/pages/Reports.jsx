@@ -13,14 +13,12 @@ const Reports = () => {
   const { language } = useLanguage();
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Redirect to home when not authenticated (after initial auth check)
   useEffect(() => {
     if (!loading && !user) {
       navigate('/', { replace: true });
     }
   }, [loading, user, navigate]);
 
-  // Redirect non-admin users
   if (user && user.role !== 'admin') {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -38,7 +36,6 @@ const Reports = () => {
     );
   }
 
-  // While auth is checking, show loader
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">

@@ -12,7 +12,6 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const mountedRef = useRef(true);
   
-  // Form State
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -30,28 +29,18 @@ const RegisterPage = () => {
     },
     agreeTerms: false
   });
-  
-  // Error State
   const [errors, setErrors] = useState({});
-  
-  // Success State
   const [isSuccess, setIsSuccess] = useState(false);
-  
-  // Loading State for registration
   const [isLoading, setIsLoading] = useState(false);
-
-  // Password visibility state
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Cleanup on unmount
   React.useEffect(() => {
     return () => {
       mountedRef.current = false;
     };
   }, []);
 
-  // Redirect if already authenticated 
   React.useEffect(() => {
     if (isAuthenticated && user && !isLoading && !isSuccess) {
       if (user.role === 'admin') {
@@ -62,7 +51,6 @@ const RegisterPage = () => {
     }
   }, [isAuthenticated, user, navigate, isLoading, isSuccess]);
 
-  // Handle Input Changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
@@ -85,7 +73,6 @@ const RegisterPage = () => {
       }));
     }
     
-    // Clear Error when User Types
     if (errors[name]) {
       setErrors(prevErrors => ({
         ...prevErrors,
@@ -94,7 +81,6 @@ const RegisterPage = () => {
     }
   };
 
-  // Validate form with Translated Error Messages
   const validateForm = () => {
     const newErrors = {};
     
@@ -172,11 +158,9 @@ const RegisterPage = () => {
     return newErrors;
   };
 
-  // Handle form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Prevent multiple submissions
     if (isLoading || isSuccess) {
       return;
     }
@@ -192,7 +176,6 @@ const RegisterPage = () => {
       setIsLoading(true);
       setErrors({});
       
-      // Prepare user data for backend API
       const userData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -208,19 +191,15 @@ const RegisterPage = () => {
         new Promise(resolve => setTimeout(resolve, 800)) 
       ]);
 
-      // Check if component is still mounted before updating state
       if (!mountedRef.current) return;
       
       if (result.success) {
         setIsSuccess(true);
-        
-        // Check if component is still mounted
+
         if (!mountedRef.current) return;
-        
-        // Small post-success delay to let the UI show success/loading
+
         await new Promise((resolve) => setTimeout(resolve, 1800));
 
-        // Get the most up-to-date user data from AuthContext or localStorage
         const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
 
         if (currentUser && currentUser.role === 'admin') {
@@ -252,7 +231,6 @@ const RegisterPage = () => {
     }
   };
 
-  // Cleanup on unmount
   React.useEffect(() => {
     return () => {
       mountedRef.current = false;
@@ -266,7 +244,6 @@ const RegisterPage = () => {
     }
   }, [loading, isLoading, isSuccess]);
 
-  // Common Input Styling
   const inputClassName = (name) => `w-full bg-black/40 border ${
     errors[name] ? 'border-red-500' : 'border-cyan-900/40'
   } rounded-md px-4 h-12 text-white 

@@ -38,7 +38,7 @@ const MyBookings = () => {
 
   const fetchStats = async () => {
     try {
-      const res = await api.bookings.getMyBookings({ limit: 1000 }); // Get all bookings for stats
+      const res = await api.bookings.getMyBookings({ limit: 1000 });
       if (res?.success) {
         const allBookings = res.data.bookings || [];
         setStats({
@@ -82,11 +82,9 @@ const MyBookings = () => {
     try {
       const response = await api.bookings.update(bookingId, { status: 'confirmed' });
       if (response?.success) {
-        // Update local bookings state
         setBookings(prev => prev.map(booking => 
           booking._id === bookingId ? { ...booking, status: 'confirmed' } : booking
         ));
-        // Refresh stats
         fetchStats();
         setConfirmingBookingId(null);
       } else {
@@ -105,11 +103,9 @@ const MyBookings = () => {
     try {
       const response = await api.bookings.update(bookingId, { status: 'cancelled' });
       if (response?.success) {
-        // Update local bookings state
         setBookings(prev => prev.map(booking => 
           booking._id === bookingId ? { ...booking, status: 'cancelled' } : booking
         ));
-        // Refresh stats
         fetchStats();
         setCancellingBookingId(null);
       } else {

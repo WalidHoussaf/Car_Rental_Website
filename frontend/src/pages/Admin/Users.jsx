@@ -22,8 +22,7 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Modals and interactions
-  const [modal, setModal] = useState({ type: null, user: null }); // type: 'verify' | 'role' | 'delete' | 'create'
+  const [modal, setModal] = useState({ type: null, user: null });
   const [processing, setProcessing] = useState(false);
   const [roleChoice, setRoleChoice] = useState('customer');
   const [createForm, setCreateForm] = useState({
@@ -51,14 +50,12 @@ const AdminUsers = () => {
 
   const isAdmin = useMemo(() => currentUser?.role === 'admin', [currentUser]);
 
-  // Guard: only admins can view
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
       setError(t('notAuthorized'));
     }
   }, [isAuthenticated, isAdmin, t]);
 
-  // Close role dropdown on outside click or Esc
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (roleDropdownRef.current && !roleDropdownRef.current.contains(e.target)) {
@@ -90,7 +87,8 @@ const AdminUsers = () => {
       } else {
         throw new Error(res?.message || t('failedToLoadUsers'));
       }
-    } catch {
+    } catch (error) {
+      console.error('Failed to load users:', error);
       setError(t('failedToLoadUsers'));
       showError(t('failedToLoadUsers'));
     } finally {
@@ -120,7 +118,8 @@ const AdminUsers = () => {
       await api.users.updateRole(id, nextRole);
       showSuccess(t('roleUpdated'));
       await fetchUsers();
-    } catch {
+    } catch (error) {
+      console.error('Failed to update role:', error);
       showError(t('failedToUpdateRole'));
     } finally {
       setLoading(false);
@@ -133,7 +132,8 @@ const AdminUsers = () => {
       await api.users.verify(id);
       showSuccess(t('userVerified'));
       await fetchUsers();
-    } catch {
+    } catch (error) {
+      console.error('Failed to verify user:', error);
       showError(t('failedToVerifyUser'));
     } finally {
       setLoading(false);
@@ -151,14 +151,14 @@ const AdminUsers = () => {
       showSuccess(t('userDeleted'));
       const newPage = users.length === 1 && page > 1 ? page - 1 : page;
       await fetchUsers({ page: newPage });
-    } catch {
+    } catch (error) {
+      console.error('Failed to delete user:', error);
       showError(t('failedToDeleteUser'));
     } finally {
       setLoading(false);
     }
   };
 
-  // Open modal helpers
   const openVerify = (user) => setModal({ type: 'verify', user });
   const openRole = (user) => {
     setRoleChoice(user?.role === 'admin' ? 'customer' : 'admin');
@@ -167,7 +167,6 @@ const AdminUsers = () => {
   const openDelete = (user) => setModal({ type: 'delete', user });
   const openCreate = () => setModal({ type: 'create', user: null });
 
-  // Confirm actions for modals
   const confirmVerify = async () => {
     if (!modal.user) return;
     setProcessing(true);
@@ -209,7 +208,6 @@ const AdminUsers = () => {
     e?.preventDefault?.();
     setProcessing(true);
     try {
-      // Minimal client-side validation to match backend requirements
       const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'password', 'dateOfBirth', 'street', 'city', 'state', 'zipCode', 'country'];
       for (const f of requiredFields) {
         if (!String(createForm[f] || '').trim()) {
@@ -223,7 +221,6 @@ const AdminUsers = () => {
         showError(t('invalidZipCode'));
         return;
       }
-      // Optional hint for password complexity
       if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}/.test(createForm.password)) {
         setProcessing(false);
         showError(t('passwordRequirements'));
@@ -254,7 +251,8 @@ const AdminUsers = () => {
       });
       setModal({ type: null, user: null });
       await fetchUsers({ page: 1 });
-    } catch {
+    } catch (error) {
+      console.error('Failed to create user:', error);
       showError(t('failedToCreateUser'));
     } finally {
       setProcessing(false);
@@ -273,7 +271,6 @@ const AdminUsers = () => {
     </span>
   );
 
-  // Wait for auth to resolve before deciding navigation
   if (authLoading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">

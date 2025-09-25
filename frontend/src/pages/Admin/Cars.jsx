@@ -67,14 +67,10 @@ const AdminCars = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // filters
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
-  const [availabilityFilter, setAvailabilityFilter] = useState('all'); // 'all', 'available', 'unavailable'
-  
-  
-
+  const [availabilityFilter, setAvailabilityFilter] = useState('all');
   const [categories, setCategories] = useState([]);
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
   const locationDropdownRef = useRef(null);
@@ -166,7 +162,7 @@ const AdminCars = () => {
     return translated !== translationKey ? translated : categoryName;
   };
 
-  const [modal, setModal] = useState({ type: null, car: null }); // type: 'create' | 'edit' | 'delete'
+  const [modal, setModal] = useState({ type: null, car: null }); 
   const [form, setForm] = useState(defaultForm);
   const [processing, setProcessing] = useState(false);
 
@@ -176,8 +172,8 @@ const AdminCars = () => {
     try {
       const res = await api.cars.getCategories();
       if (res?.success) setCategories(res.data.categories || []);
-    } catch {
-      // non-blocking
+    } catch (error) {
+      console.error('Failed to load categories:', error);
     }
   };
 
@@ -255,7 +251,6 @@ const AdminCars = () => {
       showError(err?.message || t('adminCarsFailedToUploadImages'));
     } finally {
       setUploadingImages(false);
-      // reset the input so user can re-select same files if needed
       e.target.value = '';
     }
   };
@@ -267,7 +262,7 @@ const AdminCars = () => {
     let paginationInfo = {};
     
     if (needsAllCars) {
-          let allCars = [];
+      let allCars = [];
       let totalPages = 1;
       
       const baseParams = {
@@ -354,7 +349,6 @@ const AdminCars = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, isAdmin]);
 
-  // Close location dropdown on outside click / ESC
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (locationDropdownRef.current && !locationDropdownRef.current.contains(e.target)) setIsLocationDropdownOpen(false);
@@ -376,7 +370,6 @@ const AdminCars = () => {
     };
   }, []);
 
-  // guard
   if (authLoading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -435,7 +428,6 @@ const AdminCars = () => {
     e?.preventDefault?.();
     setProcessing(true);
     try {
-      // minimal validation
       const required = ['name', 'make', 'model', 'category', 'pricePerDay', 'location', 'image'];
       for (const f of required) {
         if (!String(form[f] ?? '').trim()) {
@@ -496,7 +488,7 @@ const AdminCars = () => {
       }
       setModal({ type: null, car: null });
       await fetchCars({ page: 1 });
-        loadGlobalAvailabilityStats();
+      loadGlobalAvailabilityStats();
     } catch {
       showError(t('adminCarsOperationFailed'));
     } finally {
@@ -513,7 +505,7 @@ const AdminCars = () => {
       const newPage = cars.length === 1 && page > 1 ? page - 1 : page;
       await fetchCars({ page: newPage });
       setModal({ type: null, car: null });
-        loadGlobalAvailabilityStats();
+      loadGlobalAvailabilityStats();
     } catch (e) {
       showError(e?.message || t('adminCarsFailedToDeleteCar'));
     } finally {
@@ -895,7 +887,7 @@ const AdminCars = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   {paginationInfo.totalPages > 1 ? (
-                                    <>
+                    <>
                       <button 
                         disabled={!paginationInfo.hasPrevPage || loading} 
                         onClick={() => {
@@ -929,7 +921,7 @@ const AdminCars = () => {
                       </button>
                     </>
                   ) : (
-                                    <div className="px-3 py-2 bg-gray-600/20 border border-gray-600/40 rounded-md text-gray-400">
+                    <div className="px-3 py-2 bg-gray-600/20 border border-gray-600/40 rounded-md text-gray-400">
                       {availabilityFilter === 'all' ? 'All cars' : `All ${availabilityFilter} cars`}
                     </div>
                   )}

@@ -11,26 +11,16 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   
-  // Form State
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
   });
-  
-  // Error State
   const [errors, setErrors] = useState({});
-  
-  // Loading State for Submit Button
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Success State
   const [isSuccess, setIsSuccess] = useState(false);
-
-  // Show/Hide Password State
   const [showPassword, setShowPassword] = useState(false);
 
-  // Handle Input Changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prevData => ({
@@ -38,7 +28,6 @@ const LoginPage = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear Error when User Types
     if (errors[name]) {
       setErrors(prevErrors => ({
         ...prevErrors,
@@ -47,7 +36,6 @@ const LoginPage = () => {
     }
   };
 
-  // Validate Form
   const validateForm = () => {
     const newErrors = {};
     
@@ -64,7 +52,6 @@ const LoginPage = () => {
     return newErrors;
   };
 
-  // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -87,20 +74,15 @@ const LoginPage = () => {
         return;
       }
       
-      // Success
       setIsSuccess(true);
       
-      // Determine role and redirect
       const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
       const role = storedUser?.role?.toLowerCase?.();
       
-      // Give a brief moment to show success message
       setTimeout(() => {
-        // Check if there's a redirect URL stored
         const redirectUrl = localStorage.getItem('redirectAfterLogin');
         
         if (redirectUrl) {
-          // Clear the stored redirect URL
           localStorage.removeItem('redirectAfterLogin');
           navigate(redirectUrl);
         } else if (role === 'admin') {
@@ -117,7 +99,6 @@ const LoginPage = () => {
     }
   };
 
-  // Handle Social Login Redirects
   const handleGoogleLogin = () => {
     window.location.href = "https://accounts.google.com/o/oauth2/auth";
   };
@@ -244,7 +225,6 @@ const LoginPage = () => {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/80 hover:text-white transition-colors duration-300 cursor-pointer"
                 >
                   {showPassword ? (
-                    // Eye-off icon
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a17.7 17.7 0 0 1 5.06-5.94" />
                       <path d="M1 1l22 22" />
@@ -252,7 +232,6 @@ const LoginPage = () => {
                       <path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
                     </svg>
                   ) : (
-                    // Eye icon
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M1 12s3-8 11-8 11 8 11 8-3 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />

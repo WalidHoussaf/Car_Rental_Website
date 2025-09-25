@@ -165,37 +165,32 @@ const Dashboard = () => {
       try {
         const [statsResponse, allBookingsResponse] = await Promise.all([
           api.users.getDashboardStats(),
-          api.bookings.getAll({ limit: 100, sort: '-createdAt' }) // Get more bookings for trend analysis
+          api.bookings.getAll({ limit: 100, sort: '-createdAt' }) 
         ]);
         
         if (statsResponse.success) {
           setStats(statsResponse.data);
           
-          // Set trend data if available from backend
           if (statsResponse.data.trends) {
             setTrendData({
               bookingsTrend: statsResponse.data.trends.bookings || [],
               revenueTrend: statsResponse.data.trends.revenue || []
             });
           } else if (allBookingsResponse.success && allBookingsResponse.data.bookings) {
-            // Process real booking data for trends
             const bookings = allBookingsResponse.data.bookings;
             const trends = generateRealTrendData(bookings, statsResponse.data);
             setTrendData(trends);
           } else {
-            // Only use fallback if no real data available
             const fallbackTrends = generateRealTrendData(null, statsResponse.data);
             setTrendData(fallbackTrends);
           }
         }
         
-        // Set recent bookings (limit to 5 for display)
         if (allBookingsResponse.success) {
           setRecentBookings(allBookingsResponse.data.bookings?.slice(0, 5) || []);
         }
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
-        // Set fallback trend data even if API fails - use deterministic data
         const fallbackTrends = generateRealTrendData(null, { totalBookings: 8, revenue: 28005 });
         setTrendData(fallbackTrends);
       } finally {
@@ -210,7 +205,6 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  // Redirect to home when not authenticated (after initial auth check)
   useEffect(() => {
     if (!loading && !user) {
       navigate('/', { replace: true });
@@ -222,7 +216,6 @@ const Dashboard = () => {
     navigate('/');
   };
 
-  // Redirect non-admin users
   if (user && user.role !== 'admin') {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -240,7 +233,6 @@ const Dashboard = () => {
     );
   }
 
-  // While auth is checking, show loader. If unauthenticated, navigate effect will run; render nothing to avoid flash.
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">

@@ -32,7 +32,6 @@ const AboutPage = () => {
     }
   ];
 
-  // Statistics 
   const stats = [
     { value: "7", label: t('locations') },
     { value: "50+", label: t('premiumVehicles') },

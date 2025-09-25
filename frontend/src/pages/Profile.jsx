@@ -40,7 +40,6 @@ const Profile = () => {
     }
   }, [user]);
 
-  // Redirect to home when not authenticated (after initial auth check)
   useEffect(() => {
     if (!loading && !user) {
       navigate('/', { replace: true });
@@ -88,7 +87,6 @@ const Profile = () => {
     navigate('/');
   };
 
-  // While auth is checking, show loader. If unauthenticated, navigate effect will run; render nothing to avoid flash.
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
