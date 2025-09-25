@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <title>Screenshots</title>
+  <rect x="3" y="5" width="18" height="14" rx="2"/>
+  <path d="M8 5v-2h8v2"/>
+  <circle cx="12" cy="12" r="3"/>
+</svg>
