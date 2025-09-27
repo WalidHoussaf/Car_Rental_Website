@@ -130,27 +130,27 @@ Git + GitHub          // Version control
 ### **Project Structure**
 ```
 Car_Rental_Website/
-├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> frontend/                 # React application
-│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> src/
-│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> components/       # Reusable UI components
-│   │   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> Admin/        # Admin dashboard components
-│   │   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> Booking/      # Booking flow components
-│   │   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> Charts/       # Data visualization
-│   │   │   └── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> UI/           # Common UI elements
-│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> pages/            # Route components
-│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> context/          # React Context providers
-│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> hooks/            # Custom React hooks
-│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> utils/            # Helper functions
-│   │   └── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> translations/     # i18n language files
-│   └── <img src="assets/icons/document.png" alt="Document" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> package.json
-├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> backend/                  # Express.js API
-│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> models/               # MongoDB schemas
-│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> routes/               # API endpoints
-│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> middleware/           # Custom middleware
-│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> services/             # Business logic
-│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> utils/                # Helper utilities
-│   └── <img src="assets/icons/document.png" alt="Document" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> server.js
-└── <img src="assets/icons/document.png" alt="Document" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> README.md
+├── 📁 frontend/                 # React application
+│   ├── 📁 src/
+│   │   ├── 📁 components/       # Reusable UI components
+│   │   │   ├── 📁 Admin/        # Admin dashboard components
+│   │   │   ├── 📁 Booking/      # Booking flow components
+│   │   │   ├── 📁 Charts/       # Data visualization
+│   │   │   └── 📁 UI/           # Common UI elements
+│   │   ├── 📁 pages/            # Route components
+│   │   ├── 📁 context/          # React Context providers
+│   │   ├── 📁 hooks/            # Custom React hooks
+│   │   ├── 📁 utils/            # Helper functions
+│   │   └── 📁 translations/     # i18n language files
+│   └── 📄 package.json
+├── 📁 backend/                  # Express.js API
+│   ├── 📁 models/               # MongoDB schemas
+│   ├── 📁 routes/               # API endpoints
+│   ├── 📁 middleware/           # Custom middleware
+│   ├── 📁 services/             # Business logic
+│   ├── 📁 utils/                # Helper utilities
+│   └── 📄 server.js
+└── 📄 README.md
 ```
 
 ## <img src="assets/icons/quick-start.png" alt="Quick Start" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Quick Start
