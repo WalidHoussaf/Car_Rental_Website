@@ -35,7 +35,7 @@
 <br/>
 
 <p style="font-size: 0.9em; color: #9CA3AF; margin-top: 20px;">
-  ⭐ <strong>Star this repository if you found it helpful!</strong> ⭐
+  <img src="assets/icons/star.png" alt="Star" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> <strong>Star this repository if you found it helpful!</strong> <img src="assets/icons/star.png" alt="Star" width="16" height="16" style="vertical-align:-2px; margin-left:4px" />
 </p>
 
 </div>
@@ -57,21 +57,21 @@
 
 ## <img src="assets/icons/key-feature.png" alt="Key Features" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Key Features
 
-### 🎯 **User Experience**
+### <img src="assets/icons/target.png" alt="Target" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> **User Experience**
 - **Real-time Car Availability** - Live availability checking prevents booking conflicts
 - **Smart Booking System** - Multi-step booking with date validation and location filtering
 - **Bilingual Support** - Full English/French internationalization (i18n)
 - **Interactive Maps** - Leaflet integration for office location selection
 - **PDF Receipt Generation** - Automated booking confirmations with professional styling
 
-### 🔐 **Authentication & Security**
+### <img src="assets/icons/security.png" alt="Security" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> **Authentication & Security**
 - **JWT-based Authentication** - Secure token-based user sessions
 - **Role-based Access Control** - Admin/User permission system
 - **Password Encryption** - bcryptjs hashing for secure password storage
 - **Rate Limiting** - API protection against abuse
 - **Input Validation** - Comprehensive server-side validation
 
-### 📊 **Admin Dashboard**
+### <img src="assets/icons/dashboard.png" alt="Dashboard" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> **Admin Dashboard**
 - **Comprehensive Analytics** - Revenue, bookings, users, and fleet analytics
 - **Real-time Charts** - Interactive data visualization with Recharts
 - **Fleet Management** - Complete CRUD operations for vehicle inventory
@@ -79,7 +79,7 @@
 - **User Management** - Customer account administration
 - **Performance Metrics** - Business intelligence and reporting
 
-### 🚀 **Advanced Functionality**
+### <img src="assets/icons/rocket.png" alt="Rocket" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> **Advanced Functionality**
 - **Automatic Status Management** - Cron-based booking lifecycle automation
 - **Dynamic Pricing** - Flexible pricing with options and extras
 - **Location-based Filtering** - Cars filtered by office availability
@@ -130,27 +130,27 @@ Git + GitHub          // Version control
 ### **Project Structure**
 ```
 Car_Rental_Website/
-├── 📁 frontend/                 # React application
-│   ├── 📁 src/
-│   │   ├── 📁 components/       # Reusable UI components
-│   │   │   ├── 📁 Admin/        # Admin dashboard components
-│   │   │   ├── 📁 Booking/      # Booking flow components
-│   │   │   ├── 📁 Charts/       # Data visualization
-│   │   │   └── 📁 UI/           # Common UI elements
-│   │   ├── 📁 pages/            # Route components
-│   │   ├── 📁 context/          # React Context providers
-│   │   ├── 📁 hooks/            # Custom React hooks
-│   │   ├── 📁 utils/            # Helper functions
-│   │   └── 📁 translations/     # i18n language files
-│   └── 📄 package.json
-├── 📁 backend/                  # Express.js API
-│   ├── 📁 models/               # MongoDB schemas
-│   ├── 📁 routes/               # API endpoints
-│   ├── 📁 middleware/           # Custom middleware
-│   ├── 📁 services/             # Business logic
-│   ├── 📁 utils/                # Helper utilities
-│   └── 📄 server.js
-└── 📄 README.md
+├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> frontend/                 # React application
+│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> src/
+│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> components/       # Reusable UI components
+│   │   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> Admin/        # Admin dashboard components
+│   │   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> Booking/      # Booking flow components
+│   │   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> Charts/       # Data visualization
+│   │   │   └── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> UI/           # Common UI elements
+│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> pages/            # Route components
+│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> context/          # React Context providers
+│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> hooks/            # Custom React hooks
+│   │   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> utils/            # Helper functions
+│   │   └── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> translations/     # i18n language files
+│   └── <img src="assets/icons/document.png" alt="Document" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> package.json
+├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> backend/                  # Express.js API
+│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> models/               # MongoDB schemas
+│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> routes/               # API endpoints
+│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> middleware/           # Custom middleware
+│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> services/             # Business logic
+│   ├── <img src="assets/icons/folder.png" alt="Folder" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> utils/                # Helper utilities
+│   └── <img src="assets/icons/document.png" alt="Document" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> server.js
+└── <img src="assets/icons/document.png" alt="Document" width="16" height="16" style="vertical-align:-2px; margin-right:4px" /> README.md
 ```
 
 ## <img src="assets/icons/quick-start.png" alt="Quick Start" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Quick Start
@@ -206,7 +206,7 @@ npm run seed         # Populate with sample data
 
 ## <img src="assets/icons/feature.png" alt="Advanced Features" width="28" height="28" style="vertical-align:-5px; margin-right:8px" /> Advanced Features
 
-### **🤖 Automated Booking Management**
+### **<img src="assets/icons/robot.png" alt="Robot" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> Automated Booking Management**
 ```javascript
 // Automatic status transitions
 pending → confirmed (admin approval)
@@ -214,26 +214,26 @@ confirmed → active (pickup date arrives)
 active → completed (return date passes)
 ```
 
-### **🌍 Real-time Availability System**
+### **<img src="assets/icons/globe.png" alt="Globe" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> Real-time Availability System**
 - Live car availability checking
 - Booking conflict prevention
 - Location-based inventory management
 - Operating hours validation
 
-### **📈 Business Intelligence**
+### **<img src="assets/icons/chart.png" alt="Chart" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> Business Intelligence**
 - Revenue analytics with trend analysis
 - Fleet utilization metrics
 - Customer engagement tracking
 - Performance reporting
 
-### **🔒 Security Features**
+### **<img src="assets/icons/lock.png" alt="Lock" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> Security Features**
 - JWT token authentication
 - Password encryption (bcryptjs)
 - Rate limiting protection
 - Input sanitization
 - CORS configuration
 
-### **🌐 Internationalization**
+### **<img src="assets/icons/international.png" alt="International" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> Internationalization**
 - English/French language support
 - Dynamic content translation
 - Localized date/time formatting
@@ -299,8 +299,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 <div align="center">
 
-**⭐ Star this repository if you found it helpful!**
-
-Made with ❤️ by Walid Houssaf.
+Designed and developed by Walid Houssaf.
 
 </div>
