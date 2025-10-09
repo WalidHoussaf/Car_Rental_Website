@@ -20,6 +20,9 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [accountLocked, setAccountLocked] = useState(false);
+  const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
+  const [attemptsRemaining, setAttemptsRemaining] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -64,17 +67,38 @@ const LoginPage = () => {
     
     setIsLoading(true);
     setErrors((prev) => ({ ...prev, form: null }));
+    setAccountLocked(false);
+    setAttemptsRemaining(null);
     
     try {
       const result = await login(formData.email.trim(), formData.password);
       
       if (!result?.success) {
         const message = result?.message || (language === 'fr' ? 'Identifiants invalides' : 'Invalid credentials');
+        
+        // Check if account is locked (HTTP 423)
+        if (result?.lockTimeRemaining) {
+          setAccountLocked(true);
+          setLockTimeRemaining(result.lockTimeRemaining);
+          setErrors((prev) => ({ 
+            ...prev, 
+            form: message,
+            locked: true
+          }));
+          return;
+        }
+        
+        // Show remaining attempts if available
+        if (result?.attemptsRemaining !== undefined) {
+          setAttemptsRemaining(result.attemptsRemaining);
+        }
+        
         setErrors((prev) => ({ ...prev, form: message }));
         return;
       }
       
       setIsSuccess(true);
+      setAttemptsRemaining(null);
       
       const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
       const role = storedUser?.role?.toLowerCase?.();
@@ -157,8 +181,36 @@ const LoginPage = () => {
 
           {/* Error Message */}
           {errors.form && (
-            <div className="mb-6 p-4 bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/50 rounded-md text-center">
-              <p className="text-red-400">{errors.form}</p>
+            <div className={`mb-6 p-4 ${errors.locked ? 'bg-gradient-to-r from-orange-500/10 to-red-600/10 border border-orange-500/50' : 'bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/50'} rounded-md`}>
+              <div className="flex items-start gap-3">
+                {errors.locked && (
+                  <svg className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                )}
+                <div className="flex-1">
+                  <p className={errors.locked ? 'text-orange-400 font-medium' : 'text-red-400'}>{errors.form}</p>
+                  {accountLocked && lockTimeRemaining > 0 && (
+                    <p className="text-orange-300 text-sm mt-2">
+                      {language === 'fr' 
+                        ? `Votre compte sera déverrouillé dans ${lockTimeRemaining} minute${lockTimeRemaining > 1 ? 's' : ''}.`
+                        : `Your account will be unlocked in ${lockTimeRemaining} minute${lockTimeRemaining > 1 ? 's' : ''}.`
+                      }
+                    </p>
+                  )}
+                  {attemptsRemaining !== null && attemptsRemaining > 0 && !errors.locked && (
+                    <p className="text-yellow-400 text-sm mt-2 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      {language === 'fr'
+                        ? `${attemptsRemaining} tentative${attemptsRemaining > 1 ? 's' : ''} restante${attemptsRemaining > 1 ? 's' : ''} avant le verrouillage du compte.`
+                        : `${attemptsRemaining} attempt${attemptsRemaining > 1 ? 's' : ''} remaining before account lockout.`
+                      }
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 

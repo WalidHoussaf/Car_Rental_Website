@@ -35,10 +35,10 @@ export const validateUserRegistration = [
     .normalizeEmail(),
   
   body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-=\[\]{};':"\\|,.<>\/?])/)
+    .withMessage('Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character'),
   
   body('phone')
     .trim()
@@ -86,7 +86,7 @@ export const validateUserRegistration = [
     .withMessage('Country is required')
 ];
 
-// Car update validation rules (all fields optional to support partial updates)
+// Car update validation rules 
 export const validateCarUpdate = [
   body('make').optional().trim().notEmpty(),
   body('model').optional().trim().notEmpty(),

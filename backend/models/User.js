@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters']
+    minlength: [8, 'Password must be at least 8 characters']
   },
   phone: {
     type: String,
@@ -59,9 +59,25 @@ const userSchema = new mongoose.Schema({
   profileImage: {
     type: String,
     default: null
+  },
+  loginAttempts: {
+    type: Number,
+    default: 0
+  },
+  lockUntil: {
+    type: Date
   }
 }, {
   timestamps: true
+});
+
+// Account lockout constants
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCK_TIME = 2 * 60 * 60 * 1000; 
+
+// Virtual property to check if account is locked
+userSchema.virtual('isLocked').get(function() {
+  return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
 // Hash password before saving
@@ -82,10 +98,48 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
+// Increment login attempts
+userSchema.methods.incLoginAttempts = async function() {
+  // If we have a previous lock that has expired, restart at 1
+  if (this.lockUntil && this.lockUntil < Date.now()) {
+    return this.updateOne({
+      $set: { loginAttempts: 1 },
+      $unset: { lockUntil: 1 }
+    });
+  }
+  
+  // Otherwise increment attempts
+  const updates = { $inc: { loginAttempts: 1 } };
+  
+  // Lock the account if we've reached max attempts and it's not already locked
+  if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
+    updates.$set = { lockUntil: Date.now() + LOCK_TIME };
+  }
+  
+  return this.updateOne(updates);
+};
+
+// Reset login attempts
+userSchema.methods.resetLoginAttempts = async function() {
+  return this.updateOne({
+    $set: { loginAttempts: 0 },
+    $unset: { lockUntil: 1 }
+  });
+};
+
+// Get time remaining for lockout (in minutes)
+userSchema.methods.getLockTimeRemaining = function() {
+  if (!this.isLocked) return 0;
+  const remaining = this.lockUntil - Date.now();
+  return Math.ceil(remaining / (60 * 1000)); 
+};
+
 // Remove password from JSON output
 userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;
+  delete userObject.loginAttempts;
+  delete userObject.lockUntil;
   return userObject;
 };
 

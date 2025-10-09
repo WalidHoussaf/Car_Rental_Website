@@ -299,6 +299,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 <div align="center">
 
-Designed and developed by Walid Houssaf <img src="assets/icons/dragon.png" alt="Dragon" width="24" height="24" style="vertical-align:-4px; margin-left:8px" />.
+Designed and developed by Walid Houssaf . <img src="assets/icons/dragon.png" alt="Dragon" width="24" height="24" style="vertical-align:-4px; margin-left:8px" />
 
 </div>

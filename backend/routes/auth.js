@@ -1,16 +1,26 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import RefreshToken from '../models/RefreshToken.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { validateUserRegistration, validateUserLogin, handleValidationErrors } from '../middleware/validation.js';
 
 const router = express.Router();
 
-// Generate JWT token
-const generateToken = (userId) => {
+// Generate access token (short-lived)
+const generateAccessToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+    expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m'
   });
+};
+
+// Get client IP address
+const getClientIp = (req) => {
+  return req.headers['x-forwarded-for']?.split(',')[0] || 
+         req.headers['x-real-ip'] || 
+         req.connection.remoteAddress || 
+         req.socket.remoteAddress || 
+         'unknown';
 };
 
 // Register new user
@@ -50,15 +60,17 @@ router.post('/register', validateUserRegistration, handleValidationErrors, async
 
     await user.save();
 
-    // Generate token
-    const token = generateToken(user._id);
+    // Generate tokens
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = await RefreshToken.createToken(user._id, getClientIp(req));
 
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
       data: {
         user,
-        token
+        accessToken,
+        refreshToken: refreshToken.token
       }
     });
   } catch (error) {
@@ -76,8 +88,8 @@ router.post('/login', validateUserLogin, handleValidationErrors, async (req, res
   try {
     const { email, password } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ email }).select('+password');
+    // Find user by email (include password, loginAttempts, and lockUntil)
+    const user = await User.findOne({ email }).select('+password +loginAttempts +lockUntil');
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -85,27 +97,68 @@ router.post('/login', validateUserLogin, handleValidationErrors, async (req, res
       });
     }
 
-    // Check password
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
+    // Check if account is locked
+    if (user.isLocked) {
+      const remainingTime = user.getLockTimeRemaining();
+      await user.incLoginAttempts(); // Still count the attempt
+      return res.status(423).json({
         success: false,
-        message: 'Invalid email or password'
+        message: `Account is temporarily locked due to multiple failed login attempts. Please try again in ${remainingTime} minutes.`,
+        lockTimeRemaining: remainingTime
       });
     }
 
-    // Generate token
-    const token = generateToken(user._id);
+    // Check password
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      // Increment login attempts on failed password
+      await user.incLoginAttempts();
+      
+      // Reload user to get updated loginAttempts and lockUntil
+      const updatedUser = await User.findById(user._id).select('+loginAttempts +lockUntil');
+      
+      // Check if account just got locked
+      if (updatedUser.isLocked) {
+        const remainingTime = updatedUser.getLockTimeRemaining();
+        return res.status(423).json({
+          success: false,
+          message: `Too many failed login attempts. Account is locked for ${remainingTime} minutes.`,
+          lockTimeRemaining: remainingTime
+        });
+      }
+      
+      // Calculate remaining attempts
+      const attemptsLeft = 5 - updatedUser.loginAttempts;
+      return res.status(401).json({
+        success: false,
+        message: attemptsLeft > 0 
+          ? `Invalid email or password. ${attemptsLeft} attempt(s) remaining before account lockout.`
+          : 'Invalid email or password',
+        attemptsRemaining: attemptsLeft
+      });
+    }
 
-    // Remove password from response
+    // Successful login - reset login attempts
+    if (user.loginAttempts > 0 || user.lockUntil) {
+      await user.resetLoginAttempts();
+    }
+
+    // Generate tokens
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = await RefreshToken.createToken(user._id, getClientIp(req));
+
+    // Remove sensitive fields from response
     user.password = undefined;
+    user.loginAttempts = undefined;
+    user.lockUntil = undefined;
 
     res.status(200).json({
       success: true,
       message: 'Login successful',
       data: {
         user,
-        token
+        accessToken,
+        refreshToken: refreshToken.token
       }
     });
   } catch (error) {
@@ -182,6 +235,203 @@ router.get('/verify', authenticateToken, async (req, res) => {
       user: req.user
     }
   });
+});
+
+// Refresh access token
+router.post('/refresh-token', async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token is required'
+      });
+    }
+
+    // Find the refresh token in database
+    const tokenDoc = await RefreshToken.findOne({ token: refreshToken }).populate('user');
+
+    if (!tokenDoc) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid refresh token'
+      });
+    }
+
+    // Check if token is active (not revoked and not expired)
+    if (!tokenDoc.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: tokenDoc.revokedAt ? 'Refresh token has been revoked' : 'Refresh token has expired'
+      });
+    }
+
+    // Generate new access token
+    const newAccessToken = generateAccessToken(tokenDoc.user._id);
+
+    // Optionally rotate refresh token (create new one and revoke old one)
+    const newRefreshToken = await RefreshToken.createToken(tokenDoc.user._id, getClientIp(req));
+    await tokenDoc.revoke(getClientIp(req), 'Replaced by new token');
+    tokenDoc.replacedByToken = newRefreshToken.token;
+    await tokenDoc.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Token refreshed successfully',
+      data: {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken.token
+      }
+    });
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to refresh token',
+      error: error.message
+    });
+  }
+});
+
+// Revoke refresh token (logout)
+router.post('/revoke-token', authenticateToken, async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token is required'
+      });
+    }
+
+    const tokenDoc = await RefreshToken.findOne({ token: refreshToken });
+
+    if (!tokenDoc) {
+      return res.status(404).json({
+        success: false,
+        message: 'Refresh token not found'
+      });
+    }
+
+    // Verify token belongs to authenticated user
+    if (tokenDoc.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized to revoke this token'
+      });
+    }
+
+    // Revoke the token
+    await tokenDoc.revoke(getClientIp(req), 'Revoked by user');
+
+    res.status(200).json({
+      success: true,
+      message: 'Token revoked successfully'
+    });
+  } catch (error) {
+    console.error('Token revocation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to revoke token',
+      error: error.message
+    });
+  }
+});
+
+// Logout (revoke all refresh tokens for user)
+router.post('/logout', authenticateToken, async (req, res) => {
+  try {
+    // Revoke all active refresh tokens for this user
+    const tokens = await RefreshToken.find({
+      user: req.user._id,
+      revokedAt: null
+    });
+
+    const ipAddress = getClientIp(req);
+    await Promise.all(
+      tokens.map(token => token.revoke(ipAddress, 'Logged out'))
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully',
+      data: {
+        tokensRevoked: tokens.length
+      }
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Logout failed',
+      error: error.message
+    });
+  }
+});
+
+// Get all active refresh tokens for current user (for session management)
+router.get('/sessions', authenticateToken, async (req, res) => {
+  try {
+    const tokens = await RefreshToken.find({
+      user: req.user._id,
+      revokedAt: null,
+      expiresAt: { $gt: new Date() }
+    }).select('createdByIp createdAt expiresAt').sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        sessions: tokens
+      }
+    });
+  } catch (error) {
+    console.error('Sessions fetch error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch sessions',
+      error: error.message
+    });
+  }
+});
+
+// Unlock account (admin or user can request unlock via email in future)
+router.post('/unlock-account', authenticateToken, async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    // Allow users to unlock their own account or admins to unlock any account
+    if (req.user.role !== 'admin' && req.user._id.toString() !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized to unlock this account'
+      });
+    }
+
+    const user = await User.findById(userId).select('+loginAttempts +lockUntil');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    await user.resetLoginAttempts();
+
+    res.status(200).json({
+      success: true,
+      message: 'Account unlocked successfully'
+    });
+  } catch (error) {
+    console.error('Account unlock error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to unlock account',
+      error: error.message
+    });
+  }
 });
 
 export default router;

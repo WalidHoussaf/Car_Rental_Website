@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const createApiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -10,7 +10,7 @@ const createApiRequest = async (endpoint, options = {}) => {
     },
   };
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('accessToken');
   if (token) {
     defaultOptions.headers.Authorization = `Bearer ${token}`;
   }
@@ -66,6 +66,27 @@ export const api = {
     }),
     
     verifyToken: () => createApiRequest('/auth/verify'),
+    
+    refreshToken: (data) => createApiRequest('/auth/refresh-token', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    
+    revokeToken: (data) => createApiRequest('/auth/revoke-token', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    
+    logout: () => createApiRequest('/auth/logout', {
+      method: 'POST',
+    }),
+    
+    getSessions: () => createApiRequest('/auth/sessions'),
+    
+    unlockAccount: (data) => createApiRequest('/auth/unlock-account', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
   },
 
   // Car endpoints

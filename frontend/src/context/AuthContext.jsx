@@ -8,9 +8,52 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Clear authentication data
+  const clearAuthData = React.useCallback(() => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
+  }, []);
+
+  // Refresh access token
+  const refreshAccessToken = React.useCallback(async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        clearAuthData();
+        return false;
+      }
+
+      const response = await api.auth.refreshToken({ refreshToken });
+      
+      if (response.success) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+        
+        // Verify the new token to get user data
+        const verifyResponse = await api.auth.verifyToken();
+        if (verifyResponse.success) {
+          setUser(verifyResponse.data.user);
+          setIsAuthenticated(true);
+          return true;
+        }
+      }
+      
+      clearAuthData();
+      return false;
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      clearAuthData();
+      return false;
+    }
+  }, [clearAuthData]);
+
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
       
       if (token) {
         try {
@@ -19,13 +62,21 @@ export const AuthProvider = ({ children }) => {
             setUser(response.data.user);
             setIsAuthenticated(true);
           } else {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            // Try to refresh token if verification fails
+            if (refreshToken) {
+              await refreshAccessToken();
+            } else {
+              clearAuthData();
+            }
           }
         } catch (error) {
           console.error('Token verification failed:', error);
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          // Try to refresh token on error
+          if (refreshToken) {
+            await refreshAccessToken();
+          } else {
+            clearAuthData();
+          }
         }
       }
       
@@ -33,7 +84,7 @@ export const AuthProvider = ({ children }) => {
     };
     
     checkAuthStatus();
-  }, []);
+  }, [refreshAccessToken, clearAuthData]);
 
   // Login function
   const login = async (email, password) => {
@@ -42,7 +93,8 @@ export const AuthProvider = ({ children }) => {
       const response = await api.auth.login({ email, password });
       
       if (response.success) {
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         
         setUser(response.data.user);
@@ -52,13 +104,26 @@ export const AuthProvider = ({ children }) => {
       } else {
         return { 
           success: false, 
-          message: response.message || 'Login failed' 
+          message: response.message || 'Login failed',
+          lockTimeRemaining: response.lockTimeRemaining,
+          attemptsRemaining: response.attemptsRemaining
         };
       }
     } catch (error) {
+      // Check if it's an account lockout error (HTTP 423)
+      if (error.response?.status === 423) {
+        return {
+          success: false,
+          message: error.response.data?.message || 'Account is locked',
+          lockTimeRemaining: error.response.data?.lockTimeRemaining,
+          locked: true
+        };
+      }
+      
       return { 
         success: false, 
-        message: error.message || 'Failed to login' 
+        message: error.message || 'Failed to login',
+        attemptsRemaining: error.response?.data?.attemptsRemaining
       };
     } finally {
       setLoading(false);
@@ -72,7 +137,8 @@ export const AuthProvider = ({ children }) => {
       const response = await api.auth.register(userData);
       
       if (response.success) {
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         
         setUser(response.data.user);
@@ -123,12 +189,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Logout function
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    
-    setUser(null);
-    setIsAuthenticated(false);
+  const logout = async () => {
+    try {
+      // Call backend to revoke all tokens
+      await api.auth.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      clearAuthData();
+    }
   };
 
   // Create value object
@@ -139,7 +208,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     updateProfile,
-    logout
+    logout,
+    refreshAccessToken
   };
 
   return (
