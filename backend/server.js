@@ -6,6 +6,8 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
+import cookieParser from 'cookie-parser';
+import csrf from 'csurf';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -29,16 +31,26 @@ if (missingEnvVars.length > 0) {
   process.exit(1);
 }
 
-// Validate JWT_SECRET strength
-if (process.env.JWT_SECRET.length < 32) {
-  console.warn('⚠️  WARNING: JWT_SECRET should be at least 32 characters for security');
+// Validate JWT_SECRET strength 
+if (process.env.JWT_SECRET.length < 64) {
+  console.error('❌ SECURITY ERROR: JWT_SECRET must be at least 64 characters!');
+  console.error('💡 Current length:', process.env.JWT_SECRET.length);
+  console.error('💡 Generate a secure secret: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"');
+  process.exit(1);
 }
 
 if (process.env.JWT_SECRET === 'your_super_secure_jwt_secret_change_this_in_production') {
-  console.error('❌ SECURITY ERROR: Please change the default JWT_SECRET in production!');
-  if (process.env.NODE_ENV === 'production') {
-    process.exit(1);
-  }
+  console.error('❌ SECURITY ERROR: Please change the default JWT_SECRET!');
+  process.exit(1);
+}
+
+const hasUpperCase = /[A-Z]/.test(process.env.JWT_SECRET);
+const hasLowerCase = /[a-z]/.test(process.env.JWT_SECRET);
+const hasNumbers = /[0-9]/.test(process.env.JWT_SECRET);
+const hasSpecialChars = /[^A-Za-z0-9]/.test(process.env.JWT_SECRET);
+
+if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
+  console.warn('⚠️  WARNING: JWT_SECRET should contain uppercase, lowercase, and numbers for better security');
 }
 
 const app = express();
@@ -104,11 +116,32 @@ const authLimiter = rateLimit({
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
-// CORS configuration
+// CORS configuration 
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin 
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Allow cookies to be sent
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+  exposedHeaders: ['X-CSRF-Token']
 }));
+
+// Cookie parser middleware (MUST be before CSRF)
+app.use(cookieParser());
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -119,6 +152,58 @@ app.use(mongoSanitize());
 
 // Data sanitization against XSS attacks
 app.use(xss());
+
+// CSRF Protection (using cookies)
+const csrfProtection = csrf({ 
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    sameSite: 'strict'
+  }
+});
+
+// Apply CSRF protection to state-changing routes
+// EXCLUDE auth routes (login/register) since they don't have cookies yet
+app.use('/api/auth', (req, res, next) => {
+  // Skip CSRF for login and register endpoints
+  if (req.path === '/login' || req.path === '/register') {
+    return next();
+  }
+  // Apply CSRF to other auth routes (logout, profile updates, etc.)
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    return csrfProtection(req, res, next);
+  }
+  next();
+});
+
+app.use('/api/cars', (req, res, next) => {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    return csrfProtection(req, res, next);
+  }
+  next();
+});
+
+app.use('/api/bookings', (req, res, next) => {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    return csrfProtection(req, res, next);
+  }
+  next();
+});
+
+app.use('/api/users', (req, res, next) => {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    return csrfProtection(req, res, next);
+  }
+  next();
+});
+
+// CSRF token endpoint (for frontend to get token)
+app.get('/api/csrf-token', csrfProtection, (req, res) => {
+  res.json({ 
+    success: true,
+    csrfToken: req.csrfToken() 
+  });
+});
 
 // Static files for uploads with CORS headers
 app.use('/uploads', (req, res, next) => {

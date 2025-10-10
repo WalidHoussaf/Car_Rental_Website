@@ -1,23 +1,48 @@
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// CSRF token cache
+let csrfToken = null;
+
+// Fetch CSRF token
+const fetchCsrfToken = async () => {
+  if (csrfToken) return csrfToken;
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/csrf-token`, {
+      credentials: 'include'
+    });
+    const data = await response.json();
+    csrfToken = data.csrfToken;
+    return csrfToken;
+  } catch (error) {
+    console.error('Failed to fetch CSRF token:', error);
+    return null;
+  }
+};
+
 const createApiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   
   const defaultOptions = {
+    credentials: 'include', // CRITICAL: Send cookies with requests
     headers: {
       'Content-Type': 'application/json',
     },
   };
 
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    defaultOptions.headers.Authorization = `Bearer ${token}`;
+  // Add CSRF token for state-changing requests
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method)) {
+    const token = await fetchCsrfToken();
+    if (token) {
+      defaultOptions.headers['X-CSRF-Token'] = token;
+    }
   }
 
   const config = {
     ...defaultOptions,
     ...options,
+    credentials: 'include', // Ensure credentials are always included
     headers: {
       ...defaultOptions.headers,
       ...options.headers,
@@ -33,15 +58,40 @@ const createApiRequest = async (endpoint, options = {}) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('API Error Details:', data);
+      // Handle CSRF token errors
+      if (response.status === 403 && data.message?.includes('CSRF')) {
+        console.warn('CSRF token invalid, refreshing...');
+        csrfToken = null; // Clear cached token
+        // Retry the request once with new token
+        const newToken = await fetchCsrfToken();
+        if (newToken && config.headers) {
+          config.headers['X-CSRF-Token'] = newToken;
+          const retryResponse = await fetch(url, config);
+          const retryData = await retryResponse.json();
+          if (retryResponse.ok) return retryData;
+        }
+      }
+      
+      // Don't log expected 401 errors (user not logged in)
+      if (response.status !== 401) {
+        console.error('API Error Details:', data);
+      }
       throw new Error(data.message || `HTTP error! status: ${response.status}`);
     }
 
     return data;
   } catch (error) {
-    console.error('API Request Error:', error);
+    // Don't log expected 401 errors (user not logged in)
+    if (!error.message?.includes('Access token is required')) {
+      console.error('API Request Error:', error);
+    }
     throw error;
   }
+};
+
+// Export function to clear CSRF token cache
+export const clearCsrfToken = () => {
+  csrfToken = null;
 };
 
 // API methods

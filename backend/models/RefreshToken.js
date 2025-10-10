@@ -16,8 +16,7 @@ const refreshTokenSchema = new mongoose.Schema({
   },
   expiresAt: {
     type: Date,
-    required: true,
-    index: true
+    required: true
   },
   createdByIp: {
     type: String
@@ -60,7 +59,7 @@ refreshTokenSchema.statics.generateToken = function() {
 refreshTokenSchema.statics.createToken = async function(userId, ipAddress) {
   const token = this.generateToken();
   const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+  expiresAt.setDate(expiresAt.getDate() + 7); 
 
   const refreshToken = await this.create({
     token,

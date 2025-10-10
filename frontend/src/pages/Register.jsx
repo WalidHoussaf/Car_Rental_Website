@@ -100,10 +100,12 @@ const RegisterPage = () => {
     
     if (!formData.password) {
       newErrors.password = language === 'fr' ? 'Le mot de passe est requis' : 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = language === 'fr' ? 'Le mot de passe doit contenir au moins 6 caractères' : 'Password must be at least 6 characters';
-    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = language === 'fr' ? 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre' : 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+    } else if (formData.password.length < 8) {
+      newErrors.password = language === 'fr' ? 'Le mot de passe doit contenir au moins 8 caractères' : 'Password must be at least 8 characters';
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-=[\]{};':"\\|,.<>/?])/.test(formData.password)) {
+      newErrors.password = language === 'fr' 
+        ? 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&#, etc.)' 
+        : 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#, etc.)';
     }
     
     if (formData.password !== formData.confirmPassword) {
@@ -439,6 +441,13 @@ const RegisterPage = () => {
                   </button>
                 </div>
                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                {!errors.password && (
+                  <p className="text-gray-400 text-xs mt-1">
+                    {language === 'fr' 
+                      ? 'Min. 8 caractères avec majuscule, minuscule, chiffre et caractère spécial (@$!%*?&#, etc.)'
+                      : 'Min. 8 characters with uppercase, lowercase, number, and special character (@$!%*?&#, etc.)'}
+                  </p>
+                )}
               </div>
 
               <div className="mb-5 group">

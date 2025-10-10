@@ -14,6 +14,39 @@ const generateAccessToken = (userId) => {
   });
 };
 
+// Set authentication cookies
+const setAuthCookies = (res, accessToken, refreshToken) => {
+  // Access token cookie (15 minutes)
+  res.cookie('accessToken', accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 15 * 60 * 1000
+  });
+
+  // Refresh token cookie (7 days)
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000 
+  });
+};
+
+// Clear authentication cookies
+const clearAuthCookies = (res) => {
+  res.clearCookie('accessToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+};
+
 // Get client IP address
 const getClientIp = (req) => {
   return req.headers['x-forwarded-for']?.split(',')[0] || 
@@ -64,13 +97,14 @@ router.post('/register', validateUserRegistration, handleValidationErrors, async
     const accessToken = generateAccessToken(user._id);
     const refreshToken = await RefreshToken.createToken(user._id, getClientIp(req));
 
+    // Set httpOnly cookies
+    setAuthCookies(res, accessToken, refreshToken.token);
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
       data: {
-        user,
-        accessToken,
-        refreshToken: refreshToken.token
+        user
       }
     });
   } catch (error) {
@@ -147,6 +181,9 @@ router.post('/login', validateUserLogin, handleValidationErrors, async (req, res
     const accessToken = generateAccessToken(user._id);
     const refreshToken = await RefreshToken.createToken(user._id, getClientIp(req));
 
+    // Set httpOnly cookies
+    setAuthCookies(res, accessToken, refreshToken.token);
+
     // Remove sensitive fields from response
     user.password = undefined;
     user.loginAttempts = undefined;
@@ -156,9 +193,7 @@ router.post('/login', validateUserLogin, handleValidationErrors, async (req, res
       success: true,
       message: 'Login successful',
       data: {
-        user,
-        accessToken,
-        refreshToken: refreshToken.token
+        user
       }
     });
   } catch (error) {
@@ -240,7 +275,8 @@ router.get('/verify', authenticateToken, async (req, res) => {
 // Refresh access token
 router.post('/refresh-token', async (req, res) => {
   try {
-    const { refreshToken } = req.body;
+    // Get refresh token from cookie instead of body
+    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     if (!refreshToken) {
       return res.status(400).json({
@@ -276,13 +312,12 @@ router.post('/refresh-token', async (req, res) => {
     tokenDoc.replacedByToken = newRefreshToken.token;
     await tokenDoc.save();
 
+    // Set new cookies
+    setAuthCookies(res, newAccessToken, newRefreshToken.token);
+
     res.status(200).json({
       success: true,
-      message: 'Token refreshed successfully',
-      data: {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken.token
-      }
+      message: 'Token refreshed successfully'
     });
   } catch (error) {
     console.error('Token refresh error:', error);
@@ -297,7 +332,8 @@ router.post('/refresh-token', async (req, res) => {
 // Revoke refresh token (logout)
 router.post('/revoke-token', authenticateToken, async (req, res) => {
   try {
-    const { refreshToken } = req.body;
+    // Get refresh token from cookie instead of body
+    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
     if (!refreshToken) {
       return res.status(400).json({
@@ -326,6 +362,9 @@ router.post('/revoke-token', authenticateToken, async (req, res) => {
     // Revoke the token
     await tokenDoc.revoke(getClientIp(req), 'Revoked by user');
 
+    // Clear cookies
+    clearAuthCookies(res);
+
     res.status(200).json({
       success: true,
       message: 'Token revoked successfully'
@@ -353,6 +392,9 @@ router.post('/logout', authenticateToken, async (req, res) => {
     await Promise.all(
       tokens.map(token => token.revoke(ipAddress, 'Logged out'))
     );
+
+    // Clear cookies
+    clearAuthCookies(res);
 
     res.status(200).json({
       success: true,

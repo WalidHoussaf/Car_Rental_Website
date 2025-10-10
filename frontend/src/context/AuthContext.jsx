@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../config/api.js';
+import { api, clearCsrfToken } from '../config/api.js';
 
 import AuthContext from './authContext';
 
@@ -8,29 +8,22 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Clear authentication data
+  // Clear authentication data 
   const clearAuthData = React.useCallback(() => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    // Only clear user data from localStorage (tokens are in httpOnly cookies)
     localStorage.removeItem('user');
+    clearCsrfToken(); // Clear CSRF token cache
     setUser(null);
     setIsAuthenticated(false);
   }, []);
 
-  // Refresh access token
+  // Refresh access token 
   const refreshAccessToken = React.useCallback(async () => {
     try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        clearAuthData();
-        return false;
-      }
-
-      const response = await api.auth.refreshToken({ refreshToken });
+      // No need to pass refreshToken - it's in httpOnly cookie
+      const response = await api.auth.refreshToken({});
       
       if (response.success) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
         
         // Verify the new token to get user data
         const verifyResponse = await api.auth.verifyToken();
@@ -52,32 +45,21 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const token = localStorage.getItem('accessToken');
-      const refreshToken = localStorage.getItem('refreshToken');
-      
-      if (token) {
-        try {
-          const response = await api.auth.verifyToken();
-          if (response.success) {
-            setUser(response.data.user);
-            setIsAuthenticated(true);
-          } else {
-            // Try to refresh token if verification fails
-            if (refreshToken) {
-              await refreshAccessToken();
-            } else {
-              clearAuthData();
-            }
-          }
-        } catch (error) {
-          console.error('Token verification failed:', error);
-          // Try to refresh token on error
-          if (refreshToken) {
-            await refreshAccessToken();
-          } else {
-            clearAuthData();
-          }
+      try {
+        // Try to verify token (will use cookie automatically)
+        const response = await api.auth.verifyToken();
+        if (response.success) {
+          setUser(response.data.user);
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+          setIsAuthenticated(true);
         }
+      } catch (error) {
+        // Silently fail if no token exists (user not logged in)
+        // Only log if it's not a 401 error (which is expected for logged out users)
+        if (!error.message?.includes('Access token is required')) {
+          console.error('Token verification failed:', error);
+        }
+        clearAuthData();
       }
       
       setLoading(false);
@@ -93,8 +75,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.auth.login({ email, password });
       
       if (response.success) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+        // Tokens are now in httpOnly cookies
         localStorage.setItem('user', JSON.stringify(response.data.user));
         
         setUser(response.data.user);
@@ -137,8 +118,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.auth.register(userData);
       
       if (response.success) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+        // Tokens are now in httpOnly cookies
         localStorage.setItem('user', JSON.stringify(response.data.user));
         
         setUser(response.data.user);
