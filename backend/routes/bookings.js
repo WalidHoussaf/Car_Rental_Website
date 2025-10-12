@@ -3,6 +3,7 @@ import Booking from '../models/Booking.js';
 import Car from '../models/Car.js';
 import User from '../models/User.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
+import { requireEmailVerification } from '../middleware/emailVerification.js';
 import { validateBooking, validateObjectId, handleValidationErrors } from '../middleware/validation.js';
 import { updateBookingStatuses, updateSingleBookingStatus } from '../middleware/bookingStatusMiddleware.js';
 import BookingStatusService from '../services/bookingStatusService.js';
@@ -181,7 +182,7 @@ router.get('/:id', authenticateToken, validateObjectId, handleValidationErrors, 
 });
 
 // Create new booking
-router.post('/', authenticateToken, validateBooking, handleValidationErrors, async (req, res) => {
+router.post('/', authenticateToken, requireEmailVerification, validateBooking, handleValidationErrors, async (req, res) => {
   try {
     const {
       car: carId,

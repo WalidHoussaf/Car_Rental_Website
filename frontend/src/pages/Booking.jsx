@@ -6,6 +6,7 @@ import BookingCalendar from '../components/Booking/BookingCalendar';
 import BookingLocation from '../components/Booking/BookingLocation';
 import BookingOption from '../components/Booking/BookingOption';
 import BookingSummary from '../components/Booking/BookingSummary';
+import EmailVerificationModal from '../components/EmailVerificationModal';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
 import { useAuth } from '../hooks/useAuth';
@@ -17,10 +18,11 @@ const Booking = () => {
   const navigate = useNavigate();
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [bookingStep, setBookingStep] = useState(1); 
+  const [bookingStep, setBookingStep] = useState(1);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const { language } = useLanguage();
   const t = useTranslations(language);
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   
   const { cars } = useContext(CarContext);
   
@@ -64,8 +66,11 @@ const Booking = () => {
     if (!authLoading && !isAuthenticated) {
       localStorage.setItem('redirectAfterLogin', `/booking/${id}`);
       navigate('/login');
+    } else if (!authLoading && isAuthenticated && user && !user.isVerified) {
+      // Show verification modal for unverified users
+      setShowVerificationModal(true);
     }
-  }, [isAuthenticated, authLoading, navigate, id]);
+  }, [isAuthenticated, user, authLoading, navigate, id]);
 
   useEffect(() => {
     if (!isAuthenticated && !authLoading) {
@@ -206,6 +211,12 @@ const Booking = () => {
   
   return (
     <div className="min-h-screen bg-black text-white pb-10">
+      {/* Email Verification Modal */}
+      <EmailVerificationModal 
+        open={showVerificationModal} 
+        onClose={() => setShowVerificationModal(false)} 
+      />
+      
       <BookingHeader car={car} bookingStep={bookingStep} />
       <div className="container mx-auto px-4 py-12">
         {bookingStep !== 4 ? (

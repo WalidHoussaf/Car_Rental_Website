@@ -308,6 +308,80 @@ router.delete('/:id', authenticateToken, requireAdmin, validateObjectId, handleV
   }
 });
 
+// Get availability status for multiple cars (Public endpoint)
+router.post('/check-availability', async (req, res) => {
+  try {
+    const { carIds } = req.body;
+
+    if (!carIds || !Array.isArray(carIds) || carIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Car IDs array is required'
+      });
+    }
+
+    // Get all active and confirmed bookings for these cars
+    const bookings = await Booking.find({
+      car: { $in: carIds },
+      status: { $in: ['active', 'confirmed'] }
+    }).select('car status startDate endDate');
+
+    // Create availability map
+    const availabilityMap = {};
+    
+    for (const carId of carIds) {
+      const carBookings = bookings.filter(b => b.car.toString() === carId);
+      const unavailableBookings = carBookings.filter(b => 
+        ['active', 'confirmed'].includes(b.status)
+      );
+
+      if (unavailableBookings.length === 0) {
+        availabilityMap[carId] = {
+          available: true,
+          reason: 'Car is available for booking',
+          nextAvailableDate: null
+        };
+      } else {
+        const activeBookings = unavailableBookings.filter(b => b.status === 'active');
+        const confirmedBookings = unavailableBookings.filter(b => b.status === 'confirmed');
+
+        let reason = '';
+        let nextAvailableDate = null;
+
+        if (activeBookings.length > 0) {
+          reason = 'Car is currently rented (active booking)';
+          const returnDates = activeBookings.map(b => new Date(b.endDate));
+          nextAvailableDate = new Date(Math.min(...returnDates)).toISOString().split('T')[0];
+        } else if (confirmedBookings.length > 0) {
+          reason = 'Car has confirmed booking (waiting for pickup)';
+          const returnDates = confirmedBookings.map(b => new Date(b.endDate));
+          nextAvailableDate = new Date(Math.min(...returnDates)).toISOString().split('T')[0];
+        }
+
+        availabilityMap[carId] = {
+          available: false,
+          reason,
+          nextAvailableDate
+        };
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        availabilityMap
+      }
+    });
+  } catch (error) {
+    console.error('Check multiple cars availability error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check availability',
+      error: error.message
+    });
+  }
+});
+
 // Get car availability for specific dates
 router.get('/:id/availability', validateObjectId, handleValidationErrors, async (req, res) => {
   try {

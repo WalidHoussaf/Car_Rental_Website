@@ -200,7 +200,7 @@ const RegisterPage = () => {
 
         if (!mountedRef.current) return;
 
-        await new Promise((resolve) => setTimeout(resolve, 1800));
+        await new Promise((resolve) => setTimeout(resolve, 5000));
 
         const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -290,6 +290,31 @@ const RegisterPage = () => {
                 <p className="text-green-300 font-medium text-xl mb-2">
                   {language === 'fr' ? 'Compte créé avec succès!' : 'Account created successfully!'}
                 </p>
+                
+                {/* Email Icon */}
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                  <p className="text-cyan-300 text-base font-medium">
+                    {language === 'fr' ? 'Email de vérification envoyé!' : 'Verification email sent!'}
+                  </p>
+                </div>
+                
+                <p className="text-gray-300 text-sm mb-4 leading-relaxed">
+                  {language === 'fr' 
+                    ? 'Veuillez vérifier votre boîte de réception et cliquer sur le lien de vérification pour activer votre compte.' 
+                    : 'Please check your inbox and click the verification link to activate your account.'}
+                </p>
+                
+                <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-3 mb-4">
+                  <p className="text-cyan-300 text-xs">
+                    {language === 'fr' 
+                      ? '💡 Astuce: Vérifiez également votre dossier spam si vous ne voyez pas l\'email.' 
+                      : '💡 Tip: Check your spam folder if you don\'t see the email.'}
+                  </p>
+                </div>
+                
                 <p className="text-gray-400 text-base">
                   {language === 'fr' ? 'Redirection en cours...' : 'Redirecting...'}
                 </p>

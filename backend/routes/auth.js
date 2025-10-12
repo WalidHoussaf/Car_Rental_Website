@@ -4,6 +4,7 @@ import User from '../models/User.js';
 import RefreshToken from '../models/RefreshToken.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { validateUserRegistration, validateUserLogin, handleValidationErrors } from '../middleware/validation.js';
+import { sendVerificationEmail, sendVerificationSuccessEmail } from '../services/emailService.js';
 
 const router = express.Router();
 
@@ -91,7 +92,17 @@ router.post('/register', validateUserRegistration, handleValidationErrors, async
       address
     });
 
+    // Generate email verification token
+    const verificationToken = user.generateVerificationToken();
     await user.save();
+
+    // Send verification email
+    try {
+      await sendVerificationEmail(email, firstName, verificationToken);
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      // Continue with registration even if email fails
+    }
 
     // Generate tokens
     const accessToken = generateAccessToken(user._id);
@@ -102,9 +113,10 @@ router.post('/register', validateUserRegistration, handleValidationErrors, async
 
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: 'User registered successfully. Please check your email to verify your account.',
       data: {
-        user
+        user,
+        emailSent: true
       }
     });
   } catch (error) {
@@ -471,6 +483,108 @@ router.post('/unlock-account', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to unlock account',
+      error: error.message
+    });
+  }
+});
+
+// Verify email with token
+router.get('/verify-email/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification token is required'
+      });
+    }
+
+    // Find user with this verification token
+    const crypto = await import('crypto');
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    
+    const user = await User.findOne({
+      emailVerificationToken: hashedToken,
+      emailVerificationExpires: { $gt: Date.now() }
+    });
+    
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification token'
+      });
+    }
+
+    // Verify the email
+    const verified = await user.verifyEmail(token);
+
+    if (!verified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email verification failed'
+      });
+    }
+
+    // Send success email
+    try {
+      await sendVerificationSuccessEmail(user.email, user.firstName);
+    } catch (emailError) {
+      console.error('Failed to send success email:', emailError);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Email verified successfully',
+      data: {
+        user
+      }
+    });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Email verification failed',
+      error: error.message
+    });
+  }
+});
+
+// Resend verification email
+router.post('/resend-verification', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is already verified'
+      });
+    }
+
+    // Generate new verification token
+    const verificationToken = user.generateVerificationToken();
+    await user.save();
+
+    // Send verification email
+    await sendVerificationEmail(user.email, user.firstName, verificationToken);
+
+    res.status(200).json({
+      success: true,
+      message: 'Verification email sent successfully'
+    });
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to resend verification email',
       error: error.message
     });
   }

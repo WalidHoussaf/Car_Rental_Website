@@ -137,6 +137,12 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+    
+    verifyEmail: (token) => createApiRequest(`/auth/verify-email/${token}`),
+    
+    resendVerification: () => createApiRequest('/auth/resend-verification', {
+      method: 'POST',
+    }),
   },
 
   // Car endpoints
@@ -166,6 +172,11 @@ export const api = {
       const params = new URLSearchParams({ startDate, endDate });
       return createApiRequest(`/cars/${id}/availability?${params}`);
     },
+    
+    checkMultipleAvailability: (carIds) => createApiRequest('/cars/check-availability', {
+      method: 'POST',
+      body: JSON.stringify({ carIds }),
+    }),
     
     getCategories: () => createApiRequest('/cars/meta/categories'),
     

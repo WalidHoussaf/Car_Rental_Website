@@ -82,31 +82,46 @@ export const checkCarAvailability = async (carId, bookings = null) => {
 /**
  * Get availability status for multiple cars
  * @param {Array} cars - Array of car objects
- * @param {Array} bookings - Array of all bookings (optional, will fetch if not provided)
+ * @param {Array} bookings - Array of all bookings (optional, will fetch if not provided - ADMIN ONLY)
  * @returns {Promise<Object>} - Object with carId as key and availability info as value
  */
 export const getMultipleCarAvailability = async (cars, bookings = null) => {
   try {
-    if (!bookings) {
-      const response = await api.bookings.getAll({ limit: 1000 });
-      if (!response.success) {
-        throw new Error('Failed to fetch bookings');
+    // If bookings are provided (admin context)
+    if (bookings) {
+      const availabilityMap = {};
+      for (const car of cars) {
+        const availability = await checkCarAvailability(car._id, bookings);
+        availabilityMap[car._id] = {
+          ...availability,
+          carName: car.name,
+          carModel: `${car.make} ${car.model}`.trim()
+        };
       }
-      bookings = response.data.bookings || [];
+      return availabilityMap;
     }
 
-    const availabilityMap = {};
+    // Otherwise, use the public API endpoint
+    const carIds = cars.map(car => car._id);
+    const response = await api.cars.checkMultipleAvailability(carIds);
+    
+    if (!response.success) {
+      throw new Error('Failed to check availability');
+    }
 
+    // Enhance the response with car details
+    const availabilityMap = response.data.availabilityMap;
+    const enhancedMap = {};
+    
     for (const car of cars) {
-      const availability = await checkCarAvailability(car._id, bookings);
-      availabilityMap[car._id] = {
-        ...availability,
+      enhancedMap[car._id] = {
+        ...(availabilityMap[car._id] || { available: false, reason: 'Unknown' }),
         carName: car.name,
         carModel: `${car.make} ${car.model}`.trim()
       };
     }
 
-    return availabilityMap;
+    return enhancedMap;
   } catch (error) {
     console.error('Error checking multiple car availability:', error);
     return {};

@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { assets } from '../assets/assets';
+import { api } from '../config/api';
 
 const Profile = () => {
   const { user, updateProfile, logout, loading } = useAuth();
@@ -10,6 +11,9 @@ const Profile = () => {
   const { language } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendMessage, setResendMessage] = useState('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -45,6 +49,32 @@ const Profile = () => {
       navigate('/', { replace: true });
     }
   }, [loading, user, navigate]);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  const handleResendVerification = async () => {
+    if (resendCooldown > 0) return;
+    
+    setResendingEmail(true);
+    setResendMessage('');
+    
+    try {
+      const result = await api.auth.resendVerification();
+      if (result.success) {
+        setResendMessage(language === 'fr' ? '✅ Email envoyé! Vérifiez votre boîte de réception.' : '✅ Email sent! Check your inbox.');
+        setResendCooldown(60);
+      }
+    } catch (error) {
+      setResendMessage(error.message || (language === 'fr' ? '❌ Échec de l\'envoi de l\'email' : '❌ Failed to send email'));
+    } finally {
+      setResendingEmail(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -145,7 +175,24 @@ const Profile = () => {
                 </div>
                 <div>
                   <h2 className="text-2xl font-semibold">{user.firstName} {user.lastName}</h2>
-                  <p className="text-gray-400">{user.email}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-gray-400">{user.email}</p>
+                    {user.isVerified ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                        </svg>
+                        {language === 'fr' ? 'Vérifié' : 'Verified'}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                        </svg>
+                        {language === 'fr' ? 'Non vérifié' : 'Not Verified'}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-cyan-400 capitalize">{user.role || 'customer'}</p>
                 </div>
               </div>
@@ -311,6 +358,59 @@ const Profile = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Email Verification Section */}
+            {!user.isVerified && (
+              <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <svg className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                  <div className="flex-1">
+                    <h4 className="text-yellow-400 font-semibold mb-1">
+                      {language === 'fr' ? 'Email non vérifié' : 'Email Not Verified'}
+                    </h4>
+                    <p className="text-gray-300 text-sm mb-3">
+                      {language === 'fr' 
+                        ? 'Veuillez vérifier votre email pour activer toutes les fonctionnalités de votre compte.' 
+                        : 'Please verify your email to activate all account features.'}
+                    </p>
+                    {resendMessage && (
+                      <p className="text-sm mb-3 font-medium">{resendMessage}</p>
+                    )}
+                    <button
+                      onClick={handleResendVerification}
+                      disabled={resendingEmail || resendCooldown > 0}
+                      className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed text-sm flex items-center gap-2"
+                    >
+                      {resendingEmail ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                          </svg>
+                          {language === 'fr' ? 'Envoi...' : 'Sending...'}
+                        </>
+                      ) : resendCooldown > 0 ? (
+                        <>
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
+                          </svg>
+                          {language === 'fr' ? `Réessayer dans ${resendCooldown}s` : `Retry in ${resendCooldown}s`}
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                          </svg>
+                          {language === 'fr' ? 'Renvoyer l\'email de vérification' : 'Resend Verification Email'}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

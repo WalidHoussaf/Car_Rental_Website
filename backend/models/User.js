@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -55,6 +56,14 @@ const userSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false
+  },
+  emailVerificationToken: {
+    type: String,
+    default: null
+  },
+  emailVerificationExpires: {
+    type: Date,
+    default: null
   },
   profileImage: {
     type: String,
@@ -134,12 +143,42 @@ userSchema.methods.getLockTimeRemaining = function() {
   return Math.ceil(remaining / (60 * 1000)); 
 };
 
+// Generate email verification token
+userSchema.methods.generateVerificationToken = function() {
+  const token = crypto.randomBytes(32).toString('hex');
+  this.emailVerificationToken = crypto.createHash('sha256').update(token).digest('hex');
+  this.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+  return token;
+};
+
+// Verify email with token
+userSchema.methods.verifyEmail = async function(token) {
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+  
+  if (this.emailVerificationToken !== hashedToken) {
+    return false;
+  }
+  
+  if (this.emailVerificationExpires < Date.now()) {
+    return false;
+  }
+  
+  this.isVerified = true;
+  this.emailVerificationToken = null;
+  this.emailVerificationExpires = null;
+  await this.save();
+  
+  return true;
+};
+
 // Remove password from JSON output
 userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;
   delete userObject.loginAttempts;
   delete userObject.lockUntil;
+  delete userObject.emailVerificationToken;
+  delete userObject.emailVerificationExpires;
   return userObject;
 };
 

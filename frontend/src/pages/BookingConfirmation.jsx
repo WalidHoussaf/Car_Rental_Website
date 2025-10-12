@@ -16,6 +16,7 @@ import PriceIcon from '../components/Ui/Icons/PriceIcon';
 import DownloadIcon from '../components/Ui/Icons/DownloadIcon';
 import LocationIcon from '../components/Ui/Icons/LocationIcon';
 import ReceiptGenerator from '../components/ReceiptGenerator';
+import EmailVerificationModal from '../components/EmailVerificationModal';
 import { getLocationById, formatLocationAddress } from '../config/officeLocations';
 
 const BookingConfirmation = () => {
@@ -56,6 +57,7 @@ const BookingConfirmation = () => {
   const [carImage, setCarImage] = useState(null);
   const [isBookingCreated, setIsBookingCreated] = useState(false);
   const [locationAddresses, setLocationAddresses] = useState({});
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -162,7 +164,13 @@ const BookingConfirmation = () => {
           showSuccess(t('bookingConfirmed'));
         } else {
           console.error('Booking failed:', result.message);
-          alert(`Booking failed: ${result.message}`);
+          
+          // Check if the error is due to email verification
+          if (result.message && result.message.includes('verify your email')) {
+            setShowVerificationModal(true);
+          } else {
+            alert(`Booking failed: ${result.message}`);
+          }
         }
       } catch (error) {
         console.error('Error creating booking:', error);
@@ -233,6 +241,12 @@ const BookingConfirmation = () => {
 
   return (
     <div className="min-h-screen bg-black text-white pt-20 font-['Orbitron'] relative">
+      {/* Email Verification Modal */}
+      <EmailVerificationModal 
+        open={showVerificationModal} 
+        onClose={() => setShowVerificationModal(false)} 
+      />
+      
       {/* Hero Section */}
       <div className="w-full pt-28 pb-20 relative overflow-hidden -mt-20">
         {/* Background Elements */}
