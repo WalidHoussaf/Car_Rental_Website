@@ -54,12 +54,15 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
         }
       } catch (error) {
-        // Silently fail if no token exists (user not logged in)
-        // Only log if it's not a 401 error (which is expected for logged out users)
-        if (!error.message?.includes('Access token is required')) {
+        // Clear auth data if token is invalid or user not found
+        if (error.message?.includes('Invalid token') || error.message?.includes('user not found')) {
+          console.warn('Invalid or expired token detected, clearing auth data');
+          clearAuthData();
+        } else if (!error.message?.includes('Access token is required')) {
+          // Log other unexpected errors
           console.error('Token verification failed:', error);
+          clearAuthData();
         }
-        clearAuthData();
       }
       
       setLoading(false);

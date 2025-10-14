@@ -54,6 +54,7 @@ const CreateEditUserModal = ({
   const title = mode === 'create' ? t('createNewUser') : t('editUser');
   
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const validateAge = useCallback((dateOfBirth) => {
     if (!dateOfBirth) return null;
@@ -83,11 +84,11 @@ const CreateEditUserModal = ({
 
   const validatePassword = (password) => {
     if (!password) return null;
-    if (password.length < 6) {
-      return 'Password must be at least 6 characters long';
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long';
     }
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      return 'Password must contain at least one lowercase letter, one uppercase letter, and one number';
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(password)) {
+      return 'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character';
     }
     return null;
   };
@@ -269,16 +270,54 @@ const CreateEditUserModal = ({
               </div>
 
               <div className="lg:col-span-6 font-['Rationale']">
-                <Field label={t('password')} required help={t('passwordRequirements')} error={errors.password}>
-                  <Input 
-                    type="password"
-                    value={form.password} 
-                    onChange={(e) => setForm({ ...form, password: e.target.value })} 
-                    placeholder={t('password')}
-                    autoComplete="new-password"
-                    error={errors.password}
-                  />
-                </Field>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm text-cyan-300 font-['Orbitron'] tracking-wide">
+                    {t('password')} *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={form.password} 
+                      onChange={(e) => setForm({ ...form, password: e.target.value })} 
+                      placeholder={t('password')}
+                      autoComplete="new-password"
+                      className={`w-full bg-gradient-to-br from-black/50 to-black/30 border font-['Orbitron'] rounded-xl py-3.5 px-5 pr-12 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 ${
+                        errors.password 
+                          ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-400/50 hover:border-red-600/40' 
+                          : 'border-cyan-900/30 focus:ring-cyan-500/50 focus:border-cyan-400/50 hover:border-cyan-600/40'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(prev => !prev)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-cyan-400/80 hover:text-cyan-300 transition-colors duration-300 cursor-pointer"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a17.7 17.7 0 0 1 5.06-5.94" />
+                          <path d="M1 1l22 22" />
+                          <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 10 8 10 8a17.7 17.7 0 0 1-3.16 4.19" />
+                          <path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 12s3-8 11-8 11 8 11 8-3 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  {!errors.password && <p className="text-sm text-gray-400 mt-1">{t('passwordRequirements')}</p>}
+                  {errors.password && (
+                    <p className="text-sm text-red-400 mt-1 flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Address Information Section */}

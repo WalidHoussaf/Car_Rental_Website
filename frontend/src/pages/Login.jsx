@@ -181,33 +181,59 @@ const LoginPage = () => {
 
           {/* Error Message */}
           {errors.form && (
-            <div className={`mb-6 p-4 ${errors.locked ? 'bg-gradient-to-r from-orange-500/10 to-red-600/10 border border-orange-500/50' : 'bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/50'} rounded-md`}>
-              <div className="flex items-start gap-3">
-                {errors.locked && (
-                  <svg className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                )}
-                <div className="flex-1">
-                  <p className={errors.locked ? 'text-orange-400 font-medium' : 'text-red-400'}>{errors.form}</p>
+            <div className={`mb-6 p-5 rounded-xl backdrop-blur-sm animate-fade-in relative overflow-hidden ${
+              errors.locked 
+                ? 'bg-gradient-to-br from-orange-500/15 via-red-600/10 to-orange-500/15 border border-orange-500/40' 
+                : 'bg-gradient-to-br from-red-500/15 via-red-600/10 to-red-500/15 border border-red-500/40'
+            }`}>
+              {/* Animated glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-500/5 to-transparent animate-pulse"></div>
+              
+              <div className="relative flex items-start gap-4">
+                {/* Icon */}
+                <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+                  errors.locked 
+                    ? 'bg-orange-500/20 border border-orange-500/30' 
+                    : 'bg-red-500/20 border border-red-500/30'
+                }`}>
+                  {errors.locked ? (
+                    <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                </div>
+                
+                {/* Content */}
+                <div className="flex-1 pt-1">
+                  <p className={`font-['Orbitron'] font-medium text-sm ${errors.locked ? 'text-orange-300' : 'text-red-300'}`}>
+                    {errors.form}
+                  </p>
+                  
                   {accountLocked && lockTimeRemaining > 0 && (
-                    <p className="text-orange-300 text-sm mt-2">
+                    <p className="text-orange-200/80 text-xs mt-2.5 font-['Orbitron']">
                       {language === 'fr' 
                         ? `Votre compte sera déverrouillé dans ${lockTimeRemaining} minute${lockTimeRemaining > 1 ? 's' : ''}.`
                         : `Your account will be unlocked in ${lockTimeRemaining} minute${lockTimeRemaining > 1 ? 's' : ''}.`
                       }
                     </p>
                   )}
+                  
                   {attemptsRemaining !== null && attemptsRemaining > 0 && !errors.locked && (
-                    <p className="text-yellow-400 text-sm mt-2 flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center gap-2 mt-2.5 text-yellow-300/90 text-xs font-['Orbitron']">
+                      <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
-                      {language === 'fr'
-                        ? `${attemptsRemaining} tentative${attemptsRemaining > 1 ? 's' : ''} restante${attemptsRemaining > 1 ? 's' : ''} avant le verrouillage du compte.`
-                        : `${attemptsRemaining} attempt${attemptsRemaining > 1 ? 's' : ''} remaining before account lockout.`
-                      }
-                    </p>
+                      <span>
+                        {language === 'fr'
+                          ? `${attemptsRemaining} tentative${attemptsRemaining > 1 ? 's' : ''} restante${attemptsRemaining > 1 ? 's' : ''} avant le verrouillage du compte.`
+                          : `${attemptsRemaining} attempt${attemptsRemaining > 1 ? 's' : ''} remaining before account lockout.`
+                        }
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>
@@ -216,8 +242,22 @@ const LoginPage = () => {
 
           {/* Success Message */}
           {isSuccess && (
-            <div className="mb-6 p-4 bg-gradient-to-r from-cyan-500/10 to-green-500/10 border border-cyan-500/50 rounded-md text-center">
-              <p className="text-cyan-400">{t('loginSuccessful')}</p>
+            <div className="mb-6 p-5 rounded-xl backdrop-blur-sm animate-fade-in relative overflow-hidden bg-gradient-to-br from-cyan-500/15 via-green-500/10 to-cyan-500/15 border border-cyan-500/40">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent animate-pulse"></div>
+              
+              <div className="relative flex items-center justify-center gap-4">
+                {/* Success Icon */}
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-cyan-500/20 border border-cyan-500/30">
+                  <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                
+                {/* Success Text */}
+                <p className="font-['Orbitron'] font-medium text-sm text-cyan-300">
+                  {t('loginSuccessful')}
+                </p>
+              </div>
             </div>
           )}
 
@@ -232,8 +272,8 @@ const LoginPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder={t('enterEmail')}
-                  className={`w-full bg-black/40 border ${errors.email ? 'border-red-500' : 'border-cyan-800/50'} rounded-md px-4 h-11 text-white 
-                    focus:outline-none focus:ring-2 focus:ring-cyan-500/50
+                  className={`w-full bg-black/40 border ${errors.email ? 'border-red-500/70 focus:ring-red-500/50' : 'border-cyan-800/50 focus:ring-cyan-500/50'} rounded-md px-4 h-11 text-white 
+                    focus:outline-none focus:ring-2
                     font-['Orbitron'] 
                     text-sm
                     transition-all duration-300
@@ -242,7 +282,14 @@ const LoginPage = () => {
                     placeholder-gray-500`}
                   autoComplete="off"
                 />
-                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                {errors.email && (
+                  <div className="flex items-center gap-2 mt-2 text-red-400 text-xs animate-fade-in">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{errors.email}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -253,44 +300,53 @@ const LoginPage = () => {
                   {t('forgotPassword')}
                 </Link>
               </div>
-              <div className="relative w-full mb-4 group">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder={t('enterPassword')}
-                  className={`w-full bg-black/40 border ${errors.password ? 'border-red-500' : 'border-cyan-800/50'} rounded-md pr-11 px-4 h-11 text-white 
-                    focus:outline-none focus:ring-2 focus:ring-cyan-500/50
-                    font-['Orbitron'] 
-                    text-sm
-                    transition-all duration-300
-                    group-hover:border-cyan-400/70
-                    group-hover:bg-black/60
-                    placeholder-gray-500`}
-                  autoComplete="off"
-                />
-                <button
-                  type="button"
-                  aria-label={showPassword ? (language === 'fr' ? 'Masquer le mot de passe' : 'Hide password') : (language === 'fr' ? 'Afficher le mot de passe' : 'Show password')}
-                  onClick={() => setShowPassword(prev => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/80 hover:text-white transition-colors duration-300 cursor-pointer"
-                >
-                  {showPassword ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a17.7 17.7 0 0 1 5.06-5.94" />
-                      <path d="M1 1l22 22" />
-                      <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 10 8 10 8a17.7 17.7 0 0 1-3.16 4.19" />
-                      <path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
+              <div className="w-full mb-4 group">
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder={t('enterPassword')}
+                    className={`w-full bg-black/40 border ${errors.password ? 'border-red-500/70 focus:ring-red-500/50' : 'border-cyan-800/50 focus:ring-cyan-500/50'} rounded-md pr-11 px-4 h-11 text-white 
+                      focus:outline-none focus:ring-2
+                      font-['Orbitron'] 
+                      text-sm
+                      transition-all duration-300
+                      group-hover:border-cyan-400/70
+                      group-hover:bg-black/60
+                      placeholder-gray-500`}
+                    autoComplete="off"
+                  />
+                  <button
+                    type="button"
+                    aria-label={showPassword ? (language === 'fr' ? 'Masquer le mot de passe' : 'Hide password') : (language === 'fr' ? 'Afficher le mot de passe' : 'Show password')}
+                    onClick={() => setShowPassword(prev => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400/80 hover:text-white transition-colors duration-300 cursor-pointer"
+                  >
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a17.7 17.7 0 0 1 5.06-5.94" />
+                        <path d="M1 1l22 22" />
+                        <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 10 8 10 8a17.7 17.7 0 0 1-3.16 4.19" />
+                        <path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s3-8 11-8 11 8 11 8-3 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <div className="flex items-center gap-2 mt-2 text-red-400 text-xs animate-fade-in">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s3-8 11-8 11 8 11 8-3 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
-                </button>
-                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                    <span>{errors.password}</span>
+                  </div>
+                )}
               </div>
             </div>
 

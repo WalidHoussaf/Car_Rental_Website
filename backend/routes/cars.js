@@ -147,6 +147,15 @@ router.get('/', validateCarSearch, handleValidationErrors, optionalAuth, async (
 
     res.status(200).json({
       success: true,
+      cars: cars,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalItems: total,
+        itemsPerPage: parseInt(limit),
+        hasNextPage: parseInt(page) < totalPages,
+        hasPrevPage: parseInt(page) > 1
+      },
       data: {
         cars,
         pagination: {
@@ -183,6 +192,7 @@ router.get('/:id', validateObjectId, handleValidationErrors, optionalAuth, async
 
     res.status(200).json({
       success: true,
+      car: car,
       data: {
         car
       }
@@ -206,6 +216,7 @@ router.post('/', authenticateToken, requireAdmin, validateCar, handleValidationE
     res.status(201).json({
       success: true,
       message: 'Car created successfully',
+      car: car,
       data: {
         car
       }
@@ -247,6 +258,7 @@ router.put('/:id', authenticateToken, requireAdmin, validateObjectId, validateCa
     res.status(200).json({
       success: true,
       message: 'Car updated successfully',
+      car: car,
       data: {
         car
       }
@@ -418,11 +430,24 @@ router.get('/:id/availability', validateObjectId, handleValidationErrors, async 
                        car.availability && 
                        car.maintenanceStatus === 'available';
 
+    let reason = 'Car is available for the selected dates';
+    if (!isAvailable) {
+      if (conflictingBookings.length > 0) {
+        reason = 'Car is already booked for these dates';
+      } else if (!car.availability) {
+        reason = 'Car is not available';
+      } else if (car.maintenanceStatus !== 'available') {
+        reason = `Car is currently in ${car.maintenanceStatus}`;
+      }
+    }
+
     res.status(200).json({
       success: true,
+      available: isAvailable,
+      reason: reason,
       data: {
         available: isAvailable,
-        conflictingBookings: conflictingBookings.length,
+        reason: reason,
         car: {
           id: car._id,
           make: car.make,

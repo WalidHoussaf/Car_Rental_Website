@@ -1,4 +1,5 @@
 import Booking from '../models/Booking.js';
+import logger from '../utils/logger.js';
 
 /**
  * Service to automatically update booking statuses based on dates
@@ -39,7 +40,7 @@ class BookingStatusService {
       updatedCount += activeToCompleted.modifiedCount;
 
       if (updatedCount > 0) {
-        console.log(`📅 Updated ${updatedCount} booking statuses automatically`);
+        logger.info('Booking statuses updated automatically', { updatedCount });
       }
 
       return {
@@ -49,7 +50,7 @@ class BookingStatusService {
         activeToCompleted: activeToCompleted.modifiedCount
       };
     } catch (error) {
-      console.error('❌ Error updating booking statuses:', error);
+      logger.error('Error updating booking statuses:', { error: error.message });
       return {
         success: false,
         error: error.message
@@ -79,7 +80,7 @@ class BookingStatusService {
         activeToCompleted: activeBookings
       };
     } catch (error) {
-      console.error('Error getting bookings needing update:', error);
+      logger.error('Error getting bookings needing update:', { error: error.message });
       return {
         confirmedToActive: [],
         activeToCompleted: []
@@ -114,7 +115,7 @@ class BookingStatusService {
 
       if (updated) {
         await booking.save();
-        console.log(`📅 Updated booking ${bookingId} from ${oldStatus} to ${booking.status}`);
+        logger.info('Booking status updated', { bookingId, oldStatus, newStatus: booking.status });
         return {
           success: true,
           updated: true,
@@ -129,7 +130,7 @@ class BookingStatusService {
         status: booking.status
       };
     } catch (error) {
-      console.error('Error updating single booking status:', error);
+      logger.error('Error updating single booking status:', { error: error.message });
       return {
         success: false,
         error: error.message

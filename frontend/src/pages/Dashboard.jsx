@@ -107,8 +107,6 @@ const Dashboard = () => {
         if (includeInRevenue) {
           monthlyData[key].revenue += amount;
         }
-      } else {
-        console.log(`Booking outside 12-month range: ${key}`);
       }
     });
     

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { normalizeEmail } from '../utils/emailNormalizer.js';
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -87,6 +88,14 @@ const LOCK_TIME = 2 * 60 * 60 * 1000;
 // Virtual property to check if account is locked
 userSchema.virtual('isLocked').get(function() {
   return !!(this.lockUntil && this.lockUntil > Date.now());
+});
+
+// Normalize email before saving
+userSchema.pre('save', function(next) {
+  if (this.isModified('email')) {
+    this.email = normalizeEmail(this.email);
+  }
+  next();
 });
 
 // Hash password before saving

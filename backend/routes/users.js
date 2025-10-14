@@ -3,7 +3,7 @@ import User from '../models/User.js';
 import Booking from '../models/Booking.js';
 import Car from '../models/Car.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
-import { validateObjectId, handleValidationErrors } from '../middleware/validation.js';
+import { validateObjectId, validateUserRegistration, handleValidationErrors } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -164,6 +164,53 @@ router.get('/', authenticateToken, requireAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch users',
+      error: error.message
+    });
+  }
+});
+
+// Create user (Admin only) 
+router.post('/', authenticateToken, requireAdmin, validateUserRegistration, handleValidationErrors, async (req, res) => {
+  try {
+    const { firstName, lastName, email, password, phone, dateOfBirth, address } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    // Create new user
+    const user = new User({
+      firstName,
+      lastName,
+      email: email.toLowerCase(),
+      password,
+      phone,
+      dateOfBirth,
+      address,
+      role: 'customer', 
+      isVerified: true 
+    });
+
+    await user.save();
+
+    // Return user without password
+    const userResponse = user.toJSON();
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      data: { user: userResponse }
+    });
+  } catch (error) {
+    console.error('Create user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create user',
       error: error.message
     });
   }

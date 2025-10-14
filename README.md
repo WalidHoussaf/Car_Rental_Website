@@ -168,35 +168,42 @@ git clone https://github.com/yourusername/Car_Rental_Website.git
 cd Car_Rental_Website
 ```
 
-2. **Backend Setup**
+2. **Install all dependencies**
 ```bash
+npm run install:all  # Installs root, backend, and frontend dependencies
+```
+
+3. **Configure Environment Variables**
+```bash
+# Backend
 cd backend
-npm install
-cp .env.example .env  # Configure your environment variables
-npm run dev           # Start development server on port 5000
-```
+cp .env.example .env
+# Edit .env with your configuration
 
-3. **Frontend Setup**
-```bash
+# Frontend
 cd ../frontend
-npm install
-npm run dev          # Start Vite dev server on port 3000
+cp .env.example .env
+# Edit .env with your configuration
 ```
 
-4. **Environment Variables**
-```env
-# Backend (.env)
-MONGODB_URI=mongodb://localhost:27017/car_rental
-JWT_SECRET=your_super_secure_jwt_secret
-PORT=5000
-NODE_ENV=development
+4. **Start Development Servers**
+```bash
+# Terminal 1 - Backend
+cd backend
+npm run dev  # Runs on http://localhost:5000
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev  # Runs on http://localhost:5173
 ```
 
 5. **Database Seeding** (Optional)
 ```bash
 cd backend
-npm run seed         # Populate with sample data
+npm run seed:users   # Create sample users
 ```
+
+> **⚠️ SECURITY NOTE**: Never commit `.env` files!
 
 ---
 

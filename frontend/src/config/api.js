@@ -72,6 +72,18 @@ const createApiRequest = async (endpoint, options = {}) => {
         }
       }
       
+      // Handle authentication errors (invalid/expired tokens)
+      if (response.status === 401) {
+        // Clear stale auth data and force re-login for invalid tokens
+        if (data.message?.includes('Invalid token') || data.message?.includes('Token expired') || data.message?.includes('user not found')) {
+          console.warn('Invalid or expired token detected, clearing auth data');
+          localStorage.removeItem('user');
+          // Redirect to login if on protected routes
+          if (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin')) {
+            window.location.href = '/login';
+          }
+        }
+      }
       // Don't log expected 401 errors (user not logged in)
       if (response.status !== 401) {
         console.error('API Error Details:', data);
@@ -266,6 +278,11 @@ export const api = {
     },
     
     getById: (id) => createApiRequest(`/users/${id}`),
+    
+    create: (userData) => createApiRequest('/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    }),
     
     updateRole: (id, role) => createApiRequest(`/users/${id}/role`, {
       method: 'PATCH',

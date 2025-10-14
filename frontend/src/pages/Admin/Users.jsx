@@ -205,6 +205,7 @@ const AdminUsers = () => {
   };
 
   const submitCreate = async (e) => {
+    console.log('🚀 submitCreate called', { processing, createForm });
     e?.preventDefault?.();
     setProcessing(true);
     try {
@@ -216,14 +217,45 @@ const AdminUsers = () => {
           return;
         }
       }
-      if (!/^\d{5}$/.test(createForm.zipCode.trim())) {
+      // Validate email format
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(createForm.email.trim())) {
+        setProcessing(false);
+        showError('Please provide a valid email address');
+        return;
+      }
+      // Validate age (must be 18+)
+      if (createForm.dateOfBirth) {
+        const birthDate = new Date(createForm.dateOfBirth);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+        const actualAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+        
+        if (actualAge < 18) {
+          setProcessing(false);
+          showError('User must be at least 18 years old');
+          return;
+        }
+      }
+      // Validate phone number format
+      if (!/^[+]?[\d\s\-()]{7,15}$/.test(createForm.phone.trim())) {
+        setProcessing(false);
+        showError('Please provide a valid phone number (7-15 digits with optional +, spaces, dashes, or parentheses)');
+        return;
+      }
+      // Validate zip code
+      const zipCodeValue = createForm.zipCode.trim();
+      console.log('Validating zip code:', { value: zipCodeValue, length: zipCodeValue.length, test: /^\d{5}$/.test(zipCodeValue) });
+      if (!/^\d{5}$/.test(zipCodeValue)) {
         setProcessing(false);
         showError(t('invalidZipCode'));
         return;
       }
-      if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}/.test(createForm.password)) {
+      // Password must be at least 8 characters with lowercase, uppercase, number, and special character
+      if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(createForm.password)) {
         setProcessing(false);
-        showError(t('passwordRequirements'));
+        showError('Password must be at least 8 characters and contain uppercase, lowercase, number, and special character');
         return;
       }
 
@@ -243,7 +275,7 @@ const AdminUsers = () => {
         },
       };
 
-      await api.auth.register(payload);
+      await api.users.create(payload);
       showSuccess(t('userCreated'));
       setCreateForm({
         firstName: '', lastName: '', email: '', phone: '', password: '',

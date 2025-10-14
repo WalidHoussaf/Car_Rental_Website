@@ -18,6 +18,9 @@ import userRoutes from './routes/users.js';
 // Import scheduler
 import BookingScheduler from './utils/scheduler.js';
 
+// Import logger
+import logger from './utils/logger.js';
+
 // Load environment variables
 dotenv.config();
 
@@ -26,21 +29,20 @@ const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
-  console.error('❌ Missing required environment variables:', missingEnvVars.join(', '));
-  console.error('💡 Please create a .env file based on .env.example');
+  logger.error('Missing required environment variables:', { missing: missingEnvVars });
+  logger.error('Please create a .env file based on .env.example');
   process.exit(1);
 }
 
 // Validate JWT_SECRET strength 
 if (process.env.JWT_SECRET.length < 64) {
-  console.error('❌ SECURITY ERROR: JWT_SECRET must be at least 64 characters!');
-  console.error('💡 Current length:', process.env.JWT_SECRET.length);
-  console.error('💡 Generate a secure secret: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"');
+  logger.error('SECURITY ERROR: JWT_SECRET must be at least 64 characters!', { length: process.env.JWT_SECRET.length });
+  logger.error('Generate a secure secret: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"');
   process.exit(1);
 }
 
 if (process.env.JWT_SECRET === 'your_super_secure_jwt_secret_change_this_in_production') {
-  console.error('❌ SECURITY ERROR: Please change the default JWT_SECRET!');
+  logger.error('SECURITY ERROR: Please change the default JWT_SECRET!');
   process.exit(1);
 }
 
@@ -50,26 +52,11 @@ const hasNumbers = /[0-9]/.test(process.env.JWT_SECRET);
 const hasSpecialChars = /[^A-Za-z0-9]/.test(process.env.JWT_SECRET);
 
 if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
-  console.warn('⚠️  WARNING: JWT_SECRET should contain uppercase, lowercase, and numbers for better security');
+  logger.warn('WARNING: JWT_SECRET should contain uppercase, lowercase, and numbers for better security');
 }
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// HTTPS enforcement middleware (production only)
-if (process.env.NODE_ENV === 'production') {
-  app.use((req, res, next) => {
-    // Check if request is already HTTPS
-    if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
-      return next();
-    }
-    
-    // Redirect HTTP to HTTPS
-    const httpsUrl = `https://${req.headers.host}${req.url}`;
-    console.log(`🔒 Redirecting HTTP to HTTPS: ${req.url}`);
-    return res.redirect(301, httpsUrl);
-  });
-}
 
 // Security middleware
 app.use(helmet({
@@ -94,29 +81,7 @@ app.use(helmet({
   }
 }));
 
-// General rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, 
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, 
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use('/api/', limiter);
-
-// Stricter rate limiting for authentication endpoints
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 requests per 15 minutes
-  message: 'Too many authentication attempts, please try again later.',
-  skipSuccessfulRequests: true,
-});
-
-// Apply stricter limits to auth routes
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/register', authLimiter);
-
-// CORS configuration 
+// CORS configuration (MUST be before rate limiting to ensure CORS headers on rate limit responses) 
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
   'http://localhost:5173',
@@ -140,6 +105,47 @@ app.use(cors({
   exposedHeaders: ['X-CSRF-Token']
 }));
 
+// HTTPS enforcement middleware (production only)
+// Applied AFTER CORS to ensure CORS headers are set before redirect
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    // Check if request is already HTTPS
+    if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+      return next();
+    }
+    
+    // Redirect HTTP to HTTPS
+    const httpsUrl = `https://${req.headers.host}${req.url}`;
+    logger.info('Redirecting HTTP to HTTPS', { url: req.url });
+    return res.redirect(301, httpsUrl);
+  });
+}
+
+// General rate limiting (disabled in test environment)
+// Applied AFTER CORS to ensure rate limit responses include CORS headers
+if (process.env.NODE_ENV !== 'test') {
+  const limiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, 
+    message: 'Too many requests from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.use('/api/', limiter);
+
+  // Stricter rate limiting for authentication endpoints
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 50, // Increased from 5 to 50 for development testing
+    message: 'Too many authentication attempts, please try again later.',
+    skipSuccessfulRequests: true,
+  });
+
+  // Apply stricter limits to auth routes
+  app.use('/api/auth/login', authLimiter);
+  app.use('/api/auth/register', authLimiter);
+}
+
 // Cookie parser middleware (MUST be before CSRF)
 app.use(cookieParser());
 
@@ -153,7 +159,7 @@ app.use(mongoSanitize());
 // Data sanitization against XSS attacks
 app.use(xss());
 
-// CSRF Protection (using cookies)
+// CSRF Protection (using cookies) - Disabled in test environment
 const csrfProtection = csrf({ 
   cookie: {
     httpOnly: true,
@@ -162,40 +168,42 @@ const csrfProtection = csrf({
   }
 });
 
-// Apply CSRF protection to state-changing routes
-// EXCLUDE auth routes (login/register) since they don't have cookies yet
-app.use('/api/auth', (req, res, next) => {
-  // Skip CSRF for login and register endpoints
-  if (req.path === '/login' || req.path === '/register') {
-    return next();
-  }
-  // Apply CSRF to other auth routes (logout, profile updates, etc.)
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-    return csrfProtection(req, res, next);
-  }
-  next();
-});
+// Apply CSRF protection to state-changing routes 
+if (process.env.NODE_ENV !== 'test') {
+  // EXCLUDE auth routes (login/register) since they don't have cookies yet
+  app.use('/api/auth', (req, res, next) => {
+    // Skip CSRF for login and register endpoints
+    if (req.path === '/login' || req.path === '/register') {
+      return next();
+    }
+    // Apply CSRF to other auth routes (logout, profile updates, etc.)
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+      return csrfProtection(req, res, next);
+    }
+    next();
+  });
 
-app.use('/api/cars', (req, res, next) => {
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-    return csrfProtection(req, res, next);
-  }
-  next();
-});
+  app.use('/api/cars', (req, res, next) => {
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+      return csrfProtection(req, res, next);
+    }
+    next();
+  });
 
-app.use('/api/bookings', (req, res, next) => {
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-    return csrfProtection(req, res, next);
-  }
-  next();
-});
+  app.use('/api/bookings', (req, res, next) => {
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+      return csrfProtection(req, res, next);
+    }
+    next();
+  });
 
-app.use('/api/users', (req, res, next) => {
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-    return csrfProtection(req, res, next);
-  }
-  next();
-});
+  app.use('/api/users', (req, res, next) => {
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+      return csrfProtection(req, res, next);
+    }
+    next();
+  });
+}
 
 // CSRF token endpoint (for frontend to get token)
 app.get('/api/csrf-token', csrfProtection, (req, res) => {
@@ -212,17 +220,19 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static('uploads'));
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/car_rental_db')
-  .then(() => {
-    console.log('✅ Connected to MongoDB');
-    // Initialize booking scheduler after DB connection
-    BookingScheduler.init();
-  })
-  .catch((error) => {
-    console.error('❌ MongoDB connection error:', error);
-    process.exit(1);
-  });
+// Database connection (skip in test environment as tests handle their own connection)
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/car_rental_db')
+    .then(() => {
+      logger.info('Connected to MongoDB');
+      // Initialize booking scheduler after DB connection
+      BookingScheduler.init();
+    })
+    .catch((error) => {
+      logger.error('MongoDB connection error:', { error: error.message });
+      process.exit(1);
+    });
+}
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -249,7 +259,7 @@ app.use('*', (req, res) => {
 
 // Global error handler
 app.use((error, req, res, next) => {
-  console.error('Error:', error);
+  logger.error('Global error handler:', { message: error.message, stack: error.stack });
   
   res.status(error.status || 500).json({
     success: false,
@@ -258,11 +268,13 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Frontend URL: ${process.env.FRONTEND_URL}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
-});
+// Start server (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT}`);
+    logger.info(`Frontend URL: ${process.env.FRONTEND_URL}`);
+    logger.info(`Environment: ${process.env.NODE_ENV}`);
+  });
+}
 
 export default app;

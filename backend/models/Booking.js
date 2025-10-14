@@ -143,6 +143,19 @@ bookingSchema.pre('save', function(next) {
   next();
 });
 
+// Virtual for backward compatibility (totalPrice → totalAmount)
+bookingSchema.virtual('totalPrice').get(function() {
+  return this.totalAmount;
+});
+
+bookingSchema.virtual('totalPrice').set(function(value) {
+  this.totalAmount = value;
+});
+
+// Ensure virtuals are included in JSON
+bookingSchema.set('toJSON', { virtuals: true });
+bookingSchema.set('toObject', { virtuals: true });
+
 // Index for efficient queries
 bookingSchema.index({ user: 1, status: 1 });
 bookingSchema.index({ car: 1, startDate: 1, endDate: 1 });
