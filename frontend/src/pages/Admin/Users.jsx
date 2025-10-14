@@ -9,6 +9,7 @@ import RoleChangeModal from '../../components/Admin/RoleChangeModal';
 import DeleteModal from '../../components/Admin/DeleteModal';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
+import logger from '../../utils/logger';
 
 const PAGE_SIZE = 10;
 
@@ -88,7 +89,7 @@ const AdminUsers = () => {
         throw new Error(res?.message || t('failedToLoadUsers'));
       }
     } catch (error) {
-      console.error('Failed to load users:', error);
+      logger.error('Failed to load users:', error);
       setError(t('failedToLoadUsers'));
       showError(t('failedToLoadUsers'));
     } finally {
@@ -119,7 +120,7 @@ const AdminUsers = () => {
       showSuccess(t('roleUpdated'));
       await fetchUsers();
     } catch (error) {
-      console.error('Failed to update role:', error);
+      logger.error('Failed to update role:', error);
       showError(t('failedToUpdateRole'));
     } finally {
       setLoading(false);
@@ -133,7 +134,7 @@ const AdminUsers = () => {
       showSuccess(t('userVerified'));
       await fetchUsers();
     } catch (error) {
-      console.error('Failed to verify user:', error);
+      logger.error('Failed to verify user:', error);
       showError(t('failedToVerifyUser'));
     } finally {
       setLoading(false);
@@ -152,7 +153,7 @@ const AdminUsers = () => {
       const newPage = users.length === 1 && page > 1 ? page - 1 : page;
       await fetchUsers({ page: newPage });
     } catch (error) {
-      console.error('Failed to delete user:', error);
+      logger.error('Failed to delete user:', error);
       showError(t('failedToDeleteUser'));
     } finally {
       setLoading(false);
@@ -205,7 +206,7 @@ const AdminUsers = () => {
   };
 
   const submitCreate = async (e) => {
-    console.log('🚀 submitCreate called', { processing, createForm });
+    logger.log('submitCreate called', { processing, createForm });
     e?.preventDefault?.();
     setProcessing(true);
     try {
@@ -246,7 +247,7 @@ const AdminUsers = () => {
       }
       // Validate zip code
       const zipCodeValue = createForm.zipCode.trim();
-      console.log('Validating zip code:', { value: zipCodeValue, length: zipCodeValue.length, test: /^\d{5}$/.test(zipCodeValue) });
+      logger.log('Validating zip code:', { value: zipCodeValue, length: zipCodeValue.length, test: /^\d{5}$/.test(zipCodeValue) });
       if (!/^\d{5}$/.test(zipCodeValue)) {
         setProcessing(false);
         showError(t('invalidZipCode'));
@@ -284,7 +285,7 @@ const AdminUsers = () => {
       setModal({ type: null, user: null });
       await fetchUsers({ page: 1 });
     } catch (error) {
-      console.error('Failed to create user:', error);
+      logger.error('Failed to create user:', error);
       showError(t('failedToCreateUser'));
     } finally {
       setProcessing(false);

@@ -10,6 +10,7 @@ import CallToAction from '../components/Cars/CallToAction';
 import FiltersSidebar from '../components/Cars/Filters/FiltersSidebar';
 import { selectStyles } from '../styles/selectStyles';
 import { getMultipleCarAvailability } from '../utils/carAvailability';
+import logger from '../utils/logger';
 
 const CarsPage = () => {
   const navigate = useNavigate();
@@ -105,7 +106,7 @@ const CarsPage = () => {
       const availabilityMap = await getMultipleCarAvailability(carsToCheck);
       setCarAvailability(availabilityMap);
     } catch (error) {
-      console.error('Error loading car availability:', error);
+      logger.error('Error loading car availability:', error);
     } finally {
       setAvailabilityLoading(false);
     }

@@ -1,16 +1,5 @@
 import pino from 'pino';
 
-/**
- * Pino Logger Configuration
- * High-performance JSON logger for Node.js
- * 
- * Features:
- * - Fast and low overhead
- * - Structured JSON logging
- * - Pretty printing in development
- * - Silent in test environment
- */
-
 const isProduction = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
 const isDevelopment = process.env.NODE_ENV === 'development';

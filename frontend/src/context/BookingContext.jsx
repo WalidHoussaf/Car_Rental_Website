@@ -1,5 +1,6 @@
-import React, { createContext, useState } from 'react';
-import { api } from '../config/api.js';
+import { createContext, useState } from 'react';
+import api from '../config/api';
+import logger from '../utils/logger';
 
 const BookingContext = createContext();
 
@@ -25,14 +26,14 @@ export const BookingProvider = ({ children }) => {
         
         return { success: true, booking: newBooking };
       } else {
-        console.error('Booking creation failed:', response);
-        console.error('Validation errors:', response.errors);
+        logger.error('Booking creation failed:', response);
+        logger.error('Validation errors:', response.errors);
         setError(response.message || 'Failed to create booking');
         return { success: false, message: response.message, errors: response.errors };
       }
-    } catch (err) {
-      console.error('Booking creation error:', err);
-      const errorMessage = err.message || 'Failed to create booking';
+    } catch (error) {
+      logger.error('Error creating booking:', error);
+      const errorMessage = error.message || 'Failed to create booking';
       setError(errorMessage);
       return { success: false, message: errorMessage };
     } finally {

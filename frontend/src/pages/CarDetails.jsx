@@ -9,6 +9,7 @@ import PerformanceStats from '../components/CarsDetails/PerformanceStats';
 import AvailabilitySection from '../components/CarsDetails/AvailabilitySection';
 import DetailsTabSection from '../components/CarsDetails/DetailsTabSection';
 import { checkCarAvailability } from '../utils/carAvailability';
+import logger from '../utils/logger';
 
 const CarDetailPage = () => {
   const { id } = useParams();
@@ -52,7 +53,7 @@ const CarDetailPage = () => {
       const availability = await checkCarAvailability(carId);
       setCarAvailability(availability);
     } catch (error) {
-      console.error('Error loading car availability:', error);
+      logger.error('Error loading car availability:', error);
       setCarAvailability({ available: true });
     } finally {
       setAvailabilityLoading(false);

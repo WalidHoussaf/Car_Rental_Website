@@ -18,6 +18,7 @@ import LocationIcon from '../components/Ui/Icons/LocationIcon';
 import ReceiptGenerator from '../components/ReceiptGenerator';
 import EmailVerificationModal from '../components/EmailVerificationModal';
 import { getLocationById, formatLocationAddress } from '../config/officeLocations';
+import logger from '../utils/logger';
 
 const BookingConfirmation = () => {
   const { language } = useLanguage();
@@ -121,7 +122,7 @@ const BookingConfirmation = () => {
     const createNewBooking = async () => {
       setIsBookingCreated(true);
       if (!bookingDetails || !carDetails) {
-        console.warn('Missing booking or car details, redirecting to cars page');
+        logger.warn('Missing booking or car details, redirecting to cars page');
         navigate('/cars');
         return;
       }
@@ -163,7 +164,7 @@ const BookingConfirmation = () => {
           setBookingId(result.booking.id || result.booking._id);
           showSuccess(t('bookingConfirmed'));
         } else {
-          console.error('Booking failed:', result.message);
+          logger.error('Booking failed:', result.message);
           
           // Check if the error is due to email verification
           if (result.message && result.message.includes('verify your email')) {
@@ -173,7 +174,7 @@ const BookingConfirmation = () => {
           }
         }
       } catch (error) {
-        console.error('Error creating booking:', error);
+        logger.error('Error creating booking:', error);
         alert(`Booking error: ${error.message}`);
       }
     };
@@ -211,7 +212,7 @@ const BookingConfirmation = () => {
 
   const handleDownloadReceipt = async () => {
     if (!bookingData || !bookingId) {
-      console.error("Booking data or ID is not available for receipt generation.");
+      logger.error("Booking data or ID is not available for receipt generation.");
       return;
     }
 
@@ -221,7 +222,7 @@ const BookingConfirmation = () => {
     };
 
     const onError = (error) => {
-      console.error("Receipt generation failed:", error);
+      logger.error("Receipt generation failed:", error);
     };
 
     await receiptGenerator.generateReceipt(bookingData, bookingId, onSuccess, onError);

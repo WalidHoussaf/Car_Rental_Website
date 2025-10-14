@@ -13,6 +13,7 @@ import DestinationIcon from '../Ui/Icons/DestinationIcon';
 import ArrowLeftIcon from '../Ui/Icons/ArrowLeftIcon';
 import ArrowRightIcon from '../Ui/Icons/ArrowRightIcon';
 import InteractiveMap from '../Ui/InteractiveMap';
+import logger from '../../utils/logger';
 
 
 const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousStep }) => {
@@ -58,7 +59,7 @@ const BookingLocation = ({ car, bookingDetails, onLocationSelection, onPreviousS
         if (carLocation) {
           availableOfficeLocations = [carLocation];
         } else {
-          console.warn(`Car location "${car.location}" not found in office locations`);
+          logger.warn(`Car location "${car.location}" not found in office locations`);
           availableOfficeLocations = OFFICE_LOCATIONS;
         }
       } else {

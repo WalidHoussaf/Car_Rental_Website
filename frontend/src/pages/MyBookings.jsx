@@ -5,6 +5,7 @@ import { useNotification } from '../context/notificationUtils';
 import AuthContext from '../context/authContext';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
+import logger from '../utils/logger';
 
 const PAGE_SIZE = 10;
 
@@ -50,7 +51,7 @@ const MyBookings = () => {
         });
       }
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      logger.error('Error fetching stats:', error);
     }
   };
 

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { api } from '../config/api';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import logger from '../utils/logger';
 
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -92,7 +93,7 @@ const Dashboard = () => {
       const bookingDate = new Date(booking.createdAt || booking.startDate || booking.updatedAt);
       
       if (isNaN(bookingDate.getTime())) {
-        console.warn(`Invalid date for booking ${index}:`, booking);
+        logger.warn(`Invalid date for booking ${index}:`, booking);
         return;
       }
       
@@ -188,7 +189,7 @@ const Dashboard = () => {
           setRecentBookings(allBookingsResponse.data.bookings?.slice(0, 5) || []);
         }
       } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
+        logger.error('Failed to fetch dashboard data:', error);
         const fallbackTrends = generateRealTrendData(null, { totalBookings: 8, revenue: 28005 });
         setTrendData(fallbackTrends);
       } finally {

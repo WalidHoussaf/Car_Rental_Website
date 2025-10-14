@@ -6,6 +6,7 @@ import AuthContext from '../../context/authContext';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 import BookingDetailsModal from '../../components/Admin/BookingDetailsModal';
+import logger from '../../utils/logger';
 
 const PAGE_SIZE = 20;
 
@@ -102,7 +103,7 @@ const AdminBookings = () => {
         setStats(statsData);
       }
     } catch (error) {
-      console.error('Failed to fetch stats:', error);
+      logger.error('Failed to fetch stats:', error);
     } finally {
       setStatsLoading(false);
     }
@@ -168,7 +169,7 @@ const AdminBookings = () => {
         showError(response?.message || 'Failed to delete selected bookings');
       }
     } catch (error) {
-      console.error('Bulk delete error:', error);
+      logger.error('Bulk delete error:', error);
       showError(error?.message || 'Failed to delete selected bookings');
     } finally {
       setBulkDeleteLoading(false);

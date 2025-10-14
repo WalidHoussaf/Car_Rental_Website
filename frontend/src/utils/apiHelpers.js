@@ -1,8 +1,10 @@
 // API Helper utilities
 
+import logger from './logger';
+
 // Handle API errors consistently
 export const handleApiError = (error) => {
-  console.error('API Error:', error);
+  logger.error('API Error:', error);
   
   // Network errors
   if (!navigator.onLine) {

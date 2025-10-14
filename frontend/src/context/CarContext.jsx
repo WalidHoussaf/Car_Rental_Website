@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { api } from '../config/api.js';
+import { createContext, useState, useEffect } from 'react';
+import api from '../config/api';
+import logger from '../utils/logger.js';
 
 const CarContext = createContext();
 
@@ -97,7 +98,7 @@ export const CarProvider = ({ children }) => {
         setCategories(response.data.categories);
       }
     } catch (error) {
-      console.error('Failed to fetch categories:', error);
+      logger.error('Failed to fetch categories:', error);
     }
   };
 
@@ -109,7 +110,7 @@ export const CarProvider = ({ children }) => {
         setLocations(response.data.locations);
       }
     } catch (error) {
-      console.error('Failed to fetch locations:', error);
+      logger.error('Failed to fetch locations:', error);
     }
   };
 
@@ -121,7 +122,7 @@ export const CarProvider = ({ children }) => {
         setFeaturedCars(response.data.cars);
       }
     } catch (error) {
-      console.error('Failed to fetch featured cars:', error);
+      logger.error('Failed to fetch featured cars:', error);
     }
   };
 

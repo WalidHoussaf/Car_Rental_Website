@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import logger from '../utils/logger';
 
 class ReceiptGenerator {
   constructor(language, t) {
@@ -394,13 +395,13 @@ class ReceiptGenerator {
           }
           
         }).catch(error => {
-          console.error('Error generating canvas:', error);
+          logger.error('Error generating canvas:', error);
           this.handleError(receiptContent, loadingNotification, fontElement, onError);
         });
       }, 1000);
       
     } catch (error) {
-      console.error('Error preparing PDF:', error);
+      logger.error('Error preparing PDF:', error);
       this.handleError(null, null, null, onError);
     }
   }

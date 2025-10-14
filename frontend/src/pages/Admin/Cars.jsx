@@ -11,6 +11,7 @@ import { useTranslations } from '../../translations';
 import { locations as allLocations } from '../../assets/assets';
 import { getCarImage } from '../../utils/imageResolver';
 import { getMultipleCarAvailability } from '../../utils/carAvailability';
+import logger from '../../utils/logger';
 
 const PAGE_SIZE = 10;
 
@@ -173,7 +174,7 @@ const AdminCars = () => {
       const res = await api.cars.getCategories();
       if (res?.success) setCategories(res.data.categories || []);
     } catch (error) {
-      console.error('Failed to load categories:', error);
+      logger.error('Failed to load categories:', error);
     }
   };
 
@@ -226,7 +227,7 @@ const AdminCars = () => {
       
       setGlobalAvailabilityStats(stats);
     } catch (error) {
-      console.error('Error loading global availability stats:', error);
+      logger.error('Error loading global availability stats:', error);
     }
   };
 
@@ -332,7 +333,7 @@ const AdminCars = () => {
       setCarAvailability(availabilityMap);
       
     } catch (error) {
-      console.error('Error in fetchCars:', error);
+      logger.error('Error in fetchCars:', error);
       setError(t('adminCarsFailedToLoadCars'));
       showError(t('adminCarsFailedToLoadCars'));
     } finally {

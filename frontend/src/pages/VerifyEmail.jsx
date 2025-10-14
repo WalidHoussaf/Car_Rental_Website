@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../config/api';
 import { assets } from '../assets/assets';
 import { useAuth } from '../hooks/useAuth';
+import logger from '../utils/logger';
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
@@ -59,7 +60,7 @@ const VerifyEmail = () => {
       } catch (error) {
         setStatus('error');
         setMessage(error.message || 'An error occurred during verification. Please try again.');
-        console.error('Verification error:', error);
+        logger.error('Verification error:', error);
       }
     };
 

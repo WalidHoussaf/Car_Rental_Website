@@ -1,4 +1,5 @@
-import { api } from '../config/api';
+import api from '../config/api';
+import logger from './logger';
 
 /**
  * Check if a car is currently available based on its bookings
@@ -69,7 +70,7 @@ export const checkCarAvailability = async (carId, bookings = null) => {
     };
 
   } catch (error) {
-    console.error('Error checking car availability:', error);
+    logger.error('Error checking car availability:', error);
     return {
       available: false,
       reason: 'Error checking availability',
@@ -123,7 +124,7 @@ export const getMultipleCarAvailability = async (cars, bookings = null) => {
 
     return enhancedMap;
   } catch (error) {
-    console.error('Error checking multiple car availability:', error);
+    logger.error('Error checking multiple car availability:', error);
     return {};
   }
 };
@@ -170,7 +171,7 @@ export const getFleetAvailabilityStats = async (cars, bookings = null) => {
       availabilityMap
     };
   } catch (error) {
-    console.error('Error getting fleet availability stats:', error);
+    logger.error('Error getting fleet availability stats:', error);
     return {
       totalCars: cars.length,
       availableCars: 0,

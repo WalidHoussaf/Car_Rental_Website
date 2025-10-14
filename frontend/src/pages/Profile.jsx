@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { assets } from '../assets/assets';
 import { api } from '../config/api';
+import logger from '../utils/logger';
 
 const Profile = () => {
   const { user, updateProfile, logout, loading } = useAuth();
@@ -106,7 +107,7 @@ const Profile = () => {
         setIsEditing(false);
       }
     } catch (error) {
-      console.error('Profile update error:', error);
+      logger.error('Profile update error:', error);
     } finally {
       setIsLoading(false);
     }

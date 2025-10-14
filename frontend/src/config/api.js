@@ -1,3 +1,5 @@
+import logger from '../utils/logger';
+
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -16,7 +18,7 @@ const fetchCsrfToken = async () => {
     csrfToken = data.csrfToken;
     return csrfToken;
   } catch (error) {
-    console.error('Failed to fetch CSRF token:', error);
+    logger.error('Failed to fetch CSRF token:', error);
     return null;
   }
 };
@@ -60,7 +62,7 @@ const createApiRequest = async (endpoint, options = {}) => {
     if (!response.ok) {
       // Handle CSRF token errors
       if (response.status === 403 && data.message?.includes('CSRF')) {
-        console.warn('CSRF token invalid, refreshing...');
+        logger.warn('CSRF token invalid, refreshing...');
         csrfToken = null; // Clear cached token
         // Retry the request once with new token
         const newToken = await fetchCsrfToken();
@@ -76,7 +78,7 @@ const createApiRequest = async (endpoint, options = {}) => {
       if (response.status === 401) {
         // Clear stale auth data and force re-login for invalid tokens
         if (data.message?.includes('Invalid token') || data.message?.includes('Token expired') || data.message?.includes('user not found')) {
-          console.warn('Invalid or expired token detected, clearing auth data');
+          logger.warn('Invalid or expired token detected, clearing auth data');
           localStorage.removeItem('user');
           // Redirect to login if on protected routes
           if (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/admin')) {
@@ -86,7 +88,7 @@ const createApiRequest = async (endpoint, options = {}) => {
       }
       // Don't log expected 401 errors (user not logged in)
       if (response.status !== 401) {
-        console.error('API Error Details:', data);
+        logger.error('API Error Details:', data);
       }
       throw new Error(data.message || `HTTP error! status: ${response.status}`);
     }
@@ -95,7 +97,7 @@ const createApiRequest = async (endpoint, options = {}) => {
   } catch (error) {
     // Don't log expected 401 errors (user not logged in)
     if (!error.message?.includes('Access token is required')) {
-      console.error('API Request Error:', error);
+      logger.error('API Request Error:', error);
     }
     throw error;
   }

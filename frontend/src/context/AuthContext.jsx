@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { api, clearCsrfToken } from '../config/api.js';
+import { useState, useEffect, useCallback } from 'react';
+import api from '../config/api';
+import logger from '../utils/logger';
+import { clearCsrfToken } from '../config/api.js';
 
 import AuthContext from './authContext';
 
@@ -9,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Clear authentication data 
-  const clearAuthData = React.useCallback(() => {
+  const clearAuthData = useCallback(() => {
     // Only clear user data from localStorage (tokens are in httpOnly cookies)
     localStorage.removeItem('user');
     clearCsrfToken(); // Clear CSRF token cache
@@ -18,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Refresh access token 
-  const refreshAccessToken = React.useCallback(async () => {
+  const refreshAccessToken = useCallback(async () => {
     try {
       // No need to pass refreshToken - it's in httpOnly cookie
       const response = await api.auth.refreshToken({});
@@ -37,7 +39,7 @@ export const AuthProvider = ({ children }) => {
       clearAuthData();
       return false;
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      logger.error('Token refresh failed:', error);
       clearAuthData();
       return false;
     }
@@ -177,7 +179,7 @@ export const AuthProvider = ({ children }) => {
       // Call backend to revoke all tokens
       await api.auth.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout error:', error);
     } finally {
       clearAuthData();
     }
