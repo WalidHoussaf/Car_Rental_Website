@@ -23,6 +23,7 @@
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
@@ -116,11 +117,13 @@ Express Validator 7.0.1    // Input validation
 Helmet 7.1.0              // Security headers
 ```
 
-### **Development Tools**
+### **Development & Deployment**
 ```javascript
 ESLint 9.21.0         // Code linting
 Nodemon 3.0.2         // Development server
 Git + GitHub          // Version control
+Docker + Compose      // Containerization & orchestration
+Nginx                 // Production web server
 ```
 
 ---
@@ -204,6 +207,51 @@ npm run seed:users   # Create sample users
 ```
 
 > **⚠️ SECURITY NOTE**: Never commit `.env` files!
+
+---
+
+### **🐳 Docker Deployment** (Recommended)
+
+For production deployment or simplified setup, use Docker:
+
+**Quick Start with Docker:**
+```bash
+# 1. Copy environment configuration
+cp .env.docker.example .env.docker
+
+# 2. Edit .env.docker with your settings (IMPORTANT: Change JWT_SECRET and passwords!)
+
+# 3. Start all services
+docker-compose --env-file .env.docker up -d
+
+# Access the application:
+# - Frontend: http://localhost:3000
+# - Backend API: http://localhost:5000/api
+# - Mongo Express: http://localhost:8081 (dev mode)
+```
+
+**Development Mode:**
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.docker up
+```
+
+**Using Makefile (Simplified Commands):**
+```bash
+make help          # Show all available commands
+make dev           # Start development environment
+make prod          # Start production environment
+make logs          # View logs
+make down          # Stop all services
+make clean         # Remove all containers and volumes
+```
+
+**Benefits of Docker Deployment:**
+- ✅ Consistent environment across all machines
+- ✅ No manual MongoDB installation required
+- ✅ Isolated services with proper networking
+- ✅ Easy scaling and deployment
+- ✅ Production-ready configuration
+- ✅ Automated health checks
 
 ---
 

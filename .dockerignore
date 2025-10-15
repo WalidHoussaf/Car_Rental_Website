@@ -1,0 +1,70 @@
+# Root .dockerignore
+
+# Dependencies
+node_modules
+*/node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.docker
+*.env
+
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+
+# Documentation
+README.md
+DOCKER.md
+LICENSE.md
+docs
+
+# Build outputs
+dist
+build
+*/dist
+*/build
+coverage
+*/coverage
+
+# Testing
+e2e
+playwright-report
+test-results
+*.test.js
+*.spec.js
+__tests__
+
+# Development
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Logs
+logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Uploads (will be mounted as volume)
+backend/uploads
+
+# Playwright
+playwright.config.js
