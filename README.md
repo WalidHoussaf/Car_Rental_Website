@@ -235,14 +235,13 @@ docker-compose --env-file .env.docker up -d
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.docker up
 ```
 
-**Using Makefile (Simplified Commands):**
+**Common Docker Commands:**
 ```bash
-make help          # Show all available commands
-make dev           # Start development environment
-make prod          # Start production environment
-make logs          # View logs
-make down          # Stop all services
-make clean         # Remove all containers and volumes
+docker-compose --env-file .env.docker ps              # Show running services
+docker-compose --env-file .env.docker logs -f         # View logs
+docker-compose --env-file .env.docker down            # Stop all services
+docker-compose --env-file .env.docker restart         # Restart services
+docker-compose --env-file .env.docker down -v         # Stop and remove volumes
 ```
 
 **Benefits of Docker Deployment:**

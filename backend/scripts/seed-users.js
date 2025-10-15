@@ -18,7 +18,7 @@ const seedUsers = async () => {
       return;
     }
     
-    // Create admin user - Walid Houssaf
+    // Create admin user
     // Note: Email will be automatically normalized (dots removed for Gmail)
     const adminUser = new User({
       firstName: 'Walid',
@@ -88,7 +88,7 @@ const seedUsers = async () => {
           country: 'Morocco'
         },
         role: 'customer',
-        isVerified: false // This one is not verified yet
+        isVerified: false 
       }
     ];
     

@@ -1,4 +1,5 @@
 import logger from '../utils/logger';
+import { fetchWithRetry, isRateLimitError, getRateLimitMessage } from '../utils/retryHandler';
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -56,10 +57,23 @@ const createApiRequest = async (endpoint, options = {}) => {
   }
 
   try {
-    const response = await fetch(url, config);
+    // Use retry handler for resilient requests
+    const response = await fetchWithRetry(url, config, {
+      maxRetries: 3, // Retry up to 3 times for rate limits and transient errors
+    });
+    
     const data = await response.json();
 
     if (!response.ok) {
+      // Handle rate limiting errors (429)
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        const retryAfterMs = retryAfter ? parseInt(retryAfter) * 1000 : null;
+        const message = getRateLimitMessage(retryAfterMs);
+        logger.warn('Rate limit exceeded:', message);
+        throw new Error(message);
+      }
+      
       // Handle CSRF token errors
       if (response.status === 403 && data.message?.includes('CSRF')) {
         logger.warn('CSRF token invalid, refreshing...');
@@ -95,6 +109,12 @@ const createApiRequest = async (endpoint, options = {}) => {
 
     return data;
   } catch (error) {
+    // Handle rate limit errors with user-friendly message
+    if (isRateLimitError(error)) {
+      logger.warn('Rate limit error caught:', error.message);
+      throw error; // Re-throw with user-friendly message already set
+    }
+    
     // Don't log expected 401 errors (user not logged in)
     if (!error.message?.includes('Access token is required')) {
       logger.error('API Request Error:', error);

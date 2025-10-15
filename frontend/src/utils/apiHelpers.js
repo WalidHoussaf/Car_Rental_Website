@@ -1,6 +1,7 @@
 // API Helper utilities
 
 import logger from './logger';
+import { isRateLimitError } from './retryHandler';
 
 // Handle API errors consistently
 export const handleApiError = (error) => {
@@ -9,6 +10,12 @@ export const handleApiError = (error) => {
   // Network errors
   if (!navigator.onLine) {
     return 'No internet connection. Please check your network.';
+  }
+  
+  // Rate limiting errors (429)
+  if (isRateLimitError(error) || error.message.includes('429') || error.message.toLowerCase().includes('too many requests')) {
+    // Return the error message as-is 
+    return error.message;
   }
   
   // Server errors

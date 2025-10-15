@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import NumberInput from '../Ui/NumberInput';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
-import { locations as allLocations } from '../../assets/assets';
+import { locations as allLocations, categories as fallbackCategories } from '../../assets/assets';
 
 const Field = ({ label, required, children, help, className = '' }) => (
   <div className={`flex flex-col gap-2 ${className}`}>
@@ -68,6 +68,17 @@ const CreateEditCarModal = ({
       label: loc.label?.[language] || String(loc.value || ''),
     }));
   }, [language]);
+
+  // Use API categories if available, otherwise use fallback categories from assets
+  const availableCategories = useMemo(() => {
+    if (categories && categories.length > 0) {
+      return categories;
+    }
+    // Extract category values from fallback categories (excluding 'all')
+    return fallbackCategories
+      .filter(cat => cat.value !== 'all')
+      .map(cat => cat.value);
+  }, [categories]);
 
   const [openDropdown, setOpenDropdown] = useState(null); 
   const categoryRef = useRef(null);
@@ -164,11 +175,17 @@ const CreateEditCarModal = ({
                     {openDropdown === 'category' && (
                       <div className="absolute right-0 mt-2 w-full rounded-lg overflow-hidden border border-gray-800 bg-black backdrop-blur-xl shadow-lg transition-all duration-200 z-50">
                         <div className="py-2 font-['Orbitron']">
-                          {categories.map((c) => (
-                            <button key={c} type="button" onClick={() => handleSelect('category', c)} className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer capitalize">
-                              {c}
-                            </button>
-                          ))}
+                          {availableCategories.length > 0 ? (
+                            availableCategories.map((c) => (
+                              <button key={c} type="button" onClick={() => handleSelect('category', c)} className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer capitalize">
+                                {c}
+                              </button>
+                            ))
+                          ) : (
+                            <div className="px-4 py-2.5 text-gray-400 text-sm">
+                              No categories available
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
