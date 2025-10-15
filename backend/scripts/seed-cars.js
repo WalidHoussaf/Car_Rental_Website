@@ -10,16 +10,6 @@ const seedCars = async () => {
     const mongoUri = process.env.MONGODB_URI;
     if (!mongoUri) {
       console.error('❌ MONGODB_URI is not set in environment variables!');
-      console.log('\n💡 Solutions:');
-      console.log('   1. Create a .env file in the backend directory');
-      console.log('   2. Copy from .env.example: cp .env.example .env');
-      console.log('   3. Update MONGODB_URI with your MongoDB connection string');
-      console.log('\n   Example for local MongoDB:');
-      console.log('   MONGODB_URI=mongodb://localhost:27017/car_rental_db');
-      console.log('\n   Example for MongoDB with auth:');
-      console.log('   MONGODB_URI=mongodb://username:password@localhost:27017/car_rental_db');
-      console.log('\n   Example for MongoDB Atlas:');
-      console.log('   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/car_rental_db');
       process.exit(1);
     }
     

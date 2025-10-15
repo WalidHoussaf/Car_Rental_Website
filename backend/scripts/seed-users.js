@@ -19,12 +19,11 @@ const seedUsers = async () => {
     }
     
     // Create admin user
-    // Note: Email will be automatically normalized (dots removed for Gmail)
     const adminUser = new User({
       firstName: 'Walid',
       lastName: 'Houssaf',
       email: 'walid.houssaf@gmail.com',
-      password: 'Admin123!@#', // Change this password after first login!
+      password: 'Admin123!@#', 
       phone: '+212600000000',
       dateOfBirth: new Date('1990-01-01'),
       address: {
@@ -35,7 +34,7 @@ const seedUsers = async () => {
         country: 'Morocco'
       },
       role: 'admin',
-      isVerified: true, // Admin is pre-verified
+      isVerified: true, 
       profileImage: null
     });
     

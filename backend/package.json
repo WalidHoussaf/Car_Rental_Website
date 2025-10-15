@@ -13,7 +13,6 @@
     "test:models": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=models --setupFilesAfterEnv=./__tests__/setup.js",
     "test:routes": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=routes --setupFilesAfterEnv=./__tests__/setup.js",
     "seed:users": "node scripts/seed-users.js",
-    "reset:users": "node scripts/reset-users.js",
     "seed:cars": "node scripts/seed-cars.js"
   },
   "keywords": [
