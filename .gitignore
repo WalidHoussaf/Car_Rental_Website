@@ -42,3 +42,7 @@ coverage/
 *.tmp
 *.temp
 .cache/
+
+# Documentation (backup system docs)
+docs/BACKUP_STRATEGY.md
+docs/BACKUP_QUICKSTART.md

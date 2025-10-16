@@ -60,6 +60,11 @@ jspm_packages/
 # uploads directory
 uploads/
 
+# backups directory
+backups/
+*.tar.gz
+*.enc
+
 # IDE files
 .vscode/
 .idea/

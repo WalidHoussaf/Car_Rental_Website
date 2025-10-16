@@ -82,6 +82,7 @@
 
 ### <img src="assets/icons/rocket.png" alt="Rocket" width="24" height="24" style="vertical-align:-4px; margin-right:8px" /> **Advanced Functionality**
 - **Automatic Status Management** - Cron-based booking lifecycle automation
+- **Automated Database Backups** - Scheduled backups with retention policies and restoration
 - **Dynamic Pricing** - Flexible pricing with options and extras
 - **Location-based Filtering** - Cars filtered by office availability
 - **Time Slot Validation** - Operating hours and buffer time enforcement
@@ -310,7 +311,67 @@ npm start           # Production server
 - Configure MongoDB Atlas for production
 - Set up JWT secrets and API keys
 - Configure CORS for production domains
-- Set up automated backups
+- Set up automated backups (see [Backup Documentation](docs/BACKUP_STRATEGY.md))
+
+### **📦 Database Backup System**
+
+The application includes a comprehensive automated backup solution:
+
+- **Automated Schedules**: Daily, weekly, and monthly backups
+- **Manual Backups**: Admin API endpoints for on-demand backups
+- **Restoration**: Full database restoration capabilities
+- **Retention Policies**: Automatic cleanup of old backups
+- **Monitoring**: Health checks and statistics
+
+**Configuration:**
+```bash
+# Add to .env file
+BACKUP_ENABLED=true
+BACKUP_DIR=./backups
+BACKUP_RETENTION_DAYS=30
+BACKUP_DAILY_SCHEDULE=0 2 * * *
+```
+
+**API Endpoints (Admin Only):**
+```bash
+# Create manual backup
+POST /api/backups
+
+# List all backups
+GET /api/backups
+
+# Get statistics
+GET /api/backups/stats
+
+# Health check
+GET /api/backups/health
+
+# Verify backup
+GET /api/backups/:name/verify
+
+# Restore from backup
+POST /api/backups/:name/restore
+
+# Delete backup
+DELETE /api/backups/:name
+```
+
+**Example Usage:**
+```bash
+# Create manual backup
+curl -X POST http://localhost:5000/api/backups \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "pre-deployment-backup"}'
+
+# List backups
+curl http://localhost:5000/api/backups \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+
+# Check health
+curl http://localhost:5000/api/backups/health \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+```
 
 ---
 

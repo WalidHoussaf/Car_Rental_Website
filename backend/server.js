@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -14,15 +16,19 @@ import authRoutes from './routes/auth.js';
 import carRoutes from './routes/cars.js';
 import bookingRoutes from './routes/bookings.js';
 import userRoutes from './routes/users.js';
+import backupRoutes from './routes/backups.js';
 
-// Import scheduler
+// Import schedulers
 import BookingScheduler from './utils/scheduler.js';
+import BackupScheduler from './utils/backupScheduler.js';
+import { setBackupScheduler } from './instances/backupScheduler.js';
+
+// Create scheduler instances after env vars are loaded
+const backupScheduler = new BackupScheduler();
+setBackupScheduler(backupScheduler);
 
 // Import logger
 import logger from './utils/logger.js';
-
-// Load environment variables
-dotenv.config();
 
 // Validate required environment variables
 const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET'];
@@ -220,13 +226,23 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static('uploads'));
 
-// Database connection (skip in test environment as tests handle their own connection)
+// Database connection
 if (process.env.NODE_ENV !== 'test') {
   mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/car_rental_db')
-    .then(() => {
+    .then(async () => {
       logger.info('Connected to MongoDB');
+      
       // Initialize booking scheduler after DB connection
       BookingScheduler.init();
+      
+      // Initialize backup scheduler
+      try {
+        await backupScheduler.initialize();
+        logger.info('Backup scheduler initialized');
+      } catch (error) {
+        logger.error('Failed to initialize backup scheduler:', error);
+        // Don't exit - backup is not critical for app to run
+      }
     })
     .catch((error) => {
       logger.error('MongoDB connection error:', { error: error.message });
@@ -239,6 +255,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/backups', backupRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
