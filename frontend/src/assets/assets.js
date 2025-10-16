@@ -95,7 +95,6 @@ import car16_gallery2 from './cars/gallery/car16_gallery2.png'
 import car16_gallery3 from './cars/gallery/car16_gallery3.png'
 import car16_gallery4 from './cars/gallery/car16_gallery4.png'
 
-
 import mohammedia from './destinations/mohammedia.png'
 import marrakesh from './destinations/marrakesh.png'
 import rabat from './destinations/rabat.png'
@@ -855,17 +854,29 @@ export const sampleCars = [
 // Categories for filter
 export const categories = [
   { value: 'all', label: { en: 'All Categories', fr: 'Toutes les Catégories' } },
+  { value: 'economy', label: { en: 'Economy', fr: 'Économique' } },
+  { value: 'compact', label: { en: 'Compact', fr: 'Compacte' } },
+  { value: 'midsize', label: { en: 'Midsize', fr: 'Taille Moyenne' } },
+  { value: 'suv', label: { en: 'SUV', fr: 'SUV' } },
   { value: 'luxury', label: { en: 'Luxury', fr: 'Luxe' } },
   { value: 'sport', label: { en: 'Sport', fr: 'Sport' } },
-  { value: 'suv', label: { en: 'SUV', fr: 'SUV' } }
+  { value: 'van', label: { en: 'Van', fr: 'Fourgonnette' } },
+  { value: 'convertible', label: { en: 'Convertible', fr: 'Cabriolet' } },
+  { value: 'fullsize', label: { en: 'Full-Size', fr: 'Grande Taille' } }
 ];
 
 // Object pour les traductions des catégories
 export const categoryTranslations = {
+  all: { en: 'All Categories', fr: 'Toutes Catégories' },
+  economy: { en: 'Economy', fr: 'Économique' },
+  compact: { en: 'Compact', fr: 'Compacte' },
+  midsize: { en: 'Midsize', fr: 'Taille Moyenne' },
+  suv: { en: 'SUV', fr: 'SUV' },
   luxury: { en: 'Luxury', fr: 'Luxe' },
   sport: { en: 'Sport', fr: 'Sport' },
-  suv: { en: 'SUV', fr: 'SUV' },
-  all: { en: 'All Categories', fr: 'Toutes Catégories' },
+  van: { en: 'Van', fr: 'Fourgonnette' },
+  convertible: { en: 'Convertible', fr: 'Cabriolet' },
+  fullsize: { en: 'Full-Size', fr: 'Grande Taille' },
   'luxury suv': { en: 'Luxury SUV', fr: 'SUV de Luxe' },
   'hybrid sport': { en: 'Hybrid Sport', fr: 'Sport Hybride' },
   electric: { en: 'Electric', fr: 'Électrique' }

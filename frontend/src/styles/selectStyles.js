@@ -108,28 +108,45 @@ export const selectStyles = {
       fontFamily: 'Orbitron, sans-serif',
       maxHeight: '240px',
       overflowY: 'hidden',
+      border: '1px solid rgba(59, 130, 246, 0.3)',
+      borderRadius: '0.375rem',
       zIndex: 9999,
     }),
     menuPortal: (provided) => ({
       ...provided,
       zIndex: 9999,
     }),
-    menulist: (provided) => ({
+    menuList: (provided) => ({
       ...provided,
       maxHeight: '240px',
       overflowY: 'auto',
-      paddingRight: '8px',
+      paddingRight: '4px',
+      '::-webkit-scrollbar': {
+        width: '8px',
+      },
+      '::-webkit-scrollbar-track': {
+        background: 'rgba(0, 0, 0, 0.3)',
+        borderRadius: '4px',
+      },
+      '::-webkit-scrollbar-thumb': {
+        background: 'rgba(59, 130, 246, 0.5)',
+        borderRadius: '4px',
+      },
+      '::-webkit-scrollbar-thumb:hover': {
+        background: 'rgba(59, 130, 246, 0.7)',
+      },
       scrollbarWidth: 'thin',
-      scrollbarColor: 'rgba(255, 255, 255, 0.5) transparent',
+      scrollbarColor: 'rgba(59, 130, 246, 0.5) rgba(0, 0, 0, 0.3)',
     }),
     option: (provided, state) => ({
       ...provided,
       backgroundColor: state.isSelected ? 'rgba(59, 130, 246, 0.3)' : 'black',
       color: 'white',
       fontFamily: 'Orbitron, sans-serif',
-      padding: '4px 8px',
+      padding: '8px 12px',
       fontSize: '0.875rem',
       lineHeight: '1.2',
+      cursor: 'pointer',
       '&:hover': {
         backgroundColor: 'rgba(59, 130, 246, 0.2)',
       }

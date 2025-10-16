@@ -26,21 +26,7 @@ const LocationFilter = ({ filters, handleFilterChange }) => {
         options={localizedLocations}
         value={localizedLocations.find(loc => loc.value === filters.location)}
         onChange={(selectedOption) => handleFilterChange('location', selectedOption.value)}
-        styles={{
-          ...selectStyles,
-          menu: (provided) => ({
-            ...provided,
-            backgroundColor: 'black',
-            fontFamily: 'Orbitron, sans-serif',
-            maxHeight: '240px',
-            overflowY: 'hidden',
-            zIndex: 9999 
-          }),
-          menuPortal: (provided) => ({
-            ...provided,
-            zIndex: 9999
-          })
-        }}
+        styles={selectStyles}
         menuPortalTarget={document.body}
         isSearchable={false}
         theme={(theme) => ({

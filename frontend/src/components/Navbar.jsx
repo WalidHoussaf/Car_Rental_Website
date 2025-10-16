@@ -140,7 +140,7 @@ const Navbar = () => {
                   onClick={() => setIsAccountOpen((v) => !v)}
                   className="group cursor-pointer flex items-center gap-3 pl-2 pr-3 py-1.5 rounded-xl border border-cyan-500/20 bg-gradient-to-r from-black/60 to-black/30 backdrop-blur-sm text-white hover:border-cyan-400/40 transition-all"
                 >
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300 font-['Orbitron'] font-bold">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-cyan-500/20 to-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300 font-['Orbitron'] font-bold">
                     <span className="text-[10px] leading-none">
                       {(
                         user?.firstName?.[0] ||
@@ -174,12 +174,13 @@ const Navbar = () => {
                 <div
                   role="menu"
                   aria-hidden={!isAccountOpen}
-                  className={`absolute right-0 mt-3 w-64 rounded-lg overflow-hidden border border-gray-800 bg-black backdrop-blur-xl shadow-lg/5 transition-all duration-200 ${isAccountOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+                  className={`absolute right-0 mt-3 w-72 rounded-xl overflow-hidden border border-cyan-500/20 bg-black/95 backdrop-blur-xl shadow-2xl shadow-cyan-500/10 transition-all duration-300 ${isAccountOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
                 >
                   {/* Header */}
-                  <div className="px-4 py-3 bg-black border-b border-gray-800">
-                    <p className="text-sm text-gray-400 font-['Rationale']">{t('signedInAs')}</p>
-                    <p className="text-sm font-['Orbitron'] bg-gradient-to-r from-white to-cyan-400 bg-clip-text text-transparent">
+                  <div className="relative px-5 py-4 bg-gradient-to-br from-cyan-950/30 via-black to-black border-b border-cyan-500/20">
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-cyan-500/5"></div>
+                    <p className="text-xs text-cyan-400/70 font-['Rationale'] uppercase tracking-wider mb-1 relative z-10">{t('signedInAs')}</p>
+                    <p className="text-sm font-['Orbitron'] font-semibold bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent relative z-10 truncate">
                       {user?.email || 'admin@example.com'}
                     </p>
                   </div>
@@ -189,13 +190,13 @@ const Navbar = () => {
                       <Link
                         to="/dashboard"
                         onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
-                        className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        className="group flex items-center gap-3 px-5 py-3 text-gray-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-cyan-500/5 hover:text-white transition-all duration-200 cursor-pointer border-l-2 border-transparent hover:border-cyan-400"
                         role="menuitem"
                       >
-                        <span className="text-cyan-300">
+                        <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9z"/></svg>
                         </span>
-                        <span>{t('dashboard')}</span>
+                        <span className="font-['Orbitron'] text-sm">{t('dashboard')}</span>
                       </Link>
                     )}
 
@@ -203,13 +204,13 @@ const Navbar = () => {
                       <Link
                         to="/admin/users"
                         onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
-                        className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        className="group flex items-center gap-3 px-5 py-3 text-gray-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-cyan-500/5 hover:text-white transition-all duration-200 cursor-pointer border-l-2 border-transparent hover:border-cyan-400"
                         role="menuitem"
                       >
-                        <span className="text-cyan-300">
+                        <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V20h14v-3.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V20h6v-3.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                         </span>
-                        <span>{t('manageUsers')}</span>
+                        <span className="font-['Orbitron'] text-sm">{t('manageUsers')}</span>
                       </Link>
                     )}
 
@@ -217,13 +218,13 @@ const Navbar = () => {
                       <Link
                         to="/admin/bookings"
                         onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
-                        className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        className="group flex items-center gap-3 px-5 py-3 text-gray-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-cyan-500/5 hover:text-white transition-all duration-200 cursor-pointer border-l-2 border-transparent hover:border-cyan-400"
                         role="menuitem"
                       >
-                        <span className="text-cyan-300">
+                        <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M5 4h14a1 1 0 011 1v14l-4-3-4 3-4-3-4 3V5a1 1 0 011-1z"/></svg>
                         </span>
-                        <span>{t('bookingManagement')}</span>
+                        <span className="font-['Orbitron'] text-sm">{t('bookingManagement')}</span>
                       </Link>
                     )}
 
@@ -231,10 +232,10 @@ const Navbar = () => {
                       <Link
                         to="/admin/cars"
                         onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
-                        className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                        className="group flex items-center gap-3 px-5 py-3 text-gray-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-cyan-500/5 hover:text-white transition-all duration-200 cursor-pointer border-l-2 border-transparent hover:border-cyan-400"
                         role="menuitem"
                       >
-                        <span className="text-cyan-300">
+                        <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5"
@@ -253,49 +254,49 @@ const Navbar = () => {
                             <circle cx="17" cy="18" r="1.8" />
                           </svg>
                         </span>
-                        <span>Car Management</span>
+                        <span className="font-['Orbitron'] text-sm">Car Management</span>
                       </Link>
                     )}
 
                     <Link
                       to="/my-bookings"
                       onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
-                      className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                      className="group flex items-center gap-3 px-5 py-3 text-gray-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-cyan-500/5 hover:text-white transition-all duration-200 cursor-pointer border-l-2 border-transparent hover:border-cyan-400"
                       role="menuitem"
                     >
-                      <span className="text-cyan-300">
+                      <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M5 4h14a1 1 0 011 1v14l-4-3-4 3-4-3-4 3V5a1 1 0 011-1z"/></svg>
                       </span>
-                      <span>{t('myBookings')}</span>
+                      <span className="font-['Orbitron'] text-sm">{t('myBookings')}</span>
                     </Link>
 
                     <Link
                       to="/profile"
                       onClick={() => { setIsSearchOpen(false); setIsAccountOpen(false); }}
-                      className="flex items-center gap-3 px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
+                      className="group flex items-center gap-3 px-5 py-3 text-gray-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-cyan-500/5 hover:text-white transition-all duration-200 cursor-pointer border-l-2 border-transparent hover:border-cyan-400"
                       role="menuitem"
                     >
-                      <span className="text-cyan-300">
+                      <span className="text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0H5z"/></svg>
                       </span>
-                      <span>{t('profileSettings')}</span>
+                      <span className="font-['Orbitron'] text-sm">{t('profileSettings')}</span>
                     </Link>
 
                     <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
                     <button
                       onClick={() => { logout(); setIsSearchOpen(false); setIsAccountOpen(false); navigate('/'); }}
-                      className="w-full text-left flex items-center gap-3 px-4 py-2.5 text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
+                      className="group w-full text-left flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-gradient-to-r hover:from-red-500/10 hover:to-red-600/10 hover:text-red-300 transition-all duration-200 cursor-pointer border-l-2 border-transparent hover:border-red-400"
                       role="menuitem"
                     >
-                      <span className="text-red-300">
+                      <span className="text-red-400 group-hover:text-red-300 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-5 w-5">
                           <path d="M16 17l5-5-5-5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           <path d="M21 12H9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           <path d="M13 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </span>
-                      <span className="font-['Orbitron']">{t('logout')}</span>
+                      <span className="font-['Orbitron'] text-sm">{t('logout')}</span>
                     </button>
                   </div>
                 </div>
