@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
-import CarContext from '../context/CarContext';
+import { useCars } from '../hooks/useCarQueries';
 import { categoryTranslations, assets } from '../assets/assets'; 
 import Select from 'react-select';
 import HeroSection from '../components/Cars/HeroSection';
@@ -46,13 +46,7 @@ const CarsPage = () => {
     return imagePath;
   };
   
-  const {
-    cars,
-    loading,
-    updateFilters,
-    clearFilters: contextClearFilters
-  } = useContext(CarContext);
-  
+  // State declarations FIRST (before they're used)
   const [searchQuery, setSearchQuery] = useState(searchParam || '');
   const [carAvailability, setCarAvailability] = useState({});
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
@@ -67,6 +61,40 @@ const CarsPage = () => {
   });
   
   const [sortBy, setSortBy] = useState('recommended');
+  
+  // Build filters object for React Query (now localFilters is defined)
+  const buildFilters = useCallback(() => {
+    const filters = {
+      limit: 50, // Backend max limit is 50
+    };
+    
+    if (localFilters.location && localFilters.location !== 'all') {
+      filters.location = localFilters.location;
+    }
+    if (localFilters.category && localFilters.category !== 'all') {
+      filters.category = localFilters.category;
+    }
+    if (localFilters.priceRange && localFilters.priceRange[0] > 0) {
+      filters.minPrice = localFilters.priceRange[0];
+    }
+    if (localFilters.priceRange && localFilters.priceRange[1] < 1000) {
+      filters.maxPrice = localFilters.priceRange[1];
+    }
+    if (searchQuery) {
+      filters.search = searchQuery;
+    }
+    
+    return filters;
+  }, [localFilters, searchQuery]);
+  
+  // Use React Query hook with automatic caching
+  const { data, isLoading: loading } = useCars(buildFilters(), {
+    staleTime: 3 * 60 * 1000, // 3 minutes - cars data is fairly static
+    cacheTime: 10 * 60 * 1000, // 10 minutes cache
+  });
+  
+  // Extract cars from response 
+  const cars = React.useMemo(() => data?.cars || [], [data?.cars]);
   
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -115,16 +143,14 @@ const CarsPage = () => {
   useEffect(() => {
     if (locationParam && locationParam !== 'all') {
       setLocalFilters(prev => ({ ...prev, location: locationParam }));
-      updateFilters({ location: locationParam });
     } else if (locationParam === 'all') {
       setLocalFilters(prev => ({ ...prev, location: 'all' }));
-      updateFilters({ location: 'all' });
     }
     if (categoryParam && categoryParam !== 'all') {
       setLocalFilters(prev => ({ ...prev, category: categoryParam }));
-      updateFilters({ category: categoryParam });
     }
-  }, [locationParam, categoryParam]); // eslint-disable-line react-hooks/exhaustive-deps
+    // React Query will automatically refetch when localFilters changes
+  }, [locationParam, categoryParam]);
 
   useEffect(() => {
     if (cars && cars.length > 0) {
@@ -152,7 +178,7 @@ const CarsPage = () => {
     
     const newFilters = { ...localFilters, [filterType]: value };
     setLocalFilters(newFilters);
-    updateFilters({ [filterType]: value });
+    // React Query will automatically refetch when localFilters changes
     
     if (filterType === 'location' && value !== 'all') {
       navigate(`/cars?location=${value}`, { replace: true });
@@ -180,7 +206,7 @@ const CarsPage = () => {
       priceRange: [0, 1000],
       features: []
     });
-    contextClearFilters();
+    // React Query will automatically refetch when localFilters changes
     navigate('/cars', { replace: true });
   };
   

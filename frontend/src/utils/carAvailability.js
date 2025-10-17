@@ -11,10 +11,11 @@ export const checkCarAvailability = async (carId, bookings = null) => {
   try {
     if (!bookings) {
       const response = await api.bookings.getAll({ limit: 1000 });
-      if (!response.success) {
+      if (!response.success && !response.data) {
         throw new Error('Failed to fetch bookings');
       }
-      bookings = response.data.bookings || [];
+      // Handle different response structures
+      bookings = response.data?.bookings || response.bookings || [];
     }
 
     const carBookings = bookings.filter(booking => 
@@ -104,19 +105,25 @@ export const getMultipleCarAvailability = async (cars, bookings = null) => {
 
     // Otherwise, use the public API endpoint
     const carIds = cars.map(car => car._id);
+    
+    // Return empty map if no cars
+    if (carIds.length === 0) {
+      return {};
+    }
+    
     const response = await api.cars.checkMultipleAvailability(carIds);
     
-    if (!response.success) {
+    if (!response.success && !response.data) {
       throw new Error('Failed to check availability');
     }
 
     // Enhance the response with car details
-    const availabilityMap = response.data.availabilityMap;
+    const availabilityMap = response.data?.availabilityMap || response.availabilityMap || {};
     const enhancedMap = {};
     
     for (const car of cars) {
       enhancedMap[car._id] = {
-        ...(availabilityMap[car._id] || { available: false, reason: 'Unknown' }),
+        ...(availabilityMap[car._id] || { available: true, reason: 'No bookings found' }),
         carName: car.name,
         carModel: `${car.make} ${car.model}`.trim()
       };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { assets, resolveImagePaths } from '../assets/assets';
 import HowItWorks from '../components/Home/HowItWorks';
@@ -6,7 +6,7 @@ import FeaturedCars from '../components/Home/FeaturedCars';
 import PopularDestinations from '../components/Home/PopularDestinations';
 import Testimonials from '../components/Home/Testimonials';
 import NewsletterSection from '../components/Home/NewsletterSection';
-import CarContext from '../context/CarContext';
+import { useFeaturedCars } from '../hooks/useCarQueries';
 
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
@@ -15,7 +15,14 @@ const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { language } = useLanguage();
   const t = useTranslations(language);
-  const { featuredCars } = useContext(CarContext);
+  
+  // Use React Query hook for featured cars with longer cache time
+  const { data: featuredCarsData } = useFeaturedCars({
+    staleTime: 10 * 60 * 1000, // 10 minutes - featured cars rarely change
+    cacheTime: 30 * 60 * 1000, // 30 minutes cache
+  });
+  
+  const featuredCars = featuredCarsData?.cars || [];
   
   const heroMessages = [
     {

@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useRef, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../../config/api';
 import { useNotification } from '../../context/notificationUtils';
 import AuthContext from '../../context/authContext';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
+import { useBookings } from '../../hooks/useBookingQueries';
 import BookingDetailsModal from '../../components/Admin/BookingDetailsModal';
 import logger from '../../utils/logger';
 
@@ -24,13 +26,9 @@ const AdminBookings = () => {
     });
   }, [language]);
 
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
+  const queryClient = useQueryClient();
+  
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
 
   const [status, setStatus] = useState('');
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
@@ -53,6 +51,25 @@ const AdminBookings = () => {
 
   const isAdmin = useMemo(() => currentUser?.role === 'admin', [currentUser]);
 
+  // Build filters for React Query
+  const buildFilters = useMemo(() => {
+    const filters = { page, limit: PAGE_SIZE };
+    if (status) filters.status = status;
+    return filters;
+  }, [page, status]);
+
+  // Use React Query hook with automatic caching
+  const { data, isLoading: loading } = useBookings(buildFilters, {
+    staleTime: 2 * 60 * 1000, // 2 minutes - bookings change frequently
+    cacheTime: 5 * 60 * 1000, // 5 minutes cache
+    enabled: isAuthenticated && isAdmin,
+  });
+
+  // Extract bookings and pagination from response
+  const bookings = useMemo(() => data?.data?.bookings || data?.bookings || [], [data]);
+  const totalPages = useMemo(() => data?.data?.pagination?.totalPages || 1, [data]);
+  const totalItems = useMemo(() => data?.data?.pagination?.totalItems || 0, [data]);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (statusDropdownRef.current && !statusDropdownRef.current.contains(e.target)) {
@@ -70,13 +87,9 @@ const AdminBookings = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!isAuthenticated || !isAdmin) {
-      setError(t('notAuthorized'));
-    }
-  }, [isAuthenticated, isAdmin, t]);
+  // Remove error check - React Query handles errors
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     setStatsLoading(true);
     try {
       const response = await api.bookings.getStats();
@@ -107,7 +120,7 @@ const AdminBookings = () => {
     } finally {
       setStatsLoading(false);
     }
-  };
+  }, []);
 
   const handleViewBooking = (booking) => {
     setSelectedBooking(booking);
@@ -119,15 +132,15 @@ const AdminBookings = () => {
     setIsModalOpen(false);
   };
 
-  const handleUpdateBooking = (updatedBooking) => {
-    setBookings(prev => prev.map(booking => 
-      booking._id === updatedBooking._id ? updatedBooking : booking
-    ));
+  const handleUpdateBooking = async () => {
+    // Invalidate React Query cache to refetch bookings
+    await queryClient.invalidateQueries({ queryKey: ['bookings'] });
     fetchStats();
   };
 
-  const handleDeleteBooking = (bookingId) => {
-    setBookings(prev => prev.filter(booking => booking._id !== bookingId));
+  const handleDeleteBooking = async () => {
+    // Invalidate React Query cache to refetch bookings
+    await queryClient.invalidateQueries({ queryKey: ['bookings'] });
     fetchStats();
   };
 
@@ -159,7 +172,8 @@ const AdminBookings = () => {
     try {
       const response = await api.bookings.bulkDelete(selectedBookings);
       if (response?.success) {
-        setBookings(prev => prev.filter(booking => !selectedBookings.includes(booking._id)));
+        // Invalidate React Query cache to refetch bookings
+        await queryClient.invalidateQueries({ queryKey: ['bookings'] });
         setSelectedBookings([]);
         setShowBulkActions(false);
         setShowBulkDeleteModal(false);
@@ -181,40 +195,13 @@ const AdminBookings = () => {
     setShowBulkActions(false);
   };
 
-  const fetchBookings = async (opts = {}) => {
-    const { page: p = page, status: s = status } = opts;
-    setLoading(true);
-    setError('');
-    try {
-      const res = await api.bookings.getAll({ page: p, limit: PAGE_SIZE, status: s || undefined });
-      if (res?.success) {
-        const list = res.data.bookings || [];
-        const pag = res.data.pagination || {};
-        setBookings(list);
-        setPage(pag.currentPage || 1);
-        setTotalPages(pag.totalPages || 1);
-        setTotalItems(pag.totalItems || 0);
-        setSelectedBookings([]);
-        setShowBulkActions(false);
-      } else {
-        throw new Error(res?.message || t('failedToLoadBookings'));
-      }
-    } catch (error) {
-      const msg = error?.message || t('failedToLoadBookings');
-      setError(msg);
-      showError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // fetchBookings removed - React Query handles fetching automatically
 
   useEffect(() => {
     if (isAuthenticated && isAdmin) {
       fetchStats();
-      fetchBookings({ page: 1 });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, isAdmin]);
+  }, [isAuthenticated, isAdmin, fetchStats]);
 
   const StatusBadge = ({ status }) => {
     const statusConfig = {
@@ -372,37 +359,37 @@ const AdminBookings = () => {
                 >
                   <div className="py-2 font-['Orbitron']">
                     <button
-                      onClick={() => { setStatus(''); setPage(1); fetchBookings({ page: 1, status: '' }); setIsStatusDropdownOpen(false); }}
+                      onClick={() => { setStatus(''); setPage(1); setIsStatusDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {t('allStatuses')}
                     </button>
                     <button
-                      onClick={() => { setStatus('pending'); setPage(1); fetchBookings({ page: 1, status: 'pending' }); setIsStatusDropdownOpen(false); }}
+                      onClick={() => { setStatus('pending'); setPage(1); setIsStatusDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {t('pending')}
                     </button>
                     <button
-                      onClick={() => { setStatus('confirmed'); setPage(1); fetchBookings({ page: 1, status: 'confirmed' }); setIsStatusDropdownOpen(false); }}
+                      onClick={() => { setStatus('confirmed'); setPage(1); setIsStatusDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {t('confirmed')}
                     </button>
                     <button
-                      onClick={() => { setStatus('active'); setPage(1); fetchBookings({ page: 1, status: 'active' }); setIsStatusDropdownOpen(false); }}
+                      onClick={() => { setStatus('active'); setPage(1); setIsStatusDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {t('active')}
                     </button>
                     <button
-                      onClick={() => { setStatus('completed'); setPage(1); fetchBookings({ page: 1, status: 'completed' }); setIsStatusDropdownOpen(false); }}
+                      onClick={() => { setStatus('completed'); setPage(1); setIsStatusDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {t('completed')}
                     </button>
                     <button
-                      onClick={() => { setStatus('cancelled'); setPage(1); fetchBookings({ page: 1, status: 'cancelled' }); setIsStatusDropdownOpen(false); }}
+                      onClick={() => { setStatus('cancelled'); setPage(1); setIsStatusDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {t('cancelled')}
@@ -470,8 +457,6 @@ const AdminBookings = () => {
                 <tbody className="divide-y divide-cyan-900/30">
                   {loading ? (
                     <tr><td className="py-6 text-center text-gray-400" colSpan={8}>{t('loadingGeneric')}</td></tr>
-                  ) : error ? (
-                    <tr><td className="py-6 text-center text-red-300" colSpan={8}>{error}</td></tr>
                   ) : bookings.length === 0 ? (
                     <tr><td className="py-6 text-center text-gray-400" colSpan={8}>{t('noBookingsFound')}</td></tr>
                   ) : (
@@ -545,7 +530,7 @@ const AdminBookings = () => {
               <div className="flex items-center gap-2">
                 <button 
                   disabled={page <= 1 || loading} 
-                  onClick={() => fetchBookings({ page: page - 1 })} 
+                  onClick={() => setPage(page - 1)} 
                   className={`px-4 py-2 rounded-md border font-['Orbitron'] transition-colors flex items-center gap-2 ${page <= 1 || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -558,7 +543,7 @@ const AdminBookings = () => {
                 </div>
                 <button 
                   disabled={page >= totalPages || loading} 
-                  onClick={() => fetchBookings({ page: page + 1 })} 
+                  onClick={() => setPage(page + 1)} 
                   className={`px-4 py-2 rounded-md border font-['Orbitron'] transition-colors flex items-center gap-2 ${page >= totalPages || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
                 >
                   {t('next')}

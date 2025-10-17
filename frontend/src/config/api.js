@@ -315,6 +315,11 @@ export const api = {
       method: 'PATCH',
     }),
     
+    update: (id, userData) => createApiRequest(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    }),
+    
     delete: (id) => createApiRequest(`/users/${id}`, {
       method: 'DELETE',
     }),

@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState, useContext, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../../config/api';
 import { useNotification } from '../../context/notificationUtils';
 import AuthContext from '../../context/authContext';
+import { useUsers } from '../../hooks/useAuthQueries';
 import CreateEditUserModal from '../../components/Admin/CreateEditUserModal';
 import VerifyModal from '../../components/Admin/VerifyModal';
 import RoleChangeModal from '../../components/Admin/RoleChangeModal';
@@ -19,10 +21,8 @@ const AdminUsers = () => {
   const { language } = useLanguage();
   const t = useTranslations(language);
 
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
+  const queryClient = useQueryClient();
+  
   const [modal, setModal] = useState({ type: null, user: null });
   const [processing, setProcessing] = useState(false);
   const [roleChoice, setRoleChoice] = useState('customer');
@@ -41,8 +41,6 @@ const AdminUsers = () => {
   });
 
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
 
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
@@ -51,11 +49,27 @@ const AdminUsers = () => {
 
   const isAdmin = useMemo(() => currentUser?.role === 'admin', [currentUser]);
 
-  useEffect(() => {
-    if (!isAuthenticated || !isAdmin) {
-      setError(t('notAuthorized'));
-    }
-  }, [isAuthenticated, isAdmin, t]);
+  // Build filters for React Query
+  const buildFilters = useMemo(() => {
+    const filters = { page, limit: PAGE_SIZE };
+    if (search) filters.search = search;
+    if (roleFilter) filters.role = roleFilter;
+    return filters;
+  }, [page, search, roleFilter]);
+
+  // Use React Query hook with automatic caching
+  const { data, isLoading: loading } = useUsers(buildFilters, {
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    cacheTime: 5 * 60 * 1000, // 5 minutes cache
+    enabled: isAuthenticated && isAdmin,
+  });
+
+  // Extract users and pagination from response
+  const users = useMemo(() => data?.data?.users || [], [data]);
+  const totalPages = useMemo(() => data?.data?.pagination?.totalPages || 1, [data]);
+  const totalItems = useMemo(() => data?.data?.pagination?.totalItems || 0, [data]);
+
+  // Remove error check - React Query handles errors
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -74,39 +88,10 @@ const AdminUsers = () => {
     };
   }, []);
 
-  const fetchUsers = async (opts = {}) => {
-    const { page: p = page, search: s = search, role: r = roleFilter } = opts;
-    setLoading(true);
-    setError('');
-    try {
-      const res = await api.users.getAll({ page: p, limit: PAGE_SIZE, search: s || undefined, role: r || undefined });
-      if (res?.success) {
-        setUsers(res.data.users || []);
-        setPage(res.data.pagination.currentPage || 1);
-        setTotalPages(res.data.pagination.totalPages || 1);
-        setTotalItems(res.data.pagination.totalItems || 0);
-      } else {
-        throw new Error(res?.message || t('failedToLoadUsers'));
-      }
-    } catch (error) {
-      logger.error('Failed to load users:', error);
-      setError(t('failedToLoadUsers'));
-      showError(t('failedToLoadUsers'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isAuthenticated && isAdmin) {
-      fetchUsers({ page: 1 });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, isAdmin]);
 
   const onSearch = (e) => {
     e.preventDefault();
-    fetchUsers({ page: 1, search });
+    setPage(1); // React Query will auto-refetch when page changes
   };
 
   const onChangeRole = async (id, nextRole) => {
@@ -115,29 +100,25 @@ const AdminUsers = () => {
       return;
     }
     try {
-      setLoading(true);
       await api.users.updateRole(id, nextRole);
       showSuccess(t('roleUpdated'));
-      await fetchUsers();
+      // Invalidate React Query cache to refetch users
+      await queryClient.invalidateQueries({ queryKey: ['users'] });
     } catch (error) {
       logger.error('Failed to update role:', error);
       showError(t('failedToUpdateRole'));
-    } finally {
-      setLoading(false);
     }
   };
 
   const onVerify = async (id) => {
     try {
-      setLoading(true);
       await api.users.verify(id);
       showSuccess(t('userVerified'));
-      await fetchUsers();
+      // Invalidate React Query cache to refetch users
+      await queryClient.invalidateQueries({ queryKey: ['users'] });
     } catch (error) {
       logger.error('Failed to verify user:', error);
       showError(t('failedToVerifyUser'));
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -147,16 +128,17 @@ const AdminUsers = () => {
       return;
     }
     try {
-      setLoading(true);
       await api.users.delete(id);
       showSuccess(t('userDeleted'));
-      const newPage = users.length === 1 && page > 1 ? page - 1 : page;
-      await fetchUsers({ page: newPage });
+      // Adjust page if last item on page was deleted
+      if (users.length === 1 && page > 1) {
+        setPage(page - 1);
+      }
+      // Invalidate React Query cache to refetch users
+      await queryClient.invalidateQueries({ queryKey: ['users'] });
     } catch (error) {
       logger.error('Failed to delete user:', error);
       showError(t('failedToDeleteUser'));
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -283,7 +265,9 @@ const AdminUsers = () => {
         dateOfBirth: '', street: '', city: '', state: '', zipCode: '', country: ''
       });
       setModal({ type: null, user: null });
-      await fetchUsers({ page: 1 });
+      setPage(1);
+      // Invalidate React Query cache to refetch users
+      await queryClient.invalidateQueries({ queryKey: ['users'] });
     } catch (error) {
       logger.error('Failed to create user:', error);
       showError(t('failedToCreateUser'));
@@ -439,19 +423,19 @@ const AdminUsers = () => {
                 >
                   <div className="py-2 font-['Orbitron']">
                     <button
-                      onClick={() => { setRoleFilter(''); setPage(1); fetchUsers({ page: 1, role: '' }); setIsRoleDropdownOpen(false); }}
+                      onClick={() => { setRoleFilter(''); setPage(1); setIsRoleDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {t('allRoles')}
                     </button>
                     <button
-                      onClick={() => { setRoleFilter('customer'); setPage(1); fetchUsers({ page: 1, role: 'customer' }); setIsRoleDropdownOpen(false); }}
+                      onClick={() => { setRoleFilter('customer'); setPage(1); setIsRoleDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {t('customers')}
                     </button>
                     <button
-                      onClick={() => { setRoleFilter('admin'); setPage(1); fetchUsers({ page: 1, role: 'admin' }); setIsRoleDropdownOpen(false); }}
+                      onClick={() => { setRoleFilter('admin'); setPage(1); setIsRoleDropdownOpen(false); }}
                       className="w-full text-left px-4 py-2.5 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {t('admins')}
@@ -483,8 +467,6 @@ const AdminUsers = () => {
                 <tbody className="divide-y divide-cyan-900/30">
                   {loading ? (
                     <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('loadingUsers')}</td></tr>
-                  ) : error ? (
-                    <tr><td className="py-6 text-center text-red-300" colSpan={6}>{t('errorLoadingUsers')}</td></tr>
                   ) : users.length === 0 ? (
                     <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('noUsers')}</td></tr>
                   ) : (
@@ -563,7 +545,7 @@ const AdminUsers = () => {
               <div className="flex items-center gap-2">
                 <button 
                   disabled={page <= 1 || loading} 
-                  onClick={() => fetchUsers({ page: page - 1 })} 
+                  onClick={() => setPage(page - 1)} 
                   className={`px-4 py-2 rounded-md border font-['Orbitron'] transition-colors flex items-center gap-2 ${page <= 1 || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -576,7 +558,7 @@ const AdminUsers = () => {
                 </div>
                 <button 
                   disabled={page >= totalPages || loading} 
-                  onClick={() => fetchUsers({ page: page + 1 })} 
+                  onClick={() => setPage(page + 1)} 
                   className={`px-4 py-2 rounded-md border font-['Orbitron'] transition-colors flex items-center gap-2 ${page >= totalPages || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
                 >
                   {t('next')}

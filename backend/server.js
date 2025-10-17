@@ -132,7 +132,7 @@ if (process.env.NODE_ENV === 'production') {
 if (process.env.NODE_ENV !== 'test') {
   const limiter = rateLimit({
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, 
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 500, // Increased for React Query parallel requests
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
@@ -245,7 +245,9 @@ if (process.env.NODE_ENV !== 'test') {
       }
     })
     .catch((error) => {
-      logger.error('MongoDB connection error:', { error: error.message });
+      logger.error('MongoDB connection error:', error.message);
+      logger.error('Error details:', error);
+      console.error('Full error:', error);
       process.exit(1);
     });
 }

@@ -4,8 +4,8 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
-# Install dependencies for native modules
-RUN apk add --no-cache python3 make g++
+# Install dependencies for native modules and MongoDB Database Tools
+RUN apk add --no-cache python3 make g++ mongodb-tools
 
 # Stage 2: Dependencies
 FROM base AS dependencies

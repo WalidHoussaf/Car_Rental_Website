@@ -1,10 +1,12 @@
 import { createContext, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import api from '../config/api';
 import logger from '../utils/logger';
 
 const BookingContext = createContext();
 
 export const BookingProvider = ({ children }) => {
+  const queryClient = useQueryClient();
   const [bookings, setBookings] = useState([]);
   const [currentBooking, setCurrentBooking] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,9 @@ export const BookingProvider = ({ children }) => {
         const newBooking = response.data.booking;
         setCurrentBooking(newBooking);
         setBookings(prev => [newBooking, ...prev]);
+        
+        // Invalidate React Query cache to refetch bookings
+        await queryClient.invalidateQueries({ queryKey: ['bookings'] });
         
         return { success: true, booking: newBooking };
       } else {
@@ -107,6 +112,9 @@ export const BookingProvider = ({ children }) => {
             refundAmount: response.data.refundAmount 
           });
         }
+        
+        // Invalidate React Query cache to refetch bookings
+        await queryClient.invalidateQueries({ queryKey: ['bookings'] });
         
         return { success: true, refundAmount: response.data.refundAmount };
       } else {

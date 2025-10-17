@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../../config/api';
 import { useNotification } from '../../context/notificationUtils';
 import CreateEditCarModal from '../../components/Admin/CreateEditCarModal';
@@ -11,10 +12,10 @@ import { useTranslations } from '../../translations';
 import { locations as allLocations } from '../../assets/assets';
 import { getCarImage } from '../../utils/imageResolver';
 import { getMultipleCarAvailability } from '../../utils/carAvailability';
+import { useCars } from '../../hooks/useCarQueries';
 import logger from '../../utils/logger';
 
 const PAGE_SIZE = 10;
-
 const defaultForm = {
   name: '',
   make: '',
@@ -53,20 +54,17 @@ const defaultForm = {
 };
 
 const AdminCars = () => {
+  const queryClient = useQueryClient();
   const { showSuccess, showError } = useNotification();
   const { user: currentUser, isAuthenticated, loading: authLoading } = useContext(AuthContext);
   const [uploadingImages, setUploadingImages] = useState(false);
   const { language } = useLanguage();
   const t = useTranslations(language);
 
-  const [cars, setCars] = useState([]);
   const [carAvailability, setCarAvailability] = useState({});
   const [globalAvailabilityStats, setGlobalAvailabilityStats] = useState({ available: 0, unavailable: 0, total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -80,6 +78,36 @@ const AdminCars = () => {
   const [isAvailabilityDropdownOpen, setIsAvailabilityDropdownOpen] = useState(false);
   const availabilityDropdownRef = useRef(null);
 
+  // Check if user is admin
+  const isAdmin = useMemo(() => currentUser?.role === 'admin', [currentUser]);
+
+  // Build filters for React Query
+  const buildFilters = useMemo(() => {
+    const filters = {
+      page,
+      limit: availabilityFilter !== 'all' ? 50 : PAGE_SIZE, // Fetch all if filtering by availability
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    };
+    
+    if (search) filters.search = search;
+    if (category) filters.category = category;
+    if (locationFilter) filters.location = locationFilter;
+    
+    return filters;
+  }, [page, search, category, locationFilter, availabilityFilter]);
+  
+  // Use React Query hook with automatic caching
+  const { data, isLoading: loading } = useCars(buildFilters, {
+    staleTime: 1 * 60 * 1000, // 1 minute - admin data changes frequently
+    cacheTime: 5 * 60 * 1000, // 5 minutes cache
+    enabled: isAuthenticated && isAdmin,
+  });
+  
+  // Extract cars and pagination from response
+  const cars = useMemo(() => data?.data?.cars || data?.cars || [], [data]);
+  const totalPages = useMemo(() => data?.data?.pagination?.totalPages || 1, [data]);
+  
   const localizedLocations = useMemo(() => {
     return (allLocations || []).map(loc => ({
       value: loc.value,
@@ -166,8 +194,6 @@ const AdminCars = () => {
   const [modal, setModal] = useState({ type: null, car: null }); 
   const [form, setForm] = useState(defaultForm);
   const [processing, setProcessing] = useState(false);
-
-  const isAdmin = useMemo(() => currentUser?.role === 'admin', [currentUser]);
 
   const loadCategories = async () => {
     try {
@@ -256,94 +282,22 @@ const AdminCars = () => {
     }
   };
 
-  const fetchCars = async (opts = {}) => {
-    const needsAllCars = availabilityFilter !== 'all';
-    
-    let fetchedCars = [];
-    let paginationInfo = {};
-    
-    if (needsAllCars) {
-      let allCars = [];
-      let totalPages = 1;
-      
-      const baseParams = {
-        search: opts.search ?? search,
-        category: opts.category ?? category,
-        location: opts.location ?? locationFilter,
-        sortBy: 'createdAt',
-        sortOrder: 'desc',
-      };
-      const cleanParams = Object.fromEntries(
-        Object.entries(baseParams).filter(([, v]) => v !== undefined && v !== null && v !== '')
-      );
-      
-      const firstRes = await api.cars.getAll({ ...cleanParams, limit: 50, page: 1 });
-      if (!firstRes?.success) {
-        throw new Error('Failed to fetch cars');
-      }
-      
-      allCars = firstRes.data.cars || [];
-      totalPages = firstRes.data.pagination?.totalPages || 1;
-      
-      for (let page = 2; page <= totalPages; page++) {
-        const res = await api.cars.getAll({ ...cleanParams, limit: 50, page });
-        if (res?.success) {
-          allCars = [...allCars, ...(res.data.cars || [])];
-        }
-      }
-      
-      fetchedCars = allCars;
-      paginationInfo = {
-        currentPage: 1,
-        totalPages: 1, 
-        totalItems: allCars.length
-      };
-      
+  // Load car availability when cars change
+  useEffect(() => {
+    if (cars && cars.length > 0) {
+      getMultipleCarAvailability(cars)
+        .then(availabilityMap => setCarAvailability(availabilityMap))
+        .catch(error => {
+          logger.error('Error loading availability:', error);
+        });
     } else {
-      const raw = {
-        page: opts.page || page,
-        limit: PAGE_SIZE,
-        search: opts.search ?? search,
-        category: opts.category ?? category,
-        location: opts.location ?? locationFilter,
-        sortBy: 'createdAt',
-        sortOrder: 'desc',
-      };
-      const params = Object.fromEntries(
-        Object.entries(raw).filter(([, v]) => v !== undefined && v !== null && v !== '')
-      );
-
-      const res = await api.cars.getAll(params);
-      if (!res?.success) {
-        throw new Error('Failed to fetch cars');
-      }
-      
-      fetchedCars = res.data.cars || [];
-      paginationInfo = res.data.pagination || {};
+      // Clear availability when no cars
+      setCarAvailability({});
     }
-
-    setLoading(true);
-    setError('');
-    try {
-      setCars(fetchedCars);
-      setPage(paginationInfo.currentPage || 1);
-      setTotalPages(paginationInfo.totalPages || 1);
-      
-      const availabilityMap = await getMultipleCarAvailability(fetchedCars);
-      setCarAvailability(availabilityMap);
-      
-    } catch (error) {
-      logger.error('Error in fetchCars:', error);
-      setError(t('adminCarsFailedToLoadCars'));
-      showError(t('adminCarsFailedToLoadCars'));
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [cars]);
 
   useEffect(() => {
     if (isAuthenticated && isAdmin) {
-      fetchCars({ page: 1 });
       loadCategories();
       loadGlobalAvailabilityStats();
     }
@@ -487,8 +441,12 @@ const AdminCars = () => {
         await api.cars.update(modal.car._id, payload);
         showSuccess(t('adminCarsCarUpdated'));
       }
+      
+      // Invalidate React Query cache to refetch cars immediately
+      await queryClient.invalidateQueries({ queryKey: ['cars'] });
+      
       setModal({ type: null, car: null });
-      await fetchCars({ page: 1 });
+      setPage(1);
       loadGlobalAvailabilityStats();
     } catch {
       showError(t('adminCarsOperationFailed'));
@@ -503,8 +461,12 @@ const AdminCars = () => {
     try {
       await api.cars.delete(modal.car._id);
       showSuccess(t('adminCarsCarDeleted'));
+      
+      // Invalidate React Query cache to refetch cars immediately
+      await queryClient.invalidateQueries({ queryKey: ['cars'] });
+      
       const newPage = cars.length === 1 && page > 1 ? page - 1 : page;
-      await fetchCars({ page: newPage });
+      setPage(newPage);
       setModal({ type: null, car: null });
       loadGlobalAvailabilityStats();
     } catch (e) {
@@ -516,14 +478,13 @@ const AdminCars = () => {
 
   const onSearch = (e) => {
     e?.preventDefault?.();
-    fetchCars({ page: 1, search });
+    setPage(1); // React Query will auto-refetch with new search
     loadGlobalAvailabilityStats({ search });
   };
 
   const handleAvailabilityChange = (value) => {
     setAvailabilityFilter(value);
-    setPage(1);
-    fetchCars({ page: 1 });
+    setPage(1); // React Query will auto-refetch
     loadGlobalAvailabilityStats();
   };
 
@@ -626,8 +587,8 @@ const AdminCars = () => {
                                 type="button"
                                 onClick={() => {
                                   setCategory(value);
+                                  setPage(1);
                                   setIsCategoryDropdownOpen(false);
-                                  fetchCars({ page: 1, category: value });
                                   loadGlobalAvailabilityStats({ category: value });
                                 }}
                                 className={`w-full text-left px-3 py-2 text-sm capitalize ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'} cursor-pointer`}
@@ -719,8 +680,8 @@ const AdminCars = () => {
                                 type="button"
                                 onClick={() => {
                                   setLocationFilter(value);
+                                  setPage(1);
                                   setIsLocationDropdownOpen(false);
-                                  fetchCars({ page: 1, location: value });
                                   loadGlobalAvailabilityStats({ location: value });
                                 }}
                                 className={`w-full text-left px-3 py-2 text-sm ${active ? 'bg-cyan-600/20 text-cyan-300' : 'text-gray-200 hover:bg-white/5'} cursor-pointer`}
@@ -734,7 +695,7 @@ const AdminCars = () => {
                     </div>
                   )}
                 </div>
-                <button type="button" onClick={() => { setSearch(''); setCategory(''); setLocationFilter(''); setAvailabilityFilter('all'); fetchCars({ page: 1, search: '', category: '', location: '' }); loadGlobalAvailabilityStats({ search: '', category: '', location: '' }); }} className="px-6 py-2 text-base rounded-md border border-gray-600/40 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer w-full md:w-auto">
+                <button type="button" onClick={() => { setSearch(''); setCategory(''); setLocationFilter(''); setAvailabilityFilter('all'); setPage(1); loadGlobalAvailabilityStats({ search: '', category: '', location: '' }); }} className="px-6 py-2 text-base rounded-md border border-gray-600/40 text-gray-200 hover:bg-white/5 transition-colors cursor-pointer w-full md:w-auto">
                   {t('adminCarsReset')}
                 </button>
               </form>
@@ -755,8 +716,6 @@ const AdminCars = () => {
                   <tbody className="divide-y divide-cyan-900/30">
                     {loading ? (
                       <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('adminCarsLoadingCars')}</td></tr>
-                    ) : error ? (
-                      <tr><td className="py-6 text-center text-red-300" colSpan={6}>{t('adminCarsFailedToLoadCars')}</td></tr>
                     ) : paginatedCars.length === 0 ? (
                       <tr><td className="py-6 text-center text-gray-400" colSpan={6}>{t('adminCarsNoCarsFound')}</td></tr>
                     ) : (
@@ -768,7 +727,7 @@ const AdminCars = () => {
                                 {(() => {
                                   const src = getCarImage(c);
                                   return src ? (
-                                    <img src={src} alt={c.name} className="h-full w-full object-cover" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                                    <img src={src} alt={c.name} className="h-full w-full object-cover" onError={(e) => { e.target.style.display = 'none'; if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'; }} />
                                   ) : (
                                     <div className="text-xs text-gray-500">{t('adminCarsNoImage')}</div>
                                   );
@@ -893,10 +852,7 @@ const AdminCars = () => {
                         disabled={!paginationInfo.hasPrevPage || loading} 
                         onClick={() => {
                           const newPage = page - 1;
-                          setPage(newPage);
-                          if (availabilityFilter === 'all') {
-                            fetchCars({ page: newPage });
-                          }
+                          setPage(newPage); // React Query will auto-refetch
                         }} 
                         className={`px-4 py-2 rounded-md border transition-colors flex items-center gap-2 ${!paginationInfo.hasPrevPage || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
                       >
@@ -910,10 +866,7 @@ const AdminCars = () => {
                         disabled={!paginationInfo.hasNextPage || loading} 
                         onClick={() => {
                           const newPage = page + 1;
-                          setPage(newPage);
-                          if (availabilityFilter === 'all') {
-                            fetchCars({ page: newPage });
-                          }
+                          setPage(newPage); // React Query will auto-refetch
                         }} 
                         className={`px-4 py-2 rounded-md border transition-colors flex items-center gap-2 ${!paginationInfo.hasNextPage || loading ? 'border-cyan-900/30 text-gray-500 cursor-not-allowed' : 'border-cyan-800/30 hover:bg-white/5 cursor-pointer'}`}
                       >

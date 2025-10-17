@@ -1,8 +1,8 @@
-import React, { useEffect, useContext, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTranslations } from '../translations';
-import CarContext from '../context/CarContext';
+import { useCar, useCars } from '../hooks/useCarQueries';
 import { assets, categoryTranslations } from '../assets/assets';
 import HeroSection from '../components/CarsDetails/HeroSection';
 import PerformanceStats from '../components/CarsDetails/PerformanceStats';
@@ -41,7 +41,26 @@ const CarDetailPage = () => {
     return imagePath;
   };
   
-  const { cars } = useContext(CarContext);
+  // Use React Query hook to fetch single car with automatic caching
+  const { data, isLoading: loading } = useCar(id, {
+    staleTime: 5 * 60 * 1000, // 5 minutes - car details don't change often
+    cacheTime: 15 * 60 * 1000, // 15 minutes cache
+  });
+  
+  // Extract car from response
+  const car = data?.data?.car || data?.car;
+  
+  // Fetch related cars (same category) - only when we have the car data
+  const { data: relatedCarsData } = useCars(
+    { category: car?.category },
+    {
+      enabled: !!car?.category, // Only fetch when we have a category
+      staleTime: 5 * 60 * 1000,
+    }
+  );
+  
+  const relatedCars = relatedCarsData?.cars || [];
+  
   const [carAvailability, setCarAvailability] = useState(null);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   
@@ -68,15 +87,6 @@ const CarDetailPage = () => {
     window.scrollTo(0, 0);
     navigate(path);
   };
-  
-  const car = cars.find(car => 
-    car._id === id || 
-    car.id === parseInt(id) || 
-    car._id === parseInt(id) || 
-    car.id === id ||
-    String(car._id) === id ||
-    String(car.id) === id
-  );
 
   useEffect(() => {
     if (car) {
@@ -84,6 +94,19 @@ const CarDetailPage = () => {
     }
   }, [car, loadCarAvailability]);
   
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+          <p className="text-gray-400 font-['Orbitron']">{t('loading') || 'Loading...'}</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Show not found state
   if (!car) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -160,8 +183,8 @@ const CarDetailPage = () => {
           
           {/* Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {cars
-              .filter(relatedCar => relatedCar.category === car.category && (relatedCar._id || relatedCar.id) !== (car._id || car.id))
+            {relatedCars
+              .filter(relatedCar => (relatedCar._id || relatedCar.id) !== (car._id || car.id))
               .slice(0, 3)
               .map((relatedCar, index) => {
                 const processedRelatedCar = relatedCar;

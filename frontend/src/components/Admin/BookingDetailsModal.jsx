@@ -4,6 +4,7 @@ import api from '../../config/api';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 import { calculateInclusiveDays } from '../../utils/dateCalculation';
+import DeleteBookingModal from './DeleteBookingModal';
 
 const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) => {
   const { language } = useLanguage();
@@ -11,6 +12,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const statusDropdownRef = useRef(null);
   const [editStatus, setEditStatus] = useState(booking?.status || '');
 
@@ -97,15 +99,16 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
     }
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm(`${t('bulkDeleteWarning')} ${t('booking').toLowerCase()}? ${t('actionCannotBeUndone')}`)) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+  };
 
+  const handleDeleteConfirm = async () => {
     setLoading(true);
     try {
       await api.bookings.delete(booking._id);
       onDelete(booking._id);
+      setIsDeleteModalOpen(false);
       onClose();
     } catch (error) {
       console.error('Error deleting booking:', error);
@@ -253,7 +256,7 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
                       {t('edit')}
                     </button>
                     <button
-                      onClick={handleDelete}
+                      onClick={handleDeleteClick}
                       className="px-4 py-2 bg-red-600/50 text-white border border-red-500/30 rounded hover:bg-red-700/50 transition-all duration-300 text-sm font-['Orbitron'] font-semibold  cursor-pointer transform hover:scale-105"
                     >
                       {t('deleteBooking')}
@@ -480,6 +483,15 @@ const BookingDetailsModal = ({ booking, isOpen, onClose, onUpdate, onDelete }) =
 
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteBookingModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        booking={booking}
+        loading={loading}
+      />
     </div>
   );
 };

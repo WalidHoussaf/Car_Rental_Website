@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -27,36 +28,61 @@ import VerifyEmail from './pages/VerifyEmail';
 
 function App() {
   return (
-    <>
-      <Navbar />
+    // App-level error boundary - catches all errors in the application
+    <ErrorBoundary level="app" name="AppRoot">
+      {/* Navbar error boundary - prevents navbar errors from crashing the app */}
+      <ErrorBoundary level="component" name="Navbar">
+        <Navbar />
+      </ErrorBoundary>
+
       <main className="min-h-screen pt-16">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/cars" element={<Cars />} />
-          <Route path="/cars/:id" element={<CarDetails />} />
-          <Route path="/booking/:id" element={<Booking />} />
-          <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/bookings" element={<AdminBookings />} />
-          <Route path="/admin/cars" element={<AdminCars />} />
-          <Route path="/my-bookings" element={<MyBookings />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/cookies" element={<Cookies />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {/* Routes error boundary - catches errors in page components */}
+        <ErrorBoundary level="page" name="Routes">
+          <Routes>
+            {/* Public Pages */}
+            <Route path="/" element={<Home />} />
+            <Route path="/cars" element={<Cars />} />
+            <Route path="/cars/:id" element={<CarDetails />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
+            
+            {/* Auth Pages */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            
+            {/* User Pages */}
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/my-bookings" element={<MyBookings />} />
+            
+            {/* Booking Pages */}
+            <Route path="/booking/:id" element={<Booking />} />
+            <Route path="/booking-confirmation" element={<BookingConfirmation />} />
+            
+            {/* Admin Pages */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/bookings" element={<AdminBookings />} />
+            <Route path="/admin/cars" element={<AdminCars />} />
+            
+            {/* Legal Pages */}
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/cookies" element={<Cookies />} />
+            
+            {/* 404 Page */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </main>
-      <Footer />
-    </>
+
+      {/* Footer error boundary - prevents footer errors from crashing the app */}
+      <ErrorBoundary level="component" name="Footer">
+        <Footer />
+      </ErrorBoundary>
+    </ErrorBoundary>
   );
 }
 
