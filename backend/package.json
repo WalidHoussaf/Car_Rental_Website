@@ -5,7 +5,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node server.js",
+    "start": "node server.js",
     "dev": "cross-env NODE_ENV=development nodemon server.js",
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --setupFilesAfterEnv=./__tests__/setup.js",
     "test:watch": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --setupFilesAfterEnv=./__tests__/setup.js",
@@ -41,6 +41,7 @@
     "nodemailer": "^7.0.9",
     "pino": "^10.0.0",
     "pino-pretty": "^13.1.2",
+    "sharp": "^0.34.4",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {

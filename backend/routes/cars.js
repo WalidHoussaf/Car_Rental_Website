@@ -6,6 +6,7 @@ import Car from '../models/Car.js';
 import Booking from '../models/Booking.js';
 import { authenticateToken, requireAdmin, optionalAuth } from '../middleware/auth.js';
 import { validateCar, validateCarUpdate, validateCarSearch, validateObjectId, handleValidationErrors } from '../middleware/validation.js';
+import { optimizeImage, deleteOptimizedImages } from '../services/imageOptimizationService.js';
 
 const router = express.Router();
 
@@ -36,17 +37,70 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024, files: 10 } });
 
 // Upload car images (Admin only)
-router.post('/upload', authenticateToken, requireAdmin, upload.array('images', 10), (req, res) => {
+router.post('/upload', authenticateToken, requireAdmin, upload.array('images', 10), async (req, res) => {
   try {
     const files = req.files || [];
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const urls = files.map(f => ({
-      filename: f.filename,
-      url: `${baseUrl}/uploads/${f.filename}`,
-      mimetype: f.mimetype,
-      size: f.size,
-    }));
-    return res.status(201).json({ success: true, data: { files: urls } });
+    const optimizedFiles = [];
+
+    // Process each uploaded image
+    for (const file of files) {
+      try {
+        const filename = path.parse(file.filename).name;
+        const inputPath = file.path;
+        const outputDir = uploadsDir;
+
+        // Optimize image and generate multiple sizes
+        const optimizedVersions = await optimizeImage(inputPath, outputDir, filename);
+
+        // Delete original unoptimized file
+        fs.unlinkSync(inputPath);
+
+        // Build response with all versions
+        optimizedFiles.push({
+          filename: filename,
+          original: file.originalname,
+          sizes: {
+            thumbnail: {
+              webp: `${baseUrl}/uploads/${path.basename(optimizedVersions.thumbnail.webp)}`,
+              jpeg: `${baseUrl}/uploads/${path.basename(optimizedVersions.thumbnail.jpeg)}`
+            },
+            medium: {
+              webp: `${baseUrl}/uploads/${path.basename(optimizedVersions.medium.webp)}`,
+              jpeg: `${baseUrl}/uploads/${path.basename(optimizedVersions.medium.jpeg)}`
+            },
+            large: {
+              webp: `${baseUrl}/uploads/${path.basename(optimizedVersions.large.webp)}`,
+              jpeg: `${baseUrl}/uploads/${path.basename(optimizedVersions.large.jpeg)}`
+            },
+            full: {
+              webp: `${baseUrl}/uploads/${path.basename(optimizedVersions.full.webp)}`,
+              jpeg: `${baseUrl}/uploads/${path.basename(optimizedVersions.full.jpeg)}`
+            }
+          },
+          // Default URL for backward compatibility (use medium size)
+          url: `${baseUrl}/uploads/${path.basename(optimizedVersions.medium.jpeg)}`,
+          mimetype: file.mimetype,
+          originalSize: file.size
+        });
+      } catch (error) {
+        console.error(`Failed to optimize ${file.filename}:`, error);
+        // If optimization fails, keep the original
+        optimizedFiles.push({
+          filename: file.filename,
+          url: `${baseUrl}/uploads/${file.filename}`,
+          mimetype: file.mimetype,
+          size: file.size,
+          optimizationFailed: true
+        });
+      }
+    }
+
+    return res.status(201).json({ 
+      success: true, 
+      data: { files: optimizedFiles },
+      message: `${optimizedFiles.length} image(s) uploaded and optimized`
+    });
   } catch (e) {
     return res.status(500).json({ success: false, message: 'Upload failed', error: e.message });
   }

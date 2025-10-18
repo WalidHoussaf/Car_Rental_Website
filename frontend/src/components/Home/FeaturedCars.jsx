@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
 import { assets } from '../../assets/assets';
+import LazyImage from '../LazyImage';
 
 const FeaturedCars = ({ featuredCars }) => {
   const { language } = useLanguage();
@@ -101,9 +102,10 @@ const FeaturedCars = ({ featuredCars }) => {
               {/* Car Image Container */}
                 <div className="relative h-56 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
-                <img
+                <LazyImage
                   src={resolveImagePath(car.image)}
                   alt={car.name}
+                  sizes="thumbnail"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 

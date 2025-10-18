@@ -4,13 +4,22 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
-# Install dependencies for native modules and MongoDB Database Tools
-RUN apk add --no-cache python3 make g++ mongodb-tools
+# Install dependencies for native modules, Sharp, and MongoDB Database Tools
+# Sharp requires: vips-dev, build-base, python3
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    vips-dev \
+    fftw-dev \
+    build-base \
+    mongodb-tools
 
 # Stage 2: Dependencies
 FROM base AS dependencies
 COPY package*.json ./
 RUN npm ci --only=production && \
+    npm rebuild sharp && \
     npm cache clean --force
 
 # Stage 3: Development dependencies

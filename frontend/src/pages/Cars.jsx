@@ -8,6 +8,7 @@ import Select from 'react-select';
 import HeroSection from '../components/Cars/HeroSection';
 import CallToAction from '../components/Cars/CallToAction';
 import FiltersSidebar from '../components/Cars/Filters/FiltersSidebar';
+import LazyImage from '../components/LazyImage';
 import { selectStyles } from '../styles/selectStyles';
 import { getMultipleCarAvailability } from '../utils/carAvailability';
 import logger from '../utils/logger';
@@ -455,9 +456,10 @@ const CarsPage = () => {
                     >
                       {/* Card Header */}
                       <div className="relative h-48 overflow-hidden">
-                        <img
+                        <LazyImage
                           src={resolveImagePath(car.image)}
                           alt={car.name}
+                          sizes="thumbnail"
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>

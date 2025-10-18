@@ -13,6 +13,7 @@ import { locations as allLocations } from '../../assets/assets';
 import { getCarImage } from '../../utils/imageResolver';
 import { getMultipleCarAvailability } from '../../utils/carAvailability';
 import { useCars } from '../../hooks/useCarQueries';
+import LazyImage from '../../components/LazyImage';
 import logger from '../../utils/logger';
 
 const PAGE_SIZE = 10;
@@ -727,7 +728,7 @@ const AdminCars = () => {
                                 {(() => {
                                   const src = getCarImage(c);
                                   return src ? (
-                                    <img src={src} alt={c.name} className="h-full w-full object-cover" onError={(e) => { e.target.style.display = 'none'; if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'; }} />
+                                    <LazyImage src={src} alt={c.name} sizes="thumbnail" className="h-full w-full object-cover" onError={(e) => { e.target.style.display = 'none'; if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'; }} />
                                   ) : (
                                     <div className="text-xs text-gray-500">{t('adminCarsNoImage')}</div>
                                   );

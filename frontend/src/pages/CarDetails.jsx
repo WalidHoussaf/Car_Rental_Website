@@ -8,6 +8,7 @@ import HeroSection from '../components/CarsDetails/HeroSection';
 import PerformanceStats from '../components/CarsDetails/PerformanceStats';
 import AvailabilitySection from '../components/CarsDetails/AvailabilitySection';
 import DetailsTabSection from '../components/CarsDetails/DetailsTabSection';
+import LazyImage from '../components/LazyImage';
 import { checkCarAvailability } from '../utils/carAvailability';
 import logger from '../utils/logger';
 
@@ -201,9 +202,10 @@ const CarDetailPage = () => {
                     <div className="relative h-full bg-black/80 backdrop-blur-xl border border-gray-800/50 rounded-xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-cyan-500/20 transform group-hover:-translate-y-2 flex flex-col">
                       {/* Card Header */}
                       <div className="relative h-56 overflow-hidden flex-shrink-0">
-                        <img
+                        <LazyImage
                           src={resolveImagePath(processedRelatedCar.image)}
                           alt={processedRelatedCar.name}
+                          sizes="thumbnail"
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>

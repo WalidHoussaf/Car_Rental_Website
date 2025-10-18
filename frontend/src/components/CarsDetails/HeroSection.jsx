@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { assets, categoryTranslations } from '../../assets/assets';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
+import LazyImage from '../LazyImage';
 
 const resolvePath = (path) => {
   if (!path || typeof path !== 'string') return null;
@@ -46,27 +47,20 @@ const HeroSection = ({ car, availability, availabilityLoading }) => {
       {/* Main Image */}
       <div className="h-[60vh] overflow-hidden relative">
         <div className="absolute inset-0 transform scale-105 transition-transform duration-15000 hover:scale-100">
-          {car.image && car.image.includes('cars.') ? (
-            <img 
-              src={resolvePath(car.image)} 
-              alt={car.name} 
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = `https://via.placeholder.com/1200/800/0f172a/22d3ee?text=${encodeURIComponent(car.name)}`;
-              }}
-            />
-          ) : (
-            <img 
-              src={car.image || "/api/placeholder/1200/800"} 
-              alt={car.name} 
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = `https://via.placeholder.com/1200/800/0f172a/22d3ee?text=${encodeURIComponent(car.name)}`;
-              }}
-            />
-          )}
+          <LazyImage
+            src={car.image && car.image.includes('cars.') ? resolvePath(car.image) : (car.image || "/api/placeholder/1200/800")}
+            alt={car.name}
+            sizes="large"
+            className="w-full h-full object-cover"
+            style={{
+              filter: 'brightness(0.7)',
+              objectPosition: 'center'
+            }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `https://via.placeholder.com/1200/800/0f172a/22d3ee?text=${encodeURIComponent(car.name)}`;
+            }}
+          />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40"></div>
         
