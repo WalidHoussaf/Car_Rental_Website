@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTranslations } from '../../translations';
+import ElectricBorder from '../ElectricBorder';
 
 const Testimonials = ({ testimonials }) => {
   const { language } = useLanguage();
@@ -41,9 +42,16 @@ const Testimonials = ({ testimonials }) => {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               {/* Card Container */}
-              <div className="relative bg-gradient-to-br to-black rounded-xl border border-cyan-500 backdrop-blur-sm transform transition-all duration-300 hover:border-cyan-600 hover:shadow-[0_0_25px_rgba(6,182,212,0.3)] overflow-hidden">
-                
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 via-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <ElectricBorder
+                color="#06b6d4"
+                speed={1}
+                chaos={0.5}
+                thickness={2}
+                style={{ borderRadius: '0.75rem' }}
+              >
+                <div className="relative bg-gradient-to-br to-black rounded-xl backdrop-blur-sm transform transition-all duration-300 overflow-hidden">
+                  
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 via-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <div className="relative p-6">
                   {/* Quote */}
@@ -88,6 +96,7 @@ const Testimonials = ({ testimonials }) => {
                   </div>
                 </div>
               </div>
+              </ElectricBorder>
             </div>
           ))}
         </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
+import FuzzyText from '../components/FuzzyText';
 
 const NotFound = () => {
   const { language } = useLanguage();
@@ -20,15 +21,34 @@ const NotFound = () => {
       
       <div className="relative z-10 text-center max-w-3xl mx-auto">
         {/* 404 Number */}
-        <div className="relative mb-4">
-          <h1 className="text-9xl font-bold font-['Orbitron'] text-transparent bg-clip-text bg-gradient-to-b from-white via-cyan-400 to-transparent">404</h1>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-12 bg-cyan-500/10 blur-2xl"></div>
+        <div className="relative mb-8 flex justify-center items-center w-full">
+          <FuzzyText 
+            fontSize={120}
+            fontWeight={900}
+            fontFamily="Orbitron"
+            color="#ffffff"
+            enableHover={true}
+            baseIntensity={0.6}
+            hoverIntensity={0.9}
+          >
+            404
+          </FuzzyText>
         </div>
         
-        {/* Message */}
-        <h2 className="text-2xl md:text-3xl font-bold mb-6 font-['Orbitron']">
-          {language === 'fr' ? 'Page non trouvée' : 'Page Not Found'}
-        </h2>
+        {/* Message with Fuzzy Animation */}
+        <div className="mb-6 flex justify-center items-center w-full">
+          <FuzzyText 
+            fontSize={36}
+            fontWeight={700}
+            fontFamily="Orbitron"
+            color="#ffffff"
+            enableHover={true}
+            baseIntensity={0.6}
+            hoverIntensity={0.9}
+          >
+            {language === 'fr' ? 'NOT FOUND' : 'NOT FOUND'}
+          </FuzzyText>
+        </div>
         
         <p className="text-gray-400 mb-8 max-w-lg mx-auto font-['Orbitron']">
           {language === 'fr' 

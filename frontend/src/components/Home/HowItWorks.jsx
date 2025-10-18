@@ -43,7 +43,7 @@ const HowItWorks = () => {
               </div>
 
               {/* Content Card */}
-              <div className="p-6 rounded-lg bg-black/80 border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-blue-500/50 w-full h-full flex flex-col items-center group-hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+              <div className="p-6 rounded-lg bg-black/80 border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-cyan-500/50 w-full h-full flex flex-col items-center group-hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]">
                 <h3 className="text-2xl font-semibold mb-4 font-['Orbitron'] text-cyan-400 group-hover:text-cyan-400 transition-colors duration-300">{t('search')}</h3>
                 <p className="text-gray-300 font-['Orbitron'] text-4xs">{t('searchDescription')}</p>
 
@@ -86,7 +86,7 @@ const HowItWorks = () => {
               </div>
 
               {/* Content Card */}
-              <div className="p-6 rounded-lg bg-black/80 border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-blue-500/50 w-full h-full flex flex-col items-center group-hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+              <div className="p-6 rounded-lg bg-black/80 border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-cyan-500/50 w-full h-full flex flex-col items-center group-hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]">
                 <h3 className="text-2xl font-semibold mb-4 font-['Orbitron'] text-cyan-400 group-hover:text-cyan-400 transition-colors duration-300">{t('book')}</h3>
                 <p className="text-gray-300 font-['Orbitron'] text-4xs">{t('bookDescription')}</p>
 
@@ -138,7 +138,7 @@ const HowItWorks = () => {
               </div>
 
               {/* Content Card */}
-              <div className="p-6 rounded-lg bg-black/80 border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-blue-500/50 w-full h-full flex flex-col items-center group-hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+              <div className="p-6 rounded-lg bg-black/80 border border-gray-800 transform transition-all duration-500 hover:scale-105 hover:border-cyan-500/50 w-full h-full flex flex-col items-center group-hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]">
                 <h3 className="text-2xl font-semibold mb-4 font-['Orbitron'] text-cyan-400 group-hover:text-cyan-400 transition-colors duration-300">{t('enjoy')}</h3>
                 <p className="text-gray-300 font-['Orbitron'] text-4xs">{t('enjoyDescription')}</p>
 
